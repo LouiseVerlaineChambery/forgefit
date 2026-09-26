@@ -127,6 +127,12 @@
   function completeRepriseIfNeeded(){
     if(!state.reprise?.enabled) return false;
     if(repriseSessions().length<REPRISE_TOTAL) return false;
+    if(state.reprise.kneeSensitive!==false){
+      state.reprise.awaitingKneeReady=true;
+      saveState();
+      return false;
+    }
+    state.reprise.awaitingKneeReady=false;
     state.reprise.enabled=false;
     state.reprise.completed=true;
     state.reprise.completedAt=new Date().toISOString();
@@ -298,7 +304,9 @@
         <div class="eyebrow">MODE REPRISE</div>
         <div class="row"><h3 style="margin-top:6px">2 semaines / 6 séances</h3><span class="pill">${done}/${REPRISE_TOTAL}</span></div>
         <p class="muted small">Haut du corps inchangé. Bas du corps temporairement en poids du corps / très léger, volume augmenté et 45 s de repos.</p>
-        <button class="danger full" id="ff-cancel-reprise">Quitter le mode reprise</button>`;
+        <div class="notice small" style="margin-bottom:10px"><b>Protection genou : ${state.reprise.kneeSensitive!==false?"active":"désactivée"}</b><br>Après les 6 séances, Denat Life ne réactive pas automatiquement le Hack squat / Leg extension tant que cette protection reste active.</div>
+        <button class="secondary full" id="ff-knee-ready">${state.reprise.kneeSensitive!==false?"Mon genou est OK · autoriser la progression jambes":"Réactiver la protection genou"}</button>
+        <button class="danger full" id="ff-cancel-reprise" style="margin-top:8px">Quitter le mode reprise</button>`;
     }else{
       section.innerHTML=`
         <div class="eyebrow">MODE REPRISE</div>
@@ -310,7 +318,13 @@
     const first=view.querySelector(".card");
     if(first) first.insertAdjacentElement("afterend",section); else view.prepend(section);
 
-    section.querySelector("#ff-enable-reprise")?.addEventListener("click",()=>{
+    section.querySelector("#ff-knee-ready")?.addEventListener("click",()=>{
+      state.reprise.kneeSensitive=state.reprise.kneeSensitive===false?true:false;
+      saveState();
+      if(state.reprise.kneeSensitive===false&&repriseSessions().length>=REPRISE_TOTAL)completeRepriseIfNeeded();
+      render();
+    });
+        section.querySelector("#ff-enable-reprise")?.addEventListener("click",()=>{
       if(confirm("Remplacer temporairement ton programme par les 6 séances de reprise ?")){
         activateReprise(false); render();
       }
