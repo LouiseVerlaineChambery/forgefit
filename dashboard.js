@@ -60,6 +60,8 @@
     const last=lastSession();
     const repriseDone=state.sessions.filter(s=>String(s.workoutName||"").startsWith("Reprise ")).length;
     const sportPhase=state.reprise?.enabled?`Reprise · ${Math.min(repriseDone,6)}/6`:state.reprise?.completed?"Programme esthétique":"Programme actif";
+    const recovery=window.DenatHealth?.recovery?.()||{fresh:false,connected:false,score:null,label:"En attente Apple Santé",reasons:[]};
+    const health=recovery.data||{};
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
@@ -67,6 +69,11 @@
         <div class="hero-title" style="margin-top:18px">Bonjour 👋</div>
         <div class="dl-date">${fmtDay()}</div>
         <p class="muted" style="margin-bottom:0">Votre journée, en un coup d’œil.</p>
+      </section>
+
+      <section class="card">
+        <div class="row"><div><div class="eyebrow">FORME DU JOUR</div><h3 style="margin:6px 0">${escDash(recovery.label)}</h3></div><span class="pill">${recovery.fresh?`${recovery.score}/100`:"Coach RPE"}</span></div>
+        ${recovery.fresh?`<div class="dl-grid" style="margin-top:10px"><div class="dl-tile"><div class="dl-label">SOMMEIL</div><div class="dl-big">${health.sleepHours!=null?health.sleepHours.toFixed(1).replace(".",",")+" h":"—"}</div></div><div class="dl-tile"><div class="dl-label">PAS</div><div class="dl-big">${health.steps!=null?Math.round(health.steps).toLocaleString("fr-FR"):"—"}</div></div></div><p class="muted small" style="margin:10px 0 0">${escDash(recovery.reasons.slice(0,2).join(" · ")||"Données Apple Santé reçues.")}</p>`:`<p class="muted small" style="margin-bottom:0">Le coach fonctionne déjà avec tes séances et ton RPE. Dès que le raccourci Apple Santé envoie ses données, sommeil et récupération enrichiront automatiquement les conseils.</p>`}
       </section>
 
       <section class="card">
