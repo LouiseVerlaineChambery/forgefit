@@ -50,7 +50,7 @@
     if(r==null)return l;if(l==null)return r;if(r===l)return r;
     if(k==="forgefit_v2_state"||/^denat_profile_(jocelyn|anais)_sport_v1$/.test(k))return mergeForge(r,l);
     if(k==="denat_meal_favorites_v1"||k==="denat_meal_dislikes_v1")return JSON.stringify(unionArray(parse(r,[]),parse(l,[])));
-    if(k==="denat_meal_overrides_v1")return JSON.stringify({...parse(r,{}),...parse(l,{})});
+    if(k==="denat_meal_overrides_v1"||k==="denat_meal_rotation_v1")return JSON.stringify({...parse(r,{}),...parse(l,{})});
     if(/^denat_profile_(jocelyn|anais)_food_journal_v1$/.test(k)){
       const a=parse(r,[]),b=parse(l,[]),m=new Map();
       [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(v=>m.set(String(v?.id||v?.at||"")+"|"+String(v?.text||""),v));
