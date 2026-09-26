@@ -1,7 +1,8 @@
 // Denat Life Cloud — le serveur est la source de vérité, localStorage sert de cache hors ligne.
 (function(){
   const API="https://lv-social-publisher.jocelyn-denat.workers.dev/denat-life/state";
-  const AUTH="denat_life_cloud_auth_v1";\n  const MIGRATED_PREFIX="denat_life_cloud_migrated_";
+  const AUTH="denat_life_cloud_auth_v1";
+  const MIGRATED_PREFIX="denat_life_cloud_migrated_";
   const TIMEOUT=3000;
   let revision=0,status="initialisation",suppress=false,timer=null;
   const dirty=new Set();
