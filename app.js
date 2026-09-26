@@ -413,10 +413,10 @@ function renderSettings(){
       </div>
     </section>
     <section class="card">
-      <div class="eyebrow">APPLE SANTÉ & IA</div>
-      <h3 style="margin-top:6px">Préparé pour plus tard</h3>
-      <p class="muted">Cette PWA ne peut pas accéder directement à HealthKit. L’architecture de données peut néanmoins être réutilisée dans une future version native.</p>
-      <div class="notice">Pour une vraie IA connectée, je recommande un petit backend afin de ne jamais stocker une clé API secrète dans l’iPhone.</div>
+      <div class="eyebrow">APPLE SANTÉ</div>
+      <h3 style="margin-top:6px">Connexion future</h3>
+      <p class="muted">Apple Santé nécessite une application iPhone native pour accéder directement aux données HealthKit. Denat Life Web reste utilisable normalement sans cette connexion.</p>
+      <div class="notice"><b>Coach intelligent actif</b><br><span class="small">Le coach adapte déjà tes séances à partir de ton historique, de tes répétitions et de ton RPE. Une connexion Apple Santé pourra ensuite enrichir ces données.</span></div>
     </section>`;
   document.querySelector("#save-settings").addEventListener("click",()=>{
     state.settings.upperIncrement=+document.querySelector("#upper-inc").value.replace(",",".")||2.5;
