@@ -13,10 +13,10 @@
         id:crypto.randomUUID(),
         name:"Reprise A — Full Body",
         exercises:[
-          ex("Presse à cuisses",2,10,120,"lower"),
+          ex("Pont fessier au poids du corps",4,15,45,"lower",{lightLower:true}),
           ex("Développé couché haltères",2,8,120,"upper"),
           ex("Tirage vertical",2,10,90,"upper"),
-          ex("Leg curl",2,10,90,"lower"),
+          ex("Abduction de hanches légère",4,15,45,"lower",{lightLower:true}),
           ex("Élévations latérales",2,12,60,"upper"),
           ex("Crunch",3,12,60,"upper",{core:true})
         ]
@@ -25,10 +25,10 @@
         id:crypto.randomUUID(),
         name:"Reprise B — Full Body",
         exercises:[
-          ex("Goblet squat",2,10,120,"lower"),
+          ex("Hip hinge au poids du corps",4,15,45,"lower",{lightLower:true}),
           ex("Rowing poulie basse",2,10,90,"upper"),
           ex("Développé incliné haltères",2,8,120,"upper"),
-          ex("Leg extension",2,12,75,"lower"),
+          ex("Mollets au poids du corps",4,15,45,"lower",{lightLower:true}),
           ex("Curl biceps",2,10,75,"upper"),
           ex("Extension triceps poulie",2,10,75,"upper")
         ]
@@ -37,11 +37,11 @@
         id:crypto.randomUUID(),
         name:"Reprise C — Full Body",
         exercises:[
-          ex("Presse à cuisses",2,10,120,"lower"),
+          ex("Hip thrust au poids du corps",4,15,45,"lower",{lightLower:true}),
           ex("Tractions assistées",2,8,120,"upper"),
           ex("Développé machine",2,10,90,"upper"),
           ex("Rowing machine",2,10,90,"upper"),
-          ex("Mollets",2,12,60,"lower"),
+          ex("Abduction de hanches légère",4,15,45,"lower",{lightLower:true}),
           ex("Relevés de jambes",3,10,60,"upper",{core:true})
         ]
       }
@@ -102,6 +102,25 @@
     state.reprise.totalSessions=REPRISE_TOTAL;
     state.reprise.autoActivated=auto;
     state.program=makeRepriseProgram();
+    saveState();
+  }
+
+  function applyLightLowerReprise(){
+    if(!state.reprise?.enabled||state.reprise.lowerBodyLightV1)return;
+    const fresh=makeRepriseProgram();
+    state.program=(state.program||[]).map((workout,wi)=>{
+      const template=fresh[wi];
+      if(!template)return workout;
+      let li=0;
+      const lowers=template.exercises.filter(x=>x.category==="lower");
+      workout.exercises=(workout.exercises||[]).map(old=>{
+        if(old.category!=="lower")return old;
+        const next=lowers[li++]||old;
+        return {...next,id:old.id||next.id};
+      });
+      return workout;
+    });
+    state.reprise.lowerBodyLightV1=true;
     saveState();
   }
 
@@ -226,7 +245,7 @@
       const week=done<3?1:2;
       card.innerHTML=`
         <div class="row"><div><div class="eyebrow">MODE REPRISE</div><h3 style="margin-top:6px">Semaine ${week} sur 2</h3></div><span class="pill">${done}/${REPRISE_TOTAL}</span></div>
-        <p class="muted small">3 séances par semaine · 45–55 min · RPE 6–7. Les abdos sont déjà placés automatiquement 2 fois par rotation.</p>
+        <p class="muted small">3 séances par semaine · haut du corps inchangé. Bas du corps : poids du corps / très léger, 4 séries et 45 s de repos. Les abdos restent intégrés.</p>
         <div class="notice">Objectif : retrouver les mouvements et la tolérance à l'effort, pas battre tes anciennes charges.</div>`;
     }else if(state.reprise?.completed){
       card.innerHTML=`
@@ -259,7 +278,7 @@
       section.innerHTML=`
         <div class="eyebrow">MODE REPRISE</div>
         <div class="row"><h3 style="margin-top:6px">2 semaines / 6 séances</h3><span class="pill">${done}/${REPRISE_TOTAL}</span></div>
-        <p class="muted small">Programme Full Body volontairement léger. RPE cible 6–7. Abdos intégrés aux séances A et C.</p>
+        <p class="muted small">Haut du corps inchangé. Bas du corps temporairement en poids du corps / très léger, volume augmenté et 45 s de repos.</p>
         <button class="danger full" id="ff-cancel-reprise">Quitter le mode reprise</button>`;
     }else{
       section.innerHTML=`
