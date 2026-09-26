@@ -63,10 +63,10 @@
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
-        <div class="eyebrow">DENAT LIFE</div>
-        <div class="hero-title">Bonjour 👋</div>
+        <div class="dl-brand-hero"><img src="brand-logo-v5.svg" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">SPORT · NUTRITION · ÉQUILIBRE</div></div></div>
+        <div class="hero-title" style="margin-top:18px">Bonjour 👋</div>
         <div class="dl-date">${fmtDay()}</div>
-        <p class="muted" style="margin-bottom:0">Votre semaine, en un coup d’œil.</p>
+        <p class="muted" style="margin-bottom:0">Votre journée, en un coup d’œil.</p>
       </section>
 
       <section class="card">
@@ -105,12 +105,6 @@
         <div class="row"><div><div class="eyebrow">COURSES DE LA SEMAINE</div><h3 style="margin:6px 0">${remaining} / ${total} à acheter</h3></div><span class="pill">${meals?.weeklyEstimateEUR?`≈ ${Math.round(meals.weeklyEstimateEUR)} €`:"Budget —"}</span></div>
         <p class="muted small">Liste consolidée à partir des repas de la semaine.</p>
         <button class="secondary full" id="dash-shop-list">Ouvrir la liste de courses</button>
-      </section>
-
-      <section class="card">
-        <div class="row"><div><div class="eyebrow">DUO</div><h3 style="margin:6px 0">Jocelyn + Anaïs</h3></div><div class="dl-duo"><span class="dl-dot"></span><span class="small">Prêt</span></div></div>
-        <p class="muted small">La synchro des courses est prête. Le test à deux pourra être fait quand Anaïs sera disponible.</p>
-        <button class="ghost full" id="dash-duo">Accès Duo</button>
       </section>
 
       <section class="card">
