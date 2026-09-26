@@ -100,7 +100,7 @@
   }
 
   function injectActive(){
-    const s=state.activeSession;if(!s)return;
+    const s=state.activeSession;if(!s||s.source==="nomad")return;
     view.querySelectorAll(".exercise-card").forEach(card=>{
       const ex=s.exercises[+card.dataset.ei];if(!ex||card.querySelector(".dl-coach-live"))return;
       const p=livePlan(ex),box=document.createElement("div");box.className="dl-coach-live";
