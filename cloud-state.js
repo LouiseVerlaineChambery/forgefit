@@ -9,7 +9,7 @@
   const dirty=new Set();
   const rawSet=Storage.prototype.setItem,rawRemove=Storage.prototype.removeItem;
 
-  const tracked=k=>k==="forgefit_v2_state"||k.startsWith("denat_meal_")||k.startsWith("forgefit_shop_")||k.startsWith("forgelife_week_shop_");
+  const tracked=k=>k==="forgefit_v2_state"||k.startsWith("denat_profile_")||k.startsWith("denat_meal_")||k.startsWith("forgefit_shop_")||k.startsWith("forgelife_week_shop_");
   const b64u=a=>{let s="";a.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");};
   const random=n=>{const a=new Uint8Array(n);crypto.getRandomValues(a);return b64u(a);};
   function identity(){
@@ -44,9 +44,14 @@
   }
   function mergeValue(k,r,l){
     if(r==null)return l;if(l==null)return r;if(r===l)return r;
-    if(k==="forgefit_v2_state")return mergeForge(r,l);
+    if(k==="forgefit_v2_state"||/^denat_profile_(jocelyn|anais)_sport_v1$/.test(k))return mergeForge(r,l);
     if(k==="denat_meal_favorites_v1"||k==="denat_meal_dislikes_v1")return JSON.stringify(unionArray(parse(r,[]),parse(l,[])));
     if(k==="denat_meal_overrides_v1")return JSON.stringify({...parse(r,{}),...parse(l,{})});
+    if(/^denat_profile_(jocelyn|anais)_food_journal_v1$/.test(k)){
+      const a=parse(r,[]),b=parse(l,[]),m=new Map();
+      [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(v=>m.set(String(v?.id||v?.at||"")+"|"+String(v?.text||""),v));
+      return JSON.stringify([...m.values()].sort((x,y)=>new Date(x?.at||0)-new Date(y?.at||0)).slice(-365));
+    }
     if(k==="denat_meal_coach_v1"){
       const a=parse(r,{history:[],restaurants:[]}),b=parse(l,{history:[],restaurants:[]});
       const mergeRows=(x,y,limit)=>{const m=new Map();[...(Array.isArray(x)?x:[]),...(Array.isArray(y)?y:[])].forEach(v=>m.set(String(v?.at||"")+"|"+String(v?.person||"")+"|"+String(v?.q||v?.text||""),v));return [...m.values()].sort((x,y)=>new Date(x?.at||0)-new Date(y?.at||0)).slice(-limit);};
