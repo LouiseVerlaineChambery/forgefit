@@ -47,6 +47,11 @@
     if(k==="forgefit_v2_state")return mergeForge(r,l);
     if(k==="denat_meal_favorites_v1"||k==="denat_meal_dislikes_v1")return JSON.stringify(unionArray(parse(r,[]),parse(l,[])));
     if(k==="denat_meal_overrides_v1")return JSON.stringify({...parse(r,{}),...parse(l,{})});
+    if(k==="denat_meal_coach_v1"){
+      const a=parse(r,{history:[],restaurants:[]}),b=parse(l,{history:[],restaurants:[]});
+      const mergeRows=(x,y,limit)=>{const m=new Map();[...(Array.isArray(x)?x:[]),...(Array.isArray(y)?y:[])].forEach(v=>m.set(String(v?.at||"")+"|"+String(v?.person||"")+"|"+String(v?.q||v?.text||""),v));return [...m.values()].sort((x,y)=>new Date(x?.at||0)-new Date(y?.at||0)).slice(-limit);};
+      return JSON.stringify({history:mergeRows(a.history,b.history,60),restaurants:mergeRows(a.restaurants,b.restaurants,90)});
+    }
     if(k.startsWith("forgefit_shop_")||k.startsWith("forgelife_week_shop_"))return JSON.stringify(unionArray(parse(r,[]),parse(l,[])).map(Number).filter(Number.isInteger).sort((a,b)=>a-b));
     return r;
   }
