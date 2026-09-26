@@ -17,3 +17,9 @@ body.meals-theme .notice{background:#f7eddd!important;border-color:#e4cfad!impor
 body.meals-theme .ghost{background:#fffaf2!important;color:#3b332b!important;border-color:#dfd2c1!important}
 body.meals-theme .tabbar{background:#fffaf2!important;border-color:#e1d5c5!important}
 body.meals-theme .tab{color:#8a8176!important}body.meals-theme .tab.active{color:#9b6b2f!important}
+
+body.meals-theme .ff-recipe-card{background:#fffaf1!important;border-color:#dfd2c1!important;color:#211d18!important}
+body.meals-theme .ff-recipe-step{border-color:#e5d9c9!important;color:#211d18!important}
+body.meals-theme .ff-recipe-step:before{background:#211d18!important;color:#f0d09a!important}
+body.meals-theme .ff-shop-cat{color:#9a692f!important;border-color:#e5d9c9!important}
+body.meals-theme .ff-recipe-list{color:#3b332b!important}
