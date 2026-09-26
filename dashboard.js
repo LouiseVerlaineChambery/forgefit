@@ -72,6 +72,8 @@
     const temporalMeal=temporal?.food?.last?`${temporal.food.last.mealType||"Repas"} · ${temporal.food.lastText}`:"Aucun repas noté";
     const memory=window.DenatMemory?.context?.();
     const memoryHint=window.DenatMemory?.coachHint?.()||"";
+    const wellbeing=window.DenatWellbeing?.summary?.()||{weight:null,sleep:null,energy:null,today:[]};
+    const wellbeingText=x=>x?(window.DenatWellbeing?.valueText?.(x)||String(x.value??"")):"—";
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
@@ -91,6 +93,18 @@
         </div>
         <p class="muted small" style="margin:10px 0">${escDash(memoryHint)}</p>
         <div class="dl-actions"><button class="primary" id="dash-timeline">Ouvrir la timeline</button><button class="ghost" id="dash-memory">Interroger ma mémoire</button></div>
+      </section>
+
+      <section class="card">
+        <div class="row"><div><div class="eyebrow">ÉQUILIBRE</div><h3 style="margin:6px 0">Mes signaux du quotidien</h3></div><span class="pill">${wellbeing.today?.length||0} aujourd’hui</span></div>
+        <div class="dl-grid" style="margin-top:10px">
+          <div class="dl-tile"><div class="dl-label">POIDS</div><div class="dl-big">${escDash(wellbeingText(wellbeing.weight))}</div></div>
+          <div class="dl-tile"><div class="dl-label">SOMMEIL</div><div class="dl-big">${escDash(wellbeingText(wellbeing.sleep))}</div></div>
+          <div class="dl-tile"><div class="dl-label">ÉNERGIE</div><div class="dl-big">${escDash(wellbeingText(wellbeing.energy))}</div></div>
+          <div class="dl-tile"><div class="dl-label">SAISIE</div><div class="small" style="margin-top:6px;font-weight:750">Naturelle dans la timeline</div></div>
+        </div>
+        <p class="muted small" style="margin:10px 0">Exemples : « Poids 82,4 kg », « J’ai dormi 7h30 », « Énergie 8/10 ».</p>
+        <button class="secondary full" id="dash-balance">Ajouter un signal</button>
       </section>
 
       <section class="card">
@@ -162,6 +176,7 @@
     view.querySelector("#dash-food-journal")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-memory")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-timeline")?.addEventListener("click",()=>window.DenatTimeline?.open?.(0));
+    view.querySelector("#dash-balance")?.addEventListener("click",()=>window.DenatTimeline?.open?.(0));
     view.querySelector("#dash-meal-coach")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-meal-coach-2")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-anais-sport")?.addEventListener("click",()=>setRoute("today"));
