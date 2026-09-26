@@ -5,7 +5,8 @@
   const DUO_START_KEY="forgefit_duo_start";
   const FALLBACK={weekOf:"",generatedAt:"",retailer:"Carrefour France",weeklyEstimateEUR:null,weeklyEstimateRangeEUR:null,estimateNote:"",mealPrepNote:"Le dîner est préparé en 4 portions : dîner pour deux puis le même repas au repas du midi du lendemain.",days:[],weekShop:[]};
   let data=FALLBACK;
-  let loading=true;
+  let loading=!window.DenatMealEngine;
+  if(window.DenatMealEngine){try{data=window.DenatMealEngine.generate();loading=false;}catch(e){console.error("Denat Life repas init:",e);loading=false;}}
   let day=(new Date().getDay()+6)%7;
 
   const style=document.createElement("style");
