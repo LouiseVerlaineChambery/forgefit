@@ -7,7 +7,15 @@
   const start=d=>{const x=new Date(d);x.setHours(0,0,0,0);return x;};
   function parseWhen(text,now=new Date()){
     const n=norm(text),d=new Date(now);let explicit=false;
-    if(/avant[- ]hier/.test(n)){d.setDate(d.getDate()-2);explicit=true;}
+    const explicitDate=n.match(/\b(?:le|du)\s+(\d{1,2})[\/. -](\d{1,2})(?:[\/. -](\d{2,4}))?\b/);
+    const ago=n.match(/\bil y a\s+(\d{1,3})\s+jours?\b/);
+    if(explicitDate){
+      const day=+explicitDate[1],month=+explicitDate[2]-1,rawYear=explicitDate[3],year=rawYear?(+rawYear<100?2000+(+rawYear):+rawYear):d.getFullYear();
+      const candidate=new Date(year,month,day,d.getHours(),d.getMinutes(),0,0);
+      if(candidate.getFullYear()===year&&candidate.getMonth()===month&&candidate.getDate()===day){d.setTime(candidate.getTime());explicit=true;}
+    }
+    else if(ago){d.setDate(d.getDate()-Math.min(365,+ago[1]));explicit=true;}
+    else if(/avant[- ]hier/.test(n)){d.setDate(d.getDate()-2);explicit=true;}
     else if(/hier/.test(n)){d.setDate(d.getDate()-1);explicit=true;}
     else{
       for(let i=1;i<DAYS.length;i++){
@@ -72,11 +80,28 @@
     return null;
   }
   function removeEvent(kind,id){
-    if(kind==="meal"){window.DenatNutrition?.remove?.(id);return true;}
-    if(kind==="wellbeing")return window.DenatWellbeing?.remove?.(id)||false;
+    if(kind==="meal"){
+      const item=(window.DenatNutrition?.read?.()||[]).find(x=>x.id===id);if(!item)return null;
+      window.DenatNutrition?.remove?.(id);return {kind,item};
+    }
+    if(kind==="wellbeing"){
+      const item=(window.DenatWellbeing?.read?.()||[]).find(x=>x.id===id);if(!item)return null;
+      return window.DenatWellbeing?.remove?.(id)?{kind,item}:null;
+    }
     if(kind==="sport"&&typeof state!=="undefined"){
-      const before=state.sessions.length;state.sessions=state.sessions.filter(x=>x.id!==id);
-      if(state.sessions.length!==before){if(typeof saveState==="function")saveState();return true;}
+      const item=state.sessions.find(x=>x.id===id);if(!item)return null;
+      state.sessions=state.sessions.filter(x=>x.id!==id);if(typeof saveState==="function")saveState();return {kind,item};
+    }
+    return null;
+  }
+  function restoreEvent(removed){
+    if(!removed?.item)return false;
+    if(removed.kind==="meal")return window.DenatNutrition?.restore?.(removed.item)||false;
+    if(removed.kind==="wellbeing")return window.DenatWellbeing?.restore?.(removed.item)||false;
+    if(removed.kind==="sport"&&typeof state!=="undefined"){
+      if(!state.sessions.some(x=>x.id===removed.item.id))state.sessions.push(removed.item);
+      state.sessions.sort((a,b)=>new Date(a.endedAt||a.startedAt||0)-new Date(b.endedAt||b.startedAt||0));
+      if(typeof saveState==="function")saveState();return true;
     }
     return false;
   }
@@ -105,8 +130,15 @@
   function open(offset=0){
     currentOffset=Math.min(0,offset);
     let sheet=document.querySelector("#dlt-sheet");
-    if(!sheet){sheet=document.createElement("div");sheet.id="dlt-sheet";sheet.className="dlt-sheet";sheet.innerHTML='<div class="dlt-backdrop" data-dlt-close></div><section class="dlt-panel"><button class="dlt-close" data-dlt-close>×</button><div id="dlt-body"></div></section>';document.body.appendChild(sheet);}
+    if(!sheet){sheet=document.createElement("div");sheet.id="dlt-sheet";sheet.className="dlt-sheet";sheet.innerHTML='<div class="dlt-backdrop" data-dlt-close></div><section class="dlt-panel"><button class="dlt-close" data-dlt-close>×</button><div id="dlt-body"></div><div id="dlt-undo" class="dlt-undo" hidden></div></section>';document.body.appendChild(sheet);}
     sheet.classList.add("open");paint();
+  }
+  let undoTimer=null;
+  function showUndo(removed){
+    const box=document.querySelector("#dlt-undo");if(!box||!removed)return;
+    clearTimeout(undoTimer);box.hidden=false;box.innerHTML='<span>Élément supprimé</span><button class="ghost" id="dlt-undo-btn">Annuler</button>';
+    box.querySelector("#dlt-undo-btn")?.addEventListener("click",()=>{if(restoreEvent(removed)){window.DenatCloud?.pushNow?.().catch?.(()=>{});paint();}box.hidden=true;clearTimeout(undoTimer);});
+    undoTimer=setTimeout(()=>{box.hidden=true;},6000);
   }
   function paint(){
     const sheet=document.querySelector("#dlt-sheet"),body=sheet?.querySelector("#dlt-body");if(!body)return;
@@ -120,12 +152,12 @@
       window.DenatCloud?.pushNow?.().catch?.(()=>{});
       const target=start(new Date(r.when.iso)),today=start(new Date());currentOffset=Math.min(0,Math.round((target-today)/DAY));paint();
     });
-    body.querySelectorAll("[data-dlt-delete]").forEach(b=>b.addEventListener("click",()=>{removeEvent(b.dataset.kind,b.dataset.dltDelete);window.DenatCloud?.pushNow?.().catch?.(()=>{});paint();}));
+    body.querySelectorAll("[data-dlt-delete]").forEach(b=>b.addEventListener("click",()=>{const removed=removeEvent(b.dataset.kind,b.dataset.dltDelete);if(!removed)return;window.DenatCloud?.pushNow?.().catch?.(()=>{});paint();showUndo(removed);}));
   }
   function close(){document.querySelector("#dlt-sheet")?.classList.remove("open");}
   document.addEventListener("click",e=>{if(e.target?.matches?.("[data-dlt-close]"))close();});
   const style=document.createElement("style");
-  style.textContent=`.dlt-sheet{position:fixed;inset:0;z-index:999;display:none}.dlt-sheet.open{display:block}.dlt-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px)}.dlt-panel{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:#111113;border-radius:24px 24px 0 0;padding:22px 16px 34px;border-top:1px solid var(--line)}.dlt-close{position:absolute;right:14px;top:12px;border:0;background:transparent;color:var(--muted);font-size:28px}.dlt-head{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;text-align:center;gap:8px}.dlt-head h2{margin:4px 0 12px}.dlt-quick{display:flex;gap:7px;overflow:auto;margin:8px 0 12px}.dlt-quick button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlt-capture textarea{width:100%;box-sizing:border-box;background:#0d0d0f;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit;resize:vertical;margin-bottom:8px}.dlt-events{margin-top:14px}.dlt-event{display:grid;grid-template-columns:48px 1fr 34px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}.dlt-event>div:nth-child(2) span,.dlt-event>div:nth-child(2) b,.dlt-event>div:nth-child(2) small{display:block}.dlt-event span{font-size:9px;letter-spacing:.08em;color:var(--accent2);text-transform:uppercase}.dlt-event b{font-size:12px;line-height:1.4;margin-top:3px}.dlt-event small{color:var(--muted);font-size:10px;margin-top:4px}.dlt-time{font-size:11px;font-weight:750}.dlt-event.sport{border-left:2px solid var(--accent);padding-left:10px}.dlt-event.wellbeing{border-left:2px solid var(--accent2);padding-left:10px}`;
+  style.textContent=`.dlt-sheet{position:fixed;inset:0;z-index:999;display:none}.dlt-sheet.open{display:block}.dlt-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px)}.dlt-panel{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:#111113;border-radius:24px 24px 0 0;padding:22px 16px 34px;border-top:1px solid var(--line)}.dlt-close{position:absolute;right:14px;top:12px;border:0;background:transparent;color:var(--muted);font-size:28px}.dlt-head{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;text-align:center;gap:8px}.dlt-head h2{margin:4px 0 12px}.dlt-quick{display:flex;gap:7px;overflow:auto;margin:8px 0 12px}.dlt-quick button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlt-capture textarea{width:100%;box-sizing:border-box;background:#0d0d0f;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit;resize:vertical;margin-bottom:8px}.dlt-events{margin-top:14px}.dlt-event{display:grid;grid-template-columns:48px 1fr 34px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}.dlt-event>div:nth-child(2) span,.dlt-event>div:nth-child(2) b,.dlt-event>div:nth-child(2) small{display:block}.dlt-event span{font-size:9px;letter-spacing:.08em;color:var(--accent2);text-transform:uppercase}.dlt-event b{font-size:12px;line-height:1.4;margin-top:3px}.dlt-event small{color:var(--muted);font-size:10px;margin-top:4px}.dlt-time{font-size:11px;font-weight:750}.dlt-event.sport{border-left:2px solid var(--accent);padding-left:10px}.dlt-event.wellbeing{border-left:2px solid var(--accent2);padding-left:10px}.dlt-undo{position:sticky;bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:14px 0 0;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:#1a1a1d;box-shadow:0 10px 30px rgba(0,0,0,.35);font-size:12px}.dlt-undo[hidden]{display:none}`;
   document.head.appendChild(style);
-  window.DenatTimeline={parseWhen,mealStatement,sportStatement,record,recordMeal,recordSport,recordWellbeing,removeEvent,dayData,open,close};
+  window.DenatTimeline={parseWhen,mealStatement,sportStatement,record,recordMeal,recordSport,recordWellbeing,removeEvent,restoreEvent,dayData,open,close};
 })();
