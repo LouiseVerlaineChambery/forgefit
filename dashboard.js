@@ -132,7 +132,7 @@
         <button class="ghost full" id="dash-settings">Ouvrir les réglages</button>
       </section>`;
 
-    const goMeals=(v)=>{localStorage.setItem("forgefit_meals_view",v);setRoute("meals");};
+    view.querySelectorAll("[data-profile]").forEach(b=>b.addEventListener("click",()=>window.DenatProfile?.set?.(b.dataset.profile)));\n    const goMeals=(v)=>{localStorage.setItem("forgefit_meals_view",v);setRoute("meals");};
     view.querySelector("#dash-meal")?.addEventListener("click",()=>goMeals("today"));
     view.querySelector("#dash-week")?.addEventListener("click",()=>goMeals("week"));
     view.querySelector("#dash-shop")?.addEventListener("click",()=>goMeals("weekshop"));
