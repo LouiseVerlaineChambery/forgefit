@@ -136,7 +136,7 @@
   }
   function recipePortion(recipe,person="p1"){
     const portion=String(recipe?.[person]||""),explicit=parseExplicit(portion),ids=new Set(explicit.map(x=>x.id));
-    const pn=norm(portion),shareFactor=/portion genereuse/.test(pn)?1.15:/portion standard/.test(pn)?.85:/1\/2 pizza/.test(pn)?1.1:/1\/3 a 1\/2 pizza/.test(pn)?.9:1;
+    const pn=norm(portion),shareFactor=/portion genereuse/.test(pn)?1.15:/portion standard/.test(pn)?.85:/1\/3 a 1\/2 pizza/.test(pn)?.9:/1\/2 pizza/.test(pn)?1.1:1;
     let parts=explicit.slice(),shared=0;
     for(const raw of recipe?.shop||recipe?.ingredients||[]){
       const x=parseShopItem(raw);if(!x||ids.has(x.food.id))continue;
