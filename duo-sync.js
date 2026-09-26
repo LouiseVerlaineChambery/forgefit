@@ -3,7 +3,7 @@
   const API="https://lv-social-publisher.jocelyn-denat.workers.dev/forge-sync";
   const HID_KEY="forgelife_household_id";
   const SECRET_KEY="forgelife_household_secret";
-  const QUEUE_KEY="forgelife_sync_queue";
+  const QUEUE_KEY="forgelife_sync_queue_v2";\n  const OFFSET=200;\n  const LIMIT=500;
   let syncing=false;
   let lastOk=0;
 
@@ -61,7 +61,7 @@
   async function postToggle(day,index,checked,fromQueue=false){
     const date=weekDate(day,true);
     try{
-      const r=await fetch(API,{method:"POST",headers:headers(),body:JSON.stringify({date,index,checked})});
+      const r=await fetch(API,{method:"POST",headers:headers(),body:JSON.stringify({date,index:OFFSET+index,checked})});
       if(!r.ok)throw new Error(`HTTP ${r.status}`);
       const d=await r.json();
       writeLocal(day,d.checked||[]);applyDom(day,d.checked||[]);lastOk=Date.now();setStatus(true,"Synchronisé entre vos deux téléphones");return true;
@@ -80,7 +80,7 @@
       if(queue().length)return;
       const r=await fetch(`${API}?date=${encodeURIComponent(weekDate(day,true))}`,{headers:headers(),cache:"no-store"});
       if(!r.ok)throw new Error(`HTTP ${r.status}`);
-      const d=await r.json(),remote=d.checked||[],local=readLocal(day);
+      const d=await r.json(),remote=(d.checked||[]).filter(i=>i>=OFFSET&&i<LIMIT).map(i=>i-OFFSET),local=readLocal(day);
       if(!same(remote,local)){writeLocal(day,remote);applyDom(day,remote);}
       lastOk=Date.now();setStatus(true,"Synchronisé entre vos deux téléphones");
     }catch(e){setStatus(false);}finally{syncing=false;}
