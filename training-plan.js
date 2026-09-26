@@ -142,6 +142,8 @@
     completeRepriseIfNeeded();
   }
 
+  applyLightLowerReprise();
+
   // Pendant la reprise, ne jamais proposer automatiquement les anciennes charges.
   const baseSuggestWeight=suggestWeight;
   suggestWeight=function(exercise){
