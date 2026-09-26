@@ -55,8 +55,9 @@
     return rules.find(r=>r.k.some(k=>n.includes(k)))||{name:"repas au restaurant",kcal:[600,1100],protein:[20,45]};
   }
   function absNote(level){
-    if(level==="rich")return "😄 Pas idéal pour les abdos de Jocelyn si ça devient fréquent : c’est un repas assez riche. Aucun souci ponctuellement ; on garde simplement les autres repas normaux et protéinés.";
-    return "✓ Compatible avec l’objectif de Jocelyn : portion raisonnable, protéines et légumes restent prioritaires.";
+    const anais=window.DenatProfile?.is?.("anais")===true;
+    if(level==="rich")return anais?"😄 Repas assez riche. Si c’est le dîner pour vous deux : pas idéal pour les abdos de Jocelyn si ça devient fréquent. Aucun problème ponctuellement.":"😄 Pas idéal pour les abdos de Jocelyn si ça devient fréquent : c’est un repas assez riche. Aucun souci ponctuellement ; on garde simplement les autres repas normaux et protéinés.";
+    return anais?"✓ Repas plutôt équilibré : simple, rassasiant et compatible avec votre menu commun.":"✓ Compatible avec l’objectif de Jocelyn : portion raisonnable, protéines et légumes restent prioritaires.";
   }
   function recipeAnswer(r,ts=[]){
     const miss=missingFor(r,ts),rich=richness(r);
