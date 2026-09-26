@@ -3,6 +3,7 @@
   const DISLIKES="denat_meal_dislikes_v1";
   const OVERRIDES="denat_meal_overrides_v1";
   const FAVS="denat_meal_favorites_v1";
+  const HISTORY="denat_meal_rotation_v1";
   const NAMES=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
   const dinners=[
@@ -125,11 +126,32 @@
     }).sort((a,b)=>order.indexOf(a.category)-order.indexOf(b.category)||a.text.localeCompare(b.text,"fr"));
   }
 
+  function rotationHistory(){const x=read(HISTORY,{});return x&&typeof x==="object"&&!Array.isArray(x)?x:{};}
+  function rememberWeek(weekKey,ids){
+    const h=rotationHistory();h[weekKey]=[...new Set(ids)].slice(0,7);
+    const keys=Object.keys(h).sort().slice(-8),out={};keys.forEach(k=>out[k]=h[k]);
+    localStorage.setItem(HISTORY,JSON.stringify(out));
+  }
+  function recentMealAge(id,weekKey){
+    const keys=Object.keys(rotationHistory()).filter(k=>k<weekKey).sort().reverse();
+    for(let i=0;i<Math.min(4,keys.length);i++)if((rotationHistory()[keys[i]]||[]).includes(id))return i+1;
+    return null;
+  }
   function chooseForWeek(weekKey){
     const fav=new Set(favoriteIds());
-    const pool=allowed().slice().sort((a,b)=>(seed(weekKey+a.id)-(fav.has(a.id)?500000000:0))-(seed(weekKey+b.id)-(fav.has(b.id)?500000000:0)));
-    const out=[],counts={};
-    for(const d of pool){const p=proteinOf(d);if((counts[p]||0)>=2)continue;out.push(d);counts[p]=(counts[p]||0)+1;if(out.length===7)break;}
+    const pool=allowed().slice().sort((a,b)=>{
+      const ageA=recentMealAge(a.id,weekKey),ageB=recentMealAge(b.id,weekKey);
+      const repeatA=ageA===1?900000000:ageA===2?350000000:ageA===3?120000000:0;
+      const repeatB=ageB===1?900000000:ageB===2?350000000:ageB===3?120000000:0;
+      const favA=fav.has(a.id)&&ageA!==1?180000000:0,favB=fav.has(b.id)&&ageB!==1?180000000:0;
+      return (seed(weekKey+a.id)+repeatA-favA)-(seed(weekKey+b.id)+repeatB-favB);
+    });
+    const out=[],counts={},cats={};
+    for(const d of pool){
+      const p=proteinOf(d),cat=mealCategory(d);
+      if((counts[p]||0)>=2||(cats[cat]||0)>=3)continue;
+      out.push(d);counts[p]=(counts[p]||0)+1;cats[cat]=(cats[cat]||0)+1;if(out.length===7)break;
+    }
     for(const d of pool){if(out.length===7)break;if(!out.includes(d))out.push(d);}
     return out;
   }
@@ -148,7 +170,9 @@
     });
     const total=days.reduce((n,d)=>n+d.estimateEUR,0);
     const consolidated=consolidate(days.flatMap(d=>d.shop));
-    return {weekOf:weekKey,generatedAt:iso(new Date()),source:"Denat Life automatic weekly engine",retailer:"Carrefour France",weeklyEstimateEUR:total,weeklyEstimateRangeEUR:[Math.round(total*.88),Math.round(total*1.12)],estimateNote:"Estimation indicative. Les prix réels varient selon le magasin, les promotions, les marques et les formats.",mealPrepNote:"Le dîner est préparé en 4 portions : dîner pour deux puis le même repas au repas du midi du lendemain.",days,weekShop:consolidated.map(x=>x.text),weekShopCategories:consolidated.map(x=>x.category)};
+    rememberWeek(weekKey,days.map(d=>d.dinnerId));
+    const variety={proteins:new Set(days.map(d=>proteinOf(dinners.find(x=>x.id===d.dinnerId)||{}))).size,categories:new Set(days.map(d=>d.dinnerCategory)).size,recentRepeats:days.filter(d=>recentMealAge(d.dinnerId,weekKey)===1).length};
+    return {weekOf:weekKey,generatedAt:iso(new Date()),source:"Denat Life automatic weekly engine V2",retailer:"Carrefour France",weeklyEstimateEUR:total,weeklyEstimateRangeEUR:[Math.round(total*.88),Math.round(total*1.12)],estimateNote:"Estimation indicative. Les prix réels varient selon le magasin, les promotions, les marques et les formats.",mealPrepNote:"Le dîner est préparé en 4 portions : dîner pour deux puis le même repas au repas du midi du lendemain.",variety,days,weekShop:consolidated.map(x=>x.text),weekShopCategories:consolidated.map(x=>x.category)};
   }
 
   function replace(day,currentId){
@@ -174,9 +198,9 @@
     const d=dinners.find(x=>x.id===id);if(!d)return null;
     return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),steps:d.steps.slice(),p1:d.p1,p2:d.p2,category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
   }
-  function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);return generate();}
+  function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);localStorage.removeItem(HISTORY);return generate();}
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
   function preferences(){return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t}))};}
   function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}
-  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences};
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory};
 })();
