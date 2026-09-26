@@ -63,7 +63,7 @@
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
-        <div class="dl-brand-hero"><img src="brand-logo-v5.svg?v=12.4" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">SPORT · NUTRITION · ÉQUILIBRE</div></div></div>
+        <div class="dl-brand-hero"><img src="brand-logo-v5.svg?v=12.5" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">SPORT · NUTRITION · ÉQUILIBRE</div></div></div>
         <div class="hero-title" style="margin-top:18px">Bonjour 👋</div>
         <div class="dl-date">${fmtDay()}</div>
         <p class="muted" style="margin-bottom:0">Votre journée, en un coup d’œil.</p>
