@@ -96,8 +96,7 @@
       return {weight:0,reps,repRange:range,rpe:"7–8,5",nextIndex,level:"reps",text:`${reps} reps`,reason:"Au poids du corps, progresse d’abord en répétitions avec une exécution propre."};
     }
     if(rpe>=9.5||r<range.min-2){nw=Math.max(step,round(w-step,step));reps=range.min;level="down";reason=rpe>=9.5?`RPE ${fmt(rpe)} : baisse d’un cran pour la série suivante.`:`${r} reps : baisse d’un cran pour revenir dans la plage.`;}
-    else if(r>=range.max&&rpe>0&&rpe<=7){nw=round(w+step,step);reps=range.min;level="up";reason:`${r} reps à RPE ${fmt(rpe)} : marge importante, +${fmt(step)} kg possible sur la série suivante.`;}
-    else if(r>=range.max){reps=range.max;reason="Haut de plage atteint : garde la charge sur les séries restantes pour valider l’exercice complet.";}
+    else if(r>=range.max){reps=range.max;level="hold";reason=rpe>0&&rpe<=7?"Haut de plage atteint avec de la marge : garde la même charge sur les séries restantes. La hausse se décide seulement après validation de tout l’exercice.":"Haut de plage atteint : garde la charge sur les séries restantes pour valider l’exercice complet.";}
     else if(rpe>0&&rpe<=8.5){reps=Math.min(range.max,r+1);level="reps";reason=`Bonne marge : garde ${fmt(w)} kg et tente ${reps} reps.`;}
     else if(!rpe){reps=Math.max(range.min,r);reason="RPE manquant : charge conservée. Renseigne-le avant toute hausse de charge.";}
     if(state.reprise?.enabled&&level==="up"){nw=w;level="hold";reason="Mode reprise : charge conservée malgré la marge.";}
@@ -147,6 +146,16 @@
 
   const baseToday=renderToday;renderToday=function(){baseToday();injectToday();};
   const baseActive=renderActiveSession;renderActiveSession=function(){baseActive();injectActive();};
+  const baseExerciseStats=renderExerciseStats;renderExerciseStats=function(name){
+    baseExerciseStats(name);
+    const box=document.querySelector("#exercise-stats");if(!box)return;
+    const template=(state.program||[]).flatMap(w=>w.exercises||[]).find(e=>norm(e.name)===norm(name))||window.DenatExerciseLibrary?.find?.(name);
+    if(!template)return;
+    const ex=template.targetReps?template:{name:template.name,targetReps:template.reps,targetSets:template.sets,category:template.category};
+    const p=sessionPlan(ex),card=document.createElement("div");card.className="dl-coach-live";
+    card.innerHTML=`<div class="eyebrow">PROCHAINE PROGRESSION</div><div class="dl-coach-target">${p.weight?`${fmt(p.weight)} kg × ${p.reps}`:`${p.reps} reps`}</div><div class="small muted">Fourchette ${p.repRange.min}–${p.repRange.max} reps · RPE cible ${p.rpe} · ${esc(p.confidence)}</div><div class="dl-coach-reason" style="margin-top:7px">${esc(p.reason)}</div>`;
+    box.prepend(card);
+  };
 
   const baseFinish=finishSession;finishSession=function(){
     if(state.activeSession){
