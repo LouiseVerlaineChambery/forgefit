@@ -158,7 +158,7 @@
   function answer(text){
     const n=norm(text);
     let html="";
-    if(/qu.*(j ai|jai|ai je).*(mange|fait)|j ai mange quoi|jai mange quoi|rappelle.*(matin|midi|hier|soir|semaine)|point.*(matin|midi|hier|soir|7 jours|semaine|derniere seance)|depuis.*(derniere|dernier).*(seance|sport)|sur.*7 jours/.test(n)) html=memoryAnswer(text);
+    if(/qu.*(j ai|jai|ai je).*(mange|fait|enregistre|note)|j ai mange quoi|jai mange quoi|j ai fait quoi|jai fait quoi|rappelle.*(matin|midi|hier|soir|semaine)|point.*(matin|midi|hier|soir|7 jours|semaine|derniere seance)|depuis.*(derniere|dernier).*(seance|sport)|sur.*7 jours/.test(n)) html=memoryAnswer(text);
     else if(/quand.*sport|quand.*seance|derniere.*seance|dernier.*sport|fait.*sport|sport.*quand/.test(n)) html=timingAnswer();
     else if(/j ai mange.*repas prevu|jai mange.*repas prevu|enregistre.*repas prevu|j ai mange.*menu|jai mange.*menu/.test(n)) html=logPlannedAnswer();
     else if(/recette.*soir|recette.*diner|recette.*dîner|comment.*preparer.*soir|comment.*préparer.*soir/.test(n)) html=plannedRecipeAnswer();
