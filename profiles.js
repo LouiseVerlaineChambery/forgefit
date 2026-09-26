@@ -33,6 +33,19 @@
     const first=document.querySelector('.tab[data-route="settings"] small');
     if(first)first.textContent=label();
     document.documentElement.dataset.denatProfile=currentId();
+    const bar=document.querySelector(".tabbar");
+    const sport=document.querySelector('.tab[data-route="today"]');
+    const meals=document.querySelector('.tab[data-route="meals"]');
+    const courses=document.querySelector('.tab[data-route="courses"]');
+    if(bar&&sport&&meals&&courses){
+      if(is("anais")){
+        bar.insertBefore(meals,sport);
+        bar.insertBefore(courses,sport);
+      }else{
+        bar.insertBefore(sport,meals);
+        bar.insertBefore(meals,courses);
+      }
+    }
   }
   migrate();
   window.DenatProfile={profiles:PROFILES,currentId,current,label,is,set,sportKey,journalKey,applyShell};
