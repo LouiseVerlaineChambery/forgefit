@@ -33,6 +33,8 @@
     {id:"potato",a:["pommes de terre","pomme de terre","patate"],v:[77,2,17,0.1,2.2]},
     {id:"bread",a:["pain complet","pain"],v:[247,9.5,41,3.4,6]},
     {id:"tortilla",a:["tortillas","tortilla"],v:[310,8,52,8,4],unitG:45},
+    {id:"pizzaDough",a:["pates a pizza","pate a pizza"],v:[260,7.5,49,4,2.5],unitG:260},
+    {id:"lasagnaSheet",a:["feuilles lasagnes","feuille lasagne"],v:[350,12.5,70,1.8,3.5],unitG:20},
     {id:"egg",a:["oeufs","oeuf"],v:[143,13,0.7,9.5,0],unitG:55},
     {id:"broccoli",a:["brocoli"],v:[34,2.8,7,0.4,2.6]},
     {id:"greenBeans",a:["haricots verts"],v:[31,1.8,7,0.2,3.4]},
@@ -45,6 +47,13 @@
     {id:"mixedVeg",a:["legumes couscous","legumes wok","legumes a rotir","legumes de saison","legumes"],v:[40,2,7,0.5,2.8]},
     {id:"edamame",a:["edamame"],v:[121,11.9,8.9,5.2,5.2]},
     {id:"corn",a:["mais"],v:[96,3.4,21,1.5,2.4]},
+    {id:"peas",a:["petits pois"],v:[81,5.4,14,0.4,5.1]},
+    {id:"snowPeas",a:["pois gourmands"],v:[42,2.8,7.6,0.2,2.6]},
+    {id:"pepper",a:["poivrons","poivron"],v:[31,1,6,0.3,2.1],unitG:150},
+    {id:"onion",a:["oignons","oignon"],v:[40,1.1,9.3,0.1,1.7],unitG:100},
+    {id:"cucumber",a:["concombres","concombre"],v:[15,0.7,3.6,0.1,0.5],unitG:300},
+    {id:"salad",a:["salades","salade"],v:[17,1.4,2.9,0.2,1.3],unitG:200},
+    {id:"lemon",a:["citrons","citron"],v:[29,1.1,9.3,0.3,2.8],unitG:100},
     {id:"avocado",a:["avocats","avocat"],v:[160,2,8.5,14.7,6.7],unitG:150},
     {id:"skyr",a:["skyr"],v:[63,11,4,0.2,0]},
     {id:"fromageBlanc",a:["fromage blanc"],v:[70,8,5,2,0]},
@@ -56,6 +65,9 @@
     {id:"pesto",a:["pesto"],v:[430,5,7,42,2]},
     {id:"teriyaki",a:["sauce teriyaki"],v:[90,4,17,0.5,0]},
     {id:"tomatoSauce",a:["sauce tomate"],v:[45,1.5,7,1,1.5]},
+    {id:"soySauce",a:["sauce soja reduite en sel","sauce soja"],v:[53,8,4.9,0.6,0.8]},
+    {id:"mustard",a:["moutarde douce","moutarde"],v:[70,4.4,5.8,4,3.3]},
+    {id:"olives",a:["olives","olive"],v:[116,0.8,6,10.9,1.6]},
     {id:"peanutButter",a:["beurre de cacahuete"],v:[590,25,20,50,6]},
     {id:"almond",a:["amandes","amande"],v:[579,21,22,50,12.5]},
     {id:"walnut",a:["noix"],v:[654,15,14,65,6.7]},
@@ -124,16 +136,17 @@
   }
   function recipePortion(recipe,person="p1"){
     const portion=String(recipe?.[person]||""),explicit=parseExplicit(portion),ids=new Set(explicit.map(x=>x.id));
+    const pn=norm(portion),shareFactor=/portion genereuse/.test(pn)?1.15:/portion standard/.test(pn)?.85:/1\/2 pizza/.test(pn)?1.1:/1\/3 a 1\/2 pizza/.test(pn)?.9:1;
     let parts=explicit.slice(),shared=0;
     for(const raw of recipe?.shop||recipe?.ingredients||[]){
       const x=parseShopItem(raw);if(!x||ids.has(x.food.id))continue;
-      const g=x.g/4;if(g<=0)continue;
+      const g=x.g/4*shareFactor;if(g<=0)continue;
       parts.push({id:x.food.id,name:x.food.a[0],g,shared:true,macros:finish(scale(x.food.m,g/100))});shared++;
     }
     if(!parts.length&&recipe?.shop?.length){
       for(const raw of recipe.shop){
         const x=parseShopItem(raw);if(!x)continue;
-        const g=x.g/4;parts.push({id:x.food.id,name:x.food.a[0],g,shared:true,macros:finish(scale(x.food.m,g/100))});
+        const g=x.g/4*shareFactor;parts.push({id:x.food.id,name:x.food.a[0],g,shared:true,macros:finish(scale(x.food.m,g/100))});
       }
     }
     return {macros:sumParts(parts),parts,confidence:explicit.length>=2?"high":parts.length>=2?"medium":"low",sharedExtras:shared};
