@@ -16,7 +16,12 @@
     const item={id:crypto.randomUUID(),type,value:Math.round(v*100)/100,at,note:String(note||""),source};
     const items=read();items.push(item);write(items);return item;
   }
-  function remove(id){const a=read(),b=a.filter(x=>x.id!==id);if(a.length===b.length)return false;write(b);return true;}\n  function restore(item){\n    if(!item?.id)return false;\n    const a=read();if(a.some(x=>x.id===item.id))return true;\n    a.push(item);a.sort((x,y)=>new Date(x.at)-new Date(y.at));write(a);return true;\n  }
+  function remove(id){const a=read(),b=a.filter(x=>x.id!==id);if(a.length===b.length)return false;write(b);return true;}
+  function restore(item){
+    if(!item?.id)return false;
+    const a=read();if(a.some(x=>x.id===item.id))return true;
+    a.push(item);a.sort((x,y)=>new Date(x.at)-new Date(y.at));write(a);return true;
+  }
   function parse(text){
     const n=norm(text).replace(/,/g,".");
     let m=n.match(/(?:je\s*pese|poids(?:\s*(?:de|:|a))?)\s*(\d{2,3}(?:\.\d{1,2})?)\s*(?:kg|kilos?)?/);
