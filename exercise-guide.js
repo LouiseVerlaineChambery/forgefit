@@ -27,7 +27,7 @@
     {keys:["crunch"],type:"core",muscles:["Abdominaux"],cues:["Enroule le sternum vers le bassin.","Expire pendant la contraction.","Garde le mouvement court et contrôlé."],avoid:"Ne tire pas sur la nuque."},
     {keys:["releve","reverse crunch"],type:"core",muscles:["Abdominaux","Fléchisseurs de hanche"],cues:["Rétroverse légèrement le bassin.","Monte sans élan.","Redescends sans creuser exagérément le dos."],avoid:"Si tu te balances, réduis l’amplitude."}
   ];
-  function info(name){const n=norm(name);return defs.find(d=>d.keys.some(k=>n.includes(k)))||{type:"generic",muscles:["Muscles ciblés"],cues:["Choisis une charge permettant une exécution propre.","Contrôle la phase de retour.","Arrête si la technique se dégrade nettement."],avoid:"Ne sacrifie pas l’amplitude et le contrôle pour la charge."};}
+  function info(name){const n=norm(name),specific=defs.find(d=>d.keys.some(k=>n.includes(k)));if(specific)return specific;const meta=window.DenatExerciseLibrary?.find?.(name);return {type:motionType(name)||"generic",muscles:meta?.muscles||["Muscles ciblés"],cues:["Choisis une amplitude confortable et une exécution propre.","Contrôle la phase de retour.","Arrête la série si la technique se dégrade nettement."],avoid:"Ne sacrifie pas l’amplitude et le contrôle pour ajouter de la charge ou des répétitions."};}
   function svg(type){
     const s='stroke="currentColor" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"';
     const head=`<circle cx="70" cy="34" r="11" ${s}/>`;
