@@ -44,7 +44,8 @@
   function mealData(){try{return window.DenatMealEngine?.generate?.()||null;}catch(e){return null;}}
 
   renderSettings=function(){
-    const profileName=window.DenatProfile?.label?.()||"Jocelyn";\n    title.textContent=profileName;
+    const profileName=window.DenatProfile?.label?.()||"Jocelyn";
+    title.textContent=profileName;
     const meals=mealData();
     const di=(new Date().getDay()+6)%7;
     const today=meals?.days?.[di];
