@@ -67,6 +67,9 @@
     const health=recovery.data||{};
     const nutrition=window.DenatNutrition?.summary?.(1)||{items:[],kcal:[0,0],protein:[0,0]};
     const nutritionGuide=window.DenatNutrition?.guidance?.(1)||"Note tes repas pour construire le bilan du jour.";
+    const temporal=window.DenatTime?.snapshot?.();
+    const temporalSport=temporal?.sport?.last?`${temporal.sport.last.workoutName} · ${temporal.sport.lastText}`:"Aucune séance enregistrée";
+    const temporalMeal=temporal?.food?.last?`${temporal.food.last.mealType||"Repas"} · ${temporal.food.lastText}`:"Aucun repas noté";
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
@@ -74,6 +77,15 @@
         <div class="hero-title" style="margin-top:18px">Bonjour ${escDash(profileName)} 👋</div>
         <div class="dl-date">${fmtDay()}</div>
         <p class="muted" style="margin-bottom:0">${isAnais?"Tes repas et le quotidien du foyer en premier. Le sport reste disponible quand tu en as envie.":"Ton espace personnel, avec le foyer Denat Life partagé."}</p>
+      </section>
+
+      <section class="card">
+        <div class="row"><div><div class="eyebrow">FIL DU JOUR</div><h3 style="margin:6px 0">${escDash(temporal?.moment?.prompt||"Aujourd’hui")}</h3></div><span class="pill">${new Intl.DateTimeFormat("fr-FR",{hour:"2-digit",minute:"2-digit"}).format(new Date())}</span></div>
+        <div class="dl-grid" style="margin-top:10px">
+          ${!isAnais?`<div class="dl-tile"><div class="dl-label">DERNIER SPORT</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(temporalSport)}</div></div>`:`<div class="dl-tile"><div class="dl-label">DERNIER REPAS NOTÉ</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(temporalMeal)}</div></div>`}
+          <div class="dl-tile"><div class="dl-label">AUJOURD’HUI</div><div class="small" style="margin-top:6px;font-weight:750">${temporal?.food?.today?.length||0} repas / ajout${(temporal?.food?.today?.length||0)>1?"s":""} noté${(temporal?.food?.today?.length||0)>1?"s":""}</div></div>
+        </div>
+        <p class="muted small" style="margin:10px 0 0">${isAnais?"Denat Life se cale sur le moment de la journée pour mettre le bon repas en avant.":temporal?.sport?.last?"Le coach repas et le coach sport utilisent maintenant cette chronologie.":"Ta chronologie se construira automatiquement avec tes séances et tes repas."}</p>
       </section>
 
       <section class="card">
