@@ -68,7 +68,7 @@
     const h=date.getHours();return h<10?"Petit-déjeuner":h<15?"Repas du midi":h<19?"Collation":"Dîner";
   }
   function add(text,opts={}){
-    const e=estimate(text),now=opts.at?new Date(opts.at):new Date(),midK=Math.round((e.kcal[0]+e.kcal[1])/2);
+    const base=estimate(text),e={...base,kcal:opts.kcalRange||base.kcal,protein:opts.proteinRange||base.protein,confidence:opts.confidence||base.confidence},now=opts.at?new Date(opts.at):new Date(),midK=Math.round((e.kcal[0]+e.kcal[1])/2);
     const item={id:crypto.randomUUID(),at:now.toISOString(),person:window.DenatProfile?.label?.()||"Jocelyn",type:opts.type||"meal",mealType:opts.mealType||mealType(text,now),text,kcalRange:e.kcal,proteinRange:e.protein,confidence:e.confidence||"low",parts:e.parts||[],rich:midK>=850};
     const x=read();x.push(item);write(x);return item;
   }
