@@ -17,6 +17,12 @@
     {keys:["extension triceps","dips"],type:"arms",muscles:["Triceps"],cues:["Garde les coudes stables.","Étends sans donner d’élan.","Contrôle le retour."],avoid:"Évite de laisser les coudes partir largement vers l’extérieur."},
     {keys:["curl"],type:"arms",muscles:["Biceps","Brachial"],cues:["Coudes fixes et épaules basses.","Monte sans balancer le dos.","Redescends presque bras tendu sous contrôle."],avoid:"Si le buste se balance, réduis la charge."},
     {keys:["ecarte","pec deck"],type:"fly",muscles:["Pectoraux"],cues:["Garde une légère flexion du coude.","Rapproche les bras en serrant les pectoraux.","Épaules en arrière pendant le mouvement."],avoid:"Ne cherche pas un étirement extrême derrière le buste."},
+    {keys:["pompe"],type:"pushup",muscles:["Pectoraux","Triceps","Gainage"],cues:["Corps gainé de la tête aux talons.","Descends la poitrine entre les mains avec contrôle.","Pousse le sol sans laisser le bassin s’affaisser."],avoid:"Ne raccourcis pas l’amplitude en avançant seulement la tête."},
+    {keys:["developpe epaules"],type:"overheadpress",muscles:["Deltoïdes","Triceps"],cues:["Garde le buste stable et les côtes contrôlées.","Pousse au-dessus de la tête sans cogner les charges.","Redescends jusqu’à une amplitude confortable."],avoid:"Évite de cambrer fortement le bas du dos pour finir la répétition."},
+    {keys:["oiseau","reverse pec deck","face pull"],type:"rearraise",muscles:["Deltoïde postérieur","Haut du dos"],cues:["Épaules basses et poitrine stable.","Écarte en initiant le mouvement par les coudes.","Contrôle le retour sans relâcher brutalement."],avoid:"Évite l’élan du buste et les trapèzes qui montent vers les oreilles."},
+    {keys:["planche"],type:"plank",muscles:["Gainage","Abdominaux"],cues:["Aligne tête, bassin et chevilles.","Serre abdominaux et fessiers.","Respire sans perdre la position."],avoid:"Ne laisse pas le bassin tomber ni monter exagérément."},
+    {keys:["dead bug"],type:"core",muscles:["Gainage","Abdominaux"],cues:["Garde le bas du dos contrôlé.","Allonge bras et jambe opposée lentement.","Reviens sans perdre la tension abdominale."],avoid:"Réduis l’amplitude si le bas du dos se creuse."},
+    {keys:["mountain climber"],type:"plank",muscles:["Gainage","Abdominaux","Fléchisseurs de hanche"],cues:["Garde les épaules au-dessus des mains.","Ramène les genoux sans rebond du bassin.","Maintiens un rythme contrôlé."],avoid:"Ne transforme pas le mouvement en balancement du bassin."},
     {keys:["mollet"],type:"calf",muscles:["Mollets"],cues:["Descends le talon pour t’étirer.","Monte haut sur la pointe du pied.","Marque une pause en haut."],avoid:"Évite les petites répétitions rebondies."},
     {keys:["crunch"],type:"core",muscles:["Abdominaux"],cues:["Enroule le sternum vers le bassin.","Expire pendant la contraction.","Garde le mouvement court et contrôlé."],avoid:"Ne tire pas sur la nuque."},
     {keys:["releve","reverse crunch"],type:"core",muscles:["Abdominaux","Fléchisseurs de hanche"],cues:["Rétroverse légèrement le bassin.","Monte sans élan.","Redescends sans creuser exagérément le dos."],avoid:"Si tu te balances, réduis l’amplitude."}
@@ -46,23 +52,30 @@
     const n=norm(name);
     if(n.includes("presse a cuisses")||n.includes("presse horizontale"))return "legpress";
     if(n.includes("hack squat"))return "hacksquat";
-    if(n.includes("goblet squat")||n.includes("squat guide"))return "squat";
+    if(n.includes("fente")||n.includes("step-up"))return "lunge";
+    if(n.includes("goblet squat")||n.includes("squat"))return "squat";
+    if(n.includes("pompe"))return "pushup";
+    if(n.includes("dips"))return "dip";
+    if(n.includes("developpe epaules"))return "overheadpress";
     if(n.includes("developpe incline")||n.includes("chest press inclinee"))return "inclinepress";
     if(n.includes("developpe couche")||n.includes("chest press"))return "press";
     if(n.includes("tirage vertical"))return "latpulldown";
     if(n.includes("traction"))return "pull";
     if(n.includes("rowing")||n.includes("tirage horizontal"))return "row";
+    if(n.includes("pullover"))return "pull";
     if(n.includes("souleve de terre roumain")||n.includes("hip hinge"))return "hinge";
     if(n.includes("pont fessier")||n.includes("hip thrust"))return "hipthrust";
     if(n.includes("abduction"))return "abduction";
     if(n.includes("leg curl"))return "legcurl";
     if(n.includes("leg extension"))return "legextension";
+    if(n.includes("oiseau")||n.includes("reverse pec deck")||n.includes("face pull"))return "rearraise";
     if(n.includes("elevation laterale"))return "raise";
     if(n.includes("curl"))return "curl";
-    if(n.includes("extension triceps"))return "triceps";
+    if(n.includes("extension triceps")||n.includes("barre au front"))return "triceps";
     if(n.includes("ecarte")||n.includes("pec deck"))return "fly";
     if(n.includes("mollet"))return "calf";
-    if(n.includes("crunch")||n.includes("releve")||n.includes("reverse crunch"))return "core";
+    if(n.includes("planche")||n.includes("mountain climber"))return "plank";
+    if(n.includes("crunch")||n.includes("releve")||n.includes("dead bug"))return "core";
     return null;
   }
 
@@ -71,6 +84,36 @@
     if(!type)return "";
     const s='stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"';
     const poses={
+      pushup:[
+        `<path d="M16 88h92" ${s}/><circle cx="82" cy="48" r="7" ${s}/><path d="M75 53L48 65 27 78M49 65l25 18M27 78l-8 10M74 83l18 5" ${s}/>`,
+        `<path d="M16 88h92" ${s}/><circle cx="82" cy="61" r="7" ${s}/><path d="M75 65L49 72 28 80M49 72l24 11M28 80l-9 8M73 83l19 5" ${s}/>`,
+        `<path d="M16 88h92" ${s}/><circle cx="82" cy="48" r="7" ${s}/><path d="M75 53L48 65 27 78M49 65l25 18M27 78l-8 10M74 83l18 5" ${s}/>`
+      ],
+      dip:[
+        `<path d="M24 54h25M72 54h25M32 54v42M89 54v42" ${s}/><circle cx="60" cy="28" r="7" ${s}/><path d="M60 35v33M60 45L43 55M60 45l17 10M60 68L50 94M60 68l10 26" ${s}/>`,
+        `<path d="M24 54h25M72 54h25M32 54v42M89 54v42" ${s}/><circle cx="60" cy="39" r="7" ${s}/><path d="M60 46v28M60 52L43 55M60 52l17 3M60 74L50 96M60 74l10 22" ${s}/>`,
+        `<path d="M24 54h25M72 54h25M32 54v42M89 54v42" ${s}/><circle cx="60" cy="28" r="7" ${s}/><path d="M60 35v33M60 45L43 55M60 45l17 10M60 68L50 94M60 68l10 26" ${s}/>`
+      ],
+      overheadpress:[
+        `<circle cx="60" cy="30" r="7" ${s}/><path d="M60 37v36M60 48L44 60l-2-18M60 48l16 12 2-18M60 73L49 98M60 73l11 25M38 42h8M74 42h8" ${s}/>`,
+        `<circle cx="60" cy="30" r="7" ${s}/><path d="M60 37v36M60 48L48 39l-2-20M60 48l12-9 2-20M60 73L49 98M60 73l11 25M42 19h8M70 19h8" ${s}/>`,
+        `<circle cx="60" cy="30" r="7" ${s}/><path d="M60 37v36M60 48L52 26V9M60 48l8-22V9M60 73L49 98M60 73l11 25M48 9h8M64 9h8" ${s}/>`
+      ],
+      rearraise:[
+        `<circle cx="48" cy="34" r="7" ${s}/><path d="M52 40L67 66M60 53L39 66M60 53l28 5M67 66L51 96M67 66l20 30" ${s}/>`,
+        `<circle cx="48" cy="34" r="7" ${s}/><path d="M52 40L67 66M60 53L31 53M60 53l36-3M67 66L51 96M67 66l20 30" ${s}/>`,
+        `<circle cx="48" cy="34" r="7" ${s}/><path d="M52 40L67 66M60 53L25 43M60 53l40-12M67 66L51 96M67 66l20 30" ${s}/>`
+      ],
+      lunge:[
+        `<circle cx="58" cy="22" r="7" ${s}/><path d="M58 29v38M58 67L43 96M58 67l24 29M58 44L43 58M58 44l15 14" ${s}/><path d="M25 98h76" ${s}/>`,
+        `<circle cx="61" cy="31" r="7" ${s}/><path d="M61 38v33M61 71L42 78l-15 18M61 71l25 8 11 17M61 49L45 60M61 49l16 11" ${s}/><path d="M22 98h82" ${s}/>`,
+        `<circle cx="64" cy="37" r="7" ${s}/><path d="M64 44v29M64 73L43 76l-17 20M64 73l27 4 12 19M64 53L47 62M64 53l17 9" ${s}/><path d="M20 98h88" ${s}/>`
+      ],
+      plank:[
+        `<path d="M14 90h96" ${s}/><circle cx="87" cy="56" r="7" ${s}/><path d="M80 61L55 69 29 80M55 69l27 16M29 80l-9 10M82 85l16 5" ${s}/>`,
+        `<path d="M14 90h96" ${s}/><circle cx="87" cy="56" r="7" ${s}/><path d="M80 61L55 69 29 80M55 69l17 13-8 8M29 80l-9 10M72 82l17 8" ${s}/>`,
+        `<path d="M14 90h96" ${s}/><circle cx="87" cy="56" r="7" ${s}/><path d="M80 61L55 69 29 80M55 69l27 16M29 80l-9 10M82 85l16 5" ${s}/>`
+      ],
       legpress:[
         `<path d="M14 18l26 76M88 12l18 72M84 14h24M91 84h18" ${s}/><circle cx="45" cy="38" r="7" ${s}/><path d="M41 45l-10 24M31 69l24 10 25-8M55 79l20 17M80 71l17 17" ${s}/>`,
         `<path d="M14 18l26 76M88 12l18 72M84 14h24M91 84h18" ${s}/><circle cx="45" cy="38" r="7" ${s}/><path d="M41 45l-10 24M31 69l31 1 22-16M62 70l24 19M84 54l13 34" ${s}/>`,
