@@ -8,11 +8,13 @@
   const done=e=>(e?.sets||[]).filter(s=>s.done);
   const vol=e=>done(e).reduce((a,s)=>a+(+s.weight||0)*(+s.reps||0),0);
   const fmt=v=>{const n=+v||0;return Number.isInteger(n)?String(n):n.toFixed(1).replace(".",",");};
-  const sessions=()=>[...state.sessions].sort((a,b)=>new Date(a.endedAt)-new Date(b.endedAt));
+  const sessions=()=>[...state.sessions].filter(s=>s.source!=="nomad").sort((a,b)=>new Date(a.endedAt)-new Date(b.endedAt));
   const hist=name=>sessions().map(s=>({s,e:(s.exercises||[]).find(x=>norm(x.name)===norm(name))})).filter(x=>x.e&&done(x.e).length);
   const minutes=s=>{if(!s||s.source==="mybodynote"||!s.endedAt)return null;const d=(new Date(s.endedAt)-new Date(s.startedAt))/60000;return d>0?Math.max(1,Math.round(d)):null;};
   function best(name){let weight=0,reps=0,e1=0,volume=0;hist(name).forEach(({e})=>{done(e).forEach(s=>{weight=Math.max(weight,+s.weight||0);reps=Math.max(reps,+s.reps||0);e1=Math.max(e1,estimated1RM(+s.weight||0,+s.reps||0));});volume=Math.max(volume,vol(e));});return{weight,reps,e1,volume};}
   function target(ex){
+    const unified=window.DenatSportCoach?.sessionPlan?.(ex);
+    if(unified)return {text:unified.reason,weight:unified.weight||0,reps:unified.reps,repRange:unified.repRange,level:unified.level};
     if(state.reprise?.enabled)return{text:"Charge facile · RPE 6–7 · garde 3–4 reps en réserve",weight:0};
     const h=hist(ex.name),last=h.at(-1);if(!last)return{text:`Première référence : ${ex.targetReps} reps propres à RPE 7–8`,weight:+ex.suggestedWeight||0};
     const ds=done(last.e),w=Math.max(...ds.map(s=>+s.weight||0)),same=ds.filter(s=>(+s.weight||0)===w),r=same.reduce((a,s)=>a+(+s.reps||0),0)/same.length,rpes=same.map(s=>+s.rpe).filter(Boolean),rp=rpes.length?rpes.reduce((a,b)=>a+b,0)/rpes.length:8,step=ex.category==="lower"?(+state.settings.lowerIncrement||5):(+state.settings.upperIncrement||2.5);
@@ -20,7 +22,7 @@
     if(rp>=9.5||r<+ex.targetReps-2){const nw=Math.max(step,roundTo(w-step,step));return{text:`Allège à ${fmt(nw)} kg et garde une exécution propre`,weight:nw};}
     return{text:`Garde ${fmt(w)} kg et gagne 1 rep sur au moins une série`,weight:w};
   }
-  function nextAdvice(ex){const ds=done(ex);if(!ds.length)return target(ex).text;const s=ds.at(-1),w=+s.weight||0,r=+s.reps||0,rpe=+s.rpe||0,t=+ex.targetReps||0;if(rpe>=9.5||r<t-2)return`Baisse légèrement ou reste à ${fmt(w)} kg avec plus de marge.`;if(rpe&&rpe<=7&&r>=t)return`Garde ${fmt(w)} kg et vise ${t}-${t+1} reps.`;return`Garde ${fmt(w)} kg et vise ${t} reps propres.`;}
+  function nextAdvice(ex){const unified=window.DenatSportCoach?.livePlan?.(ex);if(unified?.reason)return unified.reason;const ds=done(ex);if(!ds.length)return target(ex).text;const s=ds.at(-1),w=+s.weight||0,r=+s.reps||0,rpe=+s.rpe||0,t=+ex.targetReps||0;if(rpe>=9.5||r<t-2)return`Baisse légèrement ou reste à ${fmt(w)} kg avec plus de marge.`;if(rpe&&rpe<=7&&r>=t)return`Garde ${fmt(w)} kg et vise ${t}-${t+1} reps.`;return`Garde ${fmt(w)} kg et vise ${t} reps propres.`;}
   function warmup(ex){const n=norm(ex.name);if(["elevation","curl","triceps","ecarte","mollet","crunch","releve","oiseau"].some(k=>n.includes(k)))return[];let w=target(ex).weight;if(!w){const h=hist(ex.name).at(-1);w=h?Math.max(...done(h.e).map(s=>+s.weight||0)):0;}if(w<12)return[];const st=ex.category==="lower"?5:2.5,rr=p=>Math.max(st,roundTo(w*p,st));return[{w:rr(.4),r:10},{w:rr(.65),r:5},{w:rr(.8),r:3}].filter((x,i,a)=>!i||x.w>a[i-1].w);}
   function showWarmup(ex){const a=warmup(ex);if(!a.length){alert("Sur cet exercice, quelques répétitions légères et contrôlées suffisent généralement.");return;}document.querySelector(".ff-modal")?.remove();const m=document.createElement("div");m.className="ff-modal";m.innerHTML=`<div class="ff-modal-card"><div class="row"><div><div class="eyebrow">ÉCHAUFFEMENT</div><h2>${esc(ex.name)}</h2></div><button class="ghost" data-x>Fermer</button></div><p class="muted small">Ces séries ne comptent pas dans les séries de travail.</p>${a.map((s,i)=>`<div class="ff-warm"><span>Série ${i+1}</span><b>${fmt(s.w)} kg × ${s.r}</b></div>`).join("")}</div>`;document.body.appendChild(m);m.querySelector("[data-x]").onclick=()=>m.remove();}
   function currentPR(ex){const b=best(ex.name),ds=done(ex);if(!ds.length)return[];const w=Math.max(...ds.map(s=>+s.weight||0)),e1=Math.max(...ds.map(s=>estimated1RM(+s.weight||0,+s.reps||0))),v=vol(ex),o=[];if(w>b.weight&&w)o.push(`Charge ${fmt(w)} kg`);if(e1>b.e1+.05&&e1)o.push(`1RM ${e1.toFixed(1)} kg`);if(v>b.volume&&v)o.push(`Volume ${Math.round(v).toLocaleString("fr-FR")} kg`);return o.slice(0,2);}
