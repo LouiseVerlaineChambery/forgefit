@@ -21,7 +21,7 @@
 
   function history(name,limit=4){
     return [...state.sessions]
-      .filter(s=>s?.endedAt)
+      .filter(s=>s?.endedAt&&s.source!=="nomad")
       .sort((a,b)=>new Date(b.endedAt)-new Date(a.endedAt))
       .map(s=>({session:s,ex:(s.exercises||[]).find(e=>norm(e.name)===norm(name))}))
       .filter(x=>x.ex&&completed(x.ex).length)
