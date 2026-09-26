@@ -49,9 +49,8 @@
   function unique(a){return [...new Set(a)];}
 
   function chooseForWeek(weekKey){
-    const pool=allowed(),start=seed(weekKey)%pool.length,out=[];
-    for(let i=0;i<7;i++)out.push(pool[(start+i*3)%pool.length]);
-    return out;
+    const pool=allowed().slice().sort((a,b)=>seed(weekKey+a.id)-seed(weekKey+b.id));
+    return pool.slice(0,7);
   }
   function overridesFor(weekKey){const all=read(OVERRIDES,{});return all[weekKey]||{};}
   function saveOverride(weekKey,day,id){const all=read(OVERRIDES,{});all[weekKey]=all[weekKey]||{};all[weekKey][day]=id;localStorage.setItem(OVERRIDES,JSON.stringify(all));}
