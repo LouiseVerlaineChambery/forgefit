@@ -57,8 +57,9 @@
     const total=meals?.weekShop?.length||0;
     const remaining=Math.max(0,total-done);
     const weekly=weekSessions();
-    const goal=3;
-    const pct=Math.min(100,Math.round(weekly.length/goal*100));
+    const isAnais=window.DenatProfile?.is?.("anais")===true;
+    const goal=isAnais?0:3;
+    const pct=goal?Math.min(100,Math.round(weekly.length/goal*100)):0;
     const next=state.program?.[typeof nextWorkoutIndex==="function"?nextWorkoutIndex():0];
     const last=lastSession();
     const repriseDone=state.sessions.filter(s=>String(s.workoutName||"").startsWith("Reprise ")).length;
@@ -141,6 +142,9 @@
     view.querySelectorAll("[data-profile]").forEach(b=>b.addEventListener("click",()=>window.DenatProfile?.set?.(b.dataset.profile)));
     const goMeals=(v)=>{localStorage.setItem("forgefit_meals_view",v);setRoute("meals");};
     view.querySelector("#dash-food-journal")?.addEventListener("click",()=>goMeals("coach"));
+    view.querySelector("#dash-meal-coach")?.addEventListener("click",()=>goMeals("coach"));
+    view.querySelector("#dash-meal-coach-2")?.addEventListener("click",()=>goMeals("coach"));
+    view.querySelector("#dash-anais-sport")?.addEventListener("click",()=>setRoute("today"));
     view.querySelector("#dash-meal")?.addEventListener("click",()=>goMeals("today"));
     view.querySelector("#dash-week")?.addEventListener("click",()=>goMeals("week"));
     view.querySelector("#dash-shop")?.addEventListener("click",()=>goMeals("weekshop"));
