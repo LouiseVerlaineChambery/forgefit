@@ -82,7 +82,7 @@
   function eatenAnswer(text){
     const e=foodEstimate(text),mid=Math.round((e.kcal[0]+e.kcal[1])/2),rich=mid>=850;
     const logged=addJournal({type:"meal",text,kcalRange:e.kcal,proteinRange:e.protein,rich});
-    return `<div class="dlmc-answer"><b>Ajouté au journal de ${esc(personName())}</b><p class="small">${esc(text)}</p><p class="small">Estimation prudente : <b>≈ ${e.kcal[0]}–${e.kcal[1]} kcal</b> · <b>≈ ${e.protein[0]}–${e.protein[1]} g protéines</b>. ${e.confidence==="high"?"Les quantités indiquées permettent une estimation plus resserrée.":"Si tu précises les quantités (ex. 180 g poulet + 150 g riz), je pourrai resserrer la fourchette."}</p><div class="notice small">${rich?"Repas plutôt riche. Pour Jocelyn : pas idéal pour les abdos si ça devient fréquent 😄. Pas besoin de compenser brutalement : le prochain repas reste normal, avec une bonne source de protéines et des légumes.":"Repas enregistré. On juge surtout la tendance de la semaine, pas un repas isolé."}</div></div>`;
+    return `<div class="dlmc-answer"><b>Ajouté au journal de ${esc(personName())}</b><p class="small">${esc(text)}</p><p class="small">Estimation prudente : <b>≈ ${e.kcal[0]}–${e.kcal[1]} kcal</b> · <b>≈ ${e.protein[0]}–${e.protein[1]} g protéines</b>. ${e.confidence==="high"?"Les quantités indiquées permettent une estimation plus resserrée.":"Si tu précises les quantités (ex. 180 g poulet + 150 g riz), je pourrai resserrer la fourchette."}</p><div class="notice small">${absNote(rich?"rich":"balanced")}</div></div>`;
   }
   function journalSummary(){
     const now=Date.now(),week=readJournal().filter(x=>now-new Date(x.at).getTime()<7*86400000),today=week.filter(x=>new Date(x.at).toDateString()===new Date().toDateString());
@@ -94,6 +94,29 @@
   }
   function nutritionGuidance(days=1){
     return window.DenatNutrition?.guidance?.(days)||"Le journal se construit au fil des repas.";
+  }
+  function temporal(){
+    return window.DenatTime?.snapshot?.()||{now:new Date(),moment:{prompt:"repas",mealType:"Repas"},sport:{last:null,lastText:"aucune séance",status:"Aucune séance enregistrée",today:[],week:[]},food:{today:[],last:null,lastText:"aucun repas noté"},planned:{current:null,dinner:null}};
+  }
+  function timingAnswer(){
+    const t=temporal(),s=t.sport;
+    if(s.active)return `<div class="dlmc-answer"><b>Sport · maintenant</b><p class="small">Tu as une séance en cours : <b>${esc(s.active.workoutName)}</b>.</p></div>`;
+    if(!s.last)return `<div class="dlmc-answer"><b>Sport</b><p class="small">Je n’ai encore aucune séance terminée enregistrée sur ton profil.</p></div>`;
+    const when=new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long",hour:"2-digit",minute:"2-digit"}).format(new Date(s.last.endedAt));
+    return `<div class="dlmc-answer"><b>Ta dernière séance</b><p class="small"><b>${esc(s.last.workoutName)}</b> · ${esc(when)} · ${esc(s.lastText)}.</p><p class="small muted">Sur les 7 derniers jours : ${s.week.length} séance${s.week.length>1?"s":""} enregistrée${s.week.length>1?"s":""}.</p></div>`;
+  }
+  function currentMealAnswer(){
+    const t=temporal(),p=t.planned?.current,dinner=t.planned?.dinner,food=t.food;
+    let planned="";
+    if(Array.isArray(p)&&p[0])planned=`Le menu prévu pour ce moment est <b>${esc(p[0])}</b>.`;
+    else if(Array.isArray(dinner)&&dinner[0])planned=`Pour ce soir, le menu prévoit <b>${esc(dinner[0])}</b>.`;
+    const sport=t.sport?.last?`Ta dernière séance était <b>${esc(t.sport.lastText)}</b> (${esc(t.sport.last.workoutName)}).`:"Aucune séance récente n’est enregistrée.";
+    const logged=food.today.length?`Tu as déjà ${food.today.length} repas/ajout${food.today.length>1?"s":""} dans ton journal aujourd’hui.`:"Ton journal est encore vide aujourd’hui.";
+    return `<div class="dlmc-answer"><b>Maintenant · ${esc(t.moment.prompt)}</b><p class="small">${planned||"Je peux te proposer quelque chose selon ce que tu as à la maison."}</p><p class="small muted">${sport} ${logged}</p><div class="notice small">${esc(nutritionGuidance(1))}</div></div>`;
+  }
+  function temporalStrip(){
+    const t=temporal(),sport=t.sport?.last?`${t.sport.last.workoutName} · ${t.sport.lastText}`:"Aucune séance enregistrée",last=t.food?.last?`${t.food.last.mealType||"Repas"} · ${t.food.lastText}`:"Aucun repas noté";
+    return `<div class="dlmc-now"><div><span>MAINTENANT</span><b>${esc(t.moment.prompt)}</b></div><div><span>DERNIER SPORT</span><b>${esc(sport)}</b></div><div><span>DERNIER REPAS NOTÉ</span><b>${esc(last)}</b></div></div>`;
   }
   function summaryAnswer(days=1){
     const s=nutritionSummary(days),label=days===1?"aujourd’hui":"sur 7 jours";
@@ -108,8 +131,10 @@
   function answer(text){
     const n=norm(text);
     let html="";
-    if(/bilan|aujourd hui|aujourdhui|ma journee|ma journée|cette semaine/.test(n)&&!/j ai|jai/.test(n)) html=summaryAnswer(/semaine/.test(n)?7:1);
-    else if(/j ai mange|jai mange|j ai pris|jai pris|j ai bu|jai bu|ce midi j ai|ce soir j ai/.test(n)) html=eatenAnswer(text);
+    if(/quand.*sport|quand.*seance|derniere.*seance|dernier.*sport|fait.*sport|sport.*quand/.test(n)) html=timingAnswer();
+    else if(/quoi.*manger|mange.*maintenant|repas.*maintenant|qu est ce qu on mange|qu est ce que je mange|prochain repas/.test(n)) html=currentMealAnswer();
+    else if(/bilan|aujourd hui|aujourdhui|ma journee|ma journée|cette semaine/.test(n)&&!/j ai|jai/.test(n)) html=summaryAnswer(/semaine/.test(n)?7:1);
+    else if(/j ai mange|jai mange|j ai pris|jai pris|j ai bu|jai bu|ce midi j ai|ce soir j ai|ce matin j ai/.test(n)) html=eatenAnswer(text);
     else if(/resto|restaurant|brasserie|mange dehors|burger|pizza|sushi|kebab|tacos/.test(n)) html=restaurantAnswer(text);
     else if(/j ai|jai|il me reste|frigo|placard|a la maison|avec/.test(n)){
       const m=pantryMatch(text);
@@ -128,7 +153,7 @@
   }
   function view(){
     const outs=weekRestaurants(),js=journalSummary(),ns=nutritionSummary(1),ng=nutritionGuidance(1),isJocelyn=window.DenatProfile?.is?.("jocelyn")===true;
-    return `<section class="card dlmc-card"><div class="row"><div><div class="eyebrow">COACH REPAS · ${esc(personName())}</div><h2 style="margin:5px 0">Qu’est-ce qu’on mange ?</h2></div><span class="pill">${esc(personName())}</span></div><p class="muted small">Écris naturellement : ingrédients disponibles, ce que tu as réellement mangé, restaurant, envie rapide… Le menu et les courses restent communs au foyer ; ton journal reste personnel.</p><div class="dlmc-chips"><button data-dlmc-fill="J’ai poulet, riz et courgettes à la maison. Fais-moi un repas avec la recette.">J’ai des ingrédients</button><button data-dlmc-fill="J’ai mangé ce midi : 180 g poulet, 150 g riz, 200 g courgettes.">J’ai mangé…</button><button data-dlmc-fill="Fais-moi le bilan d’aujourd’hui.">Bilan du jour</button><button data-dlmc-fill="Je mange au restaurant ce soir : ">Je mange au resto</button><button data-dlmc-fill="Fais-moi un repas rapide en moins de 25 minutes.">Repas rapide</button></div><textarea id="dlmc-input" rows="4" placeholder="Ex. J’ai mangé ce midi 180 g de poulet, 150 g de riz et 200 g de courgettes."></textarea><button class="primary full" id="dlmc-send">Demander au coach</button><div id="dlmc-result"></div></section><section class="card"><div class="row"><div><div class="eyebrow">JOURNAL · ${esc(personName())}</div><h3 style="margin:6px 0">Ce que tu as réellement mangé</h3></div><span class="pill">${js.week.length} entrée${js.week.length>1?"s":""}</span></div><div class="dlmc-portions"><div><b>Aujourd’hui</b><br>${js.today.length} repas / ajout${js.today.length>1?"s":""}</div><div><b>7 jours</b><br>${js.rich} repas riche${js.rich>1?"s":""}</div></div><p class="muted small">Le menu reste commun au foyer. Ce journal, les restos et le suivi nutritionnel sont personnels à ${esc(personName())}.</p>
+    return `<section class="card dlmc-card"><div class="row"><div><div class="eyebrow">COACH REPAS · ${esc(personName())}</div><h2 style="margin:5px 0">Qu’est-ce qu’on mange ?</h2></div><span class="pill">${esc(personName())}</span></div>${temporalStrip()}<p class="muted small">Le coach tient maintenant compte de l’heure, de tes repas notés et de ton dernier entraînement. Tu peux lui parler normalement.</p><div class="dlmc-chips"><button data-dlmc-fill="Qu’est-ce que je mange maintenant ?">Maintenant</button><button data-dlmc-fill="Quand est-ce que j’ai fait du sport pour la dernière fois ?">Dernier sport</button><button data-dlmc-fill="J’ai poulet, riz et courgettes à la maison. Fais-moi un repas avec la recette.">J’ai des ingrédients</button><button data-dlmc-fill="J’ai mangé ce midi : 180 g poulet, 150 g riz, 200 g courgettes.">J’ai mangé…</button><button data-dlmc-fill="Fais-moi le bilan d’aujourd’hui.">Bilan du jour</button><button data-dlmc-fill="Je mange au restaurant ce soir : ">Restaurant</button></div><textarea id="dlmc-input" rows="4" placeholder="Ex. J’ai mangé ce midi 180 g de poulet, 150 g de riz et 200 g de courgettes."></textarea><button class="primary full" id="dlmc-send">Demander au coach</button><div id="dlmc-result"></div></section><section class="card"><div class="row"><div><div class="eyebrow">JOURNAL · ${esc(personName())}</div><h3 style="margin:6px 0">Ce que tu as réellement mangé</h3></div><span class="pill">${js.week.length} entrée${js.week.length>1?"s":""}</span></div><div class="dlmc-portions"><div><b>Aujourd’hui</b><br>${js.today.length} repas / ajout${js.today.length>1?"s":""}</div><div><b>7 jours</b><br>${js.rich} repas riche${js.rich>1?"s":""}</div></div><p class="muted small">Le menu reste commun au foyer. Ce journal, les restos et le suivi nutritionnel sont personnels à ${esc(personName())}.</p>
     <div class="notice small" style="margin:10px 0"><b>Bilan du jour</b><br>${isJocelyn&&ns.items.length?`≈ ${ns.kcal[0]}–${ns.kcal[1]} kcal · ≈ ${ns.protein[0]}–${ns.protein[1]} g protéines<br>`:""}${esc(ng)}</div>${js.week.length?`<div class="small" style="margin:12px 0"><b>Derniers ajouts</b>${js.week.slice(-6).reverse().map(x=>`<div class="dlmc-journal-row"><div><b>${esc(x.mealType||x.type||"Repas")}</b><br><span>${new Intl.DateTimeFormat("fr-FR",{weekday:"short",hour:"2-digit",minute:"2-digit"}).format(new Date(x.at))} · ${esc(x.text||"Repas")}</span></div>${x.id?`<button class="ghost dlmc-delete" data-dlmc-delete="${esc(x.id)}">Supprimer</button>`:""}</div>`).join("")}</div>`:""}<button class="ghost full" id="dlmc-share">Partager / connecter un autre téléphone</button></section>`;
   }
   function bind(root=document){
@@ -143,7 +168,7 @@
     root.querySelector("#dlmc-share")?.addEventListener("click",()=>window.DenatCloud?.shareAccess?.());
   }
   const style=document.createElement("style");
-  style.textContent=`.dlmc-card textarea{width:100%;box-sizing:border-box;margin:10px 0;padding:13px;border-radius:14px;border:1px solid var(--line);background:#101012;color:var(--text);font:inherit;resize:vertical}.dlmc-chips{display:flex;gap:7px;overflow:auto;margin:10px 0}.dlmc-chips button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlmc-answer{margin-top:14px;padding:14px;border-radius:16px;background:#101012;border:1px solid var(--line);line-height:1.45}.dlmc-portions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.dlmc-portions>div{padding:10px;border:1px solid var(--line);border-radius:12px;font-size:11px}.dlmc-steps{padding-left:20px}.dlmc-steps li{margin:7px 0;font-size:12px}.dlmc-journal-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:11px}.dlmc-journal-row span{color:var(--muted);line-height:1.4}.dlmc-delete{padding:7px 9px;font-size:10px}@media(max-width:420px){.dlmc-portions{grid-template-columns:1fr}}`;
+  style.textContent=`.dlmc-card textarea{width:100%;box-sizing:border-box;margin:10px 0;padding:13px;border-radius:14px;border:1px solid var(--line);background:#101012;color:var(--text);font:inherit;resize:vertical}.dlmc-chips{display:flex;gap:7px;overflow:auto;margin:10px 0}.dlmc-chips button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlmc-answer{margin-top:14px;padding:14px;border-radius:16px;background:#101012;border:1px solid var(--line);line-height:1.45}.dlmc-portions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.dlmc-portions>div{padding:10px;border:1px solid var(--line);border-radius:12px;font-size:11px}.dlmc-steps{padding-left:20px}.dlmc-steps li{margin:7px 0;font-size:12px}.dlmc-journal-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:11px}.dlmc-journal-row span{color:var(--muted);line-height:1.4}.dlmc-delete{padding:7px 9px;font-size:10px}.dlmc-now{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}.dlmc-now>div{padding:10px;border:1px solid var(--line);border-radius:12px}.dlmc-now span,.dlmc-now b{display:block}.dlmc-now span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.dlmc-now b{font-size:11px;margin-top:4px;line-height:1.3}@media(max-width:420px){.dlmc-now{grid-template-columns:1fr}.dlmc-portions{grid-template-columns:1fr}}@media(max-width:420px){.dlmc-portions{grid-template-columns:1fr}}`;
   document.head.appendChild(style);
   window.DenatMealCoach={view,bind,answer,weekRestaurants};
 })();
