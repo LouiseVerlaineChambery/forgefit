@@ -5,6 +5,19 @@
   const completed=e=>(e?.sets||[]).filter(s=>s.done);
   const stepFor=ex=>ex.category==="lower"?(+state.settings.lowerIncrement||5):(+state.settings.upperIncrement||2.5);
   const round=(n,step)=>Math.max(0,Math.round(n/step)*step);
+  const recovery=()=>window.DenatHealth?.recovery?.()||{fresh:false,band:"unknown",score:null,label:""};
+  function recoveryNote(p,last){
+    const r=recovery();if(!r.fresh)return p;
+    p.recovery=r;
+    if(r.band==="low"){
+      if(p.level==="up"&&last?.weight){p.weight=last.weight;p.level="hold";}
+      p.rpe=p.level==="knee-light"?"5–6":"6–7";
+      p.reason=`${r.label} (${r.score}/100) : pas d’augmentation aujourd’hui. ${p.reason}`;
+    }else if(r.band==="medium"){
+      p.reason=`${r.label} (${r.score}/100) : progression prudente. ${p.reason}`;
+    }
+    return p;
+  }
 
   function history(name,limit=4){
     return [...state.sessions]
@@ -21,11 +34,11 @@
   }
   function sessionPlan(ex){
     const target=+ex.targetReps||10,step=stepFor(ex),h=history(ex.name,4);
-    if(state.reprise?.enabled&&ex.lightLower){return {weight:0,reps:target,rpe:"5–6",level:"knee-light",reason:"Bas du corps protégé : poids du corps ou charge symbolique. Pas de progression de charge tant que le genou est sensible.",confidence:"Priorité tolérance du genou"};}
-    if(state.reprise?.enabled){return {weight:0,reps:target,rpe:"6–7",level:"reprise",reason:"Reprise : choisis une première charge facile. Le coach ajuste les séries suivantes selon ton RPE.",confidence:h.length?"Historique disponible mais volontairement ignoré en reprise":"Nouvelle référence"};}
-    if(!h.length)return {weight:0,reps:target,rpe:"7–8",level:"new",reason:"Pas encore de référence fiable : démarre avec une charge propre et renseigne ton RPE.",confidence:"À calibrer"};
+    if(state.reprise?.enabled&&ex.lightLower){return recoveryNote({weight:0,reps:target,rpe:"5–6",level:"knee-light",reason:"Bas du corps protégé : poids du corps ou charge symbolique. Pas de progression de charge tant que le genou est sensible.",confidence:"Priorité tolérance du genou"},null);}
+    if(state.reprise?.enabled){return recoveryNote({weight:0,reps:target,rpe:"6–7",level:"reprise",reason:"Reprise : choisis une première charge facile. Le coach ajuste les séries suivantes selon ton RPE.",confidence:h.length?"Historique disponible mais volontairement ignoré en reprise":"Nouvelle référence"},h[0]?stats(h[0].ex):null);}
+    if(!h.length)return recoveryNote({weight:0,reps:target,rpe:"7–8",level:"new",reason:"Pas encore de référence fiable : démarre avec une charge propre et renseigne ton RPE.",confidence:"À calibrer"},null);
     const last=stats(h[0].ex),prev=h[1]?stats(h[1].ex):null;
-    if(!last)return {weight:0,reps:target,rpe:"7–8",level:"new",reason:"Référence insuffisante.",confidence:"À calibrer"};
+    if(!last)return recoveryNote({weight:0,reps:target,rpe:"7–8",level:"new",reason:"Référence insuffisante.",confidence:"À calibrer"},null);
     let weight=last.weight||last.avgWeight||0,reason="Charge maintenue pour consolider la progression.",level="hold";
     const hit=last.minReps>=target,good=last.avgRpe!=null&&last.avgRpe<=8.25,hard=last.avgRpe!=null&&last.avgRpe>=9.25,bigMiss=last.avgReps<target-2;
     if(weight&&hit&&good){weight=round(weight+step,step);level="up";reason=`Dernière séance validée à ${last.avgRpe!=null?`RPE moyen ${last.avgRpe.toFixed(1).replace(".",",")}`:"la cible"} : +${fmt(step)} kg.`;}
@@ -37,7 +50,7 @@
       if(plateau&&last.avgRpe!=null&&last.avgRpe<=8.5)reason="Progression stable : garde la charge et essaie d’ajouter 1 répétition sur une série avant d’augmenter.";
     }
     const confidence=h.length>=3&&last.rpeCount?"Confiance élevée":h.length>=2?"Confiance moyenne":"Première référence";
-    return {weight,reps:target,rpe:"7–8,5",level,reason,confidence};
+    return recoveryNote({weight,reps:target,rpe:"7–8,5",level,reason,confidence},last);
   }
 
   function livePlan(ex){
@@ -59,6 +72,8 @@
     else if(rpe>=9){reason=`RPE ${fmt(rpe)} : garde ${fmt(w)} kg mais n’ajoute pas de charge sur cette série.`;}
     else if(!rpe){reason="RPE manquant : charge conservée. Renseigne le RPE pour un ajustement plus précis.";}
     if(state.reprise?.enabled&&level==="up"&&rpe>6.5){nw=w;level="hold";reason="Mode reprise : charge conservée pour rester autour de RPE 6–7.";}
+    const rec=recovery();
+    if(rec.fresh&&rec.band==="low"&&level==="up"){nw=w;level="hold";reason=`${rec.label} (${rec.score}/100) : charge conservée malgré la marge sur la série.`;}
     return {weight:nw,reps,rpe:state.reprise?.enabled?"6–7":"7–8,5",nextIndex,level,text:`${fmt(nw)} kg × ${reps}`,reason};
   }
 
@@ -78,7 +93,7 @@
     const hero=view.querySelector(".hero");if(!hero||view.querySelector(".dl-coach-card"))return;
     const plans=w.exercises.map(ex=>({ex,p:sessionPlan(ex)}));
     const card=document.createElement("section");card.className="card dl-coach-card";
-    card.innerHTML=`<div class="row"><div><div class="eyebrow">COACH SPORT INTELLIGENT</div><h3 style="margin:6px 0">Plan de la prochaine séance</h3></div><span class="pill">RPE adaptatif</span></div><p class="muted small">Le haut du corps reste sur la reprise prévue. Le bas du corps est temporairement protégé : poids du corps / très léger, sans progression de charge.</p>${plans.map(({ex,p})=>`<div class="dl-coach-plan-row"><div class="row"><span>${esc(ex.name)}</span><b>${ex.lightLower?`${p.reps} reps · très léger`:p.weight?`${fmt(p.weight)} kg × ${p.reps}`:`${p.reps} reps · calibration`}</b></div><div class="small muted" style="margin-top:4px">RPE cible ${p.rpe} · ${esc(p.confidence)}</div></div>`).join("")}`;
+    card.innerHTML=`<div class="row"><div><div class="eyebrow">COACH SPORT INTELLIGENT</div><h3 style="margin:6px 0">Plan de la prochaine séance</h3></div><span class="pill">${recovery().fresh?`${recovery().score}/100 · récupération`:"RPE adaptatif"}</span></div><p class="muted small">${state.reprise?.enabled?"Le coach combine historique, RPE et récupération. Le bas du corps reste temporairement protégé pendant la reprise.":"Le coach combine historique, RPE et récupération du jour lorsqu’Apple Santé est disponible."}</p>${plans.map(({ex,p})=>`<div class="dl-coach-plan-row"><div class="row"><span>${esc(ex.name)}</span><b>${ex.lightLower?`${p.reps} reps · très léger`:p.weight?`${fmt(p.weight)} kg × ${p.reps}`:`${p.reps} reps · calibration`}</b></div><div class="small muted" style="margin-top:4px">RPE cible ${p.rpe} · ${esc(p.confidence)}</div></div>`).join("")}`;
     hero.insertAdjacentElement("afterend",card);
   }
 
