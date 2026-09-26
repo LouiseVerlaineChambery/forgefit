@@ -1,20 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Denat Life">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Denat Life — Cercle & Chemin">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#171719"/>
-      <stop offset="1" stop-color="#080809"/>
-    </linearGradient>
-    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#f6dfb0"/>
-      <stop offset="0.48" stop-color="#d6a45b"/>
-      <stop offset="1" stop-color="#a87534"/>
+    <radialGradient id="bg" cx="38%" cy="24%" r="90%">
+      <stop offset="0" stop-color="#1d1b18"/>
+      <stop offset=".62" stop-color="#0d0d0e"/>
+      <stop offset="1" stop-color="#070708"/>
+    </radialGradient>
+    <linearGradient id="gold" x1=".15" y1=".08" x2=".82" y2=".92">
+      <stop offset="0" stop-color="#fff0bf"/>
+      <stop offset=".32" stop-color="#e6bd69"/>
+      <stop offset=".68" stop-color="#c28a38"/>
+      <stop offset="1" stop-color="#8d5b24"/>
     </linearGradient>
   </defs>
   <rect width="512" height="512" rx="116" fill="url(#bg)"/>
-  <rect x="20" y="20" width="472" height="472" rx="98" fill="none" stroke="#d6a45b" stroke-width="4" opacity="0.34"/>
-  <g fill="url(#gold)" font-family="Didot, 'Bodoni 72', Georgia, 'Times New Roman', serif" font-weight="500">
-    <text x="70" y="356" font-size="310">D</text>
-    <text x="220" y="356" font-size="310">L</text>
-  </g>
-  <path d="M120 397H392" stroke="#f3d39b" stroke-width="7" stroke-linecap="round" opacity="0.62"/>
+  <circle cx="256" cy="248" r="180" fill="none" stroke="url(#gold)" stroke-width="12" stroke-linecap="round" stroke-dasharray="910 220" transform="rotate(-40 256 248)"/>
+  <path d="M121 287 L184 218 L219 252 L278 166 L365 286" fill="none" stroke="url(#gold)" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M181 286 L220 238 L246 264 L279 216 L324 286" fill="none" stroke="#f6dda5" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" opacity=".82"/>
+  <path d="M329 302 C287 313 244 330 225 353 C208 374 222 392 252 394 C292 397 322 375 349 347 C368 327 386 318 404 315" fill="none" stroke="url(#gold)" stroke-width="16" stroke-linecap="round"/>
+  <circle cx="404" cy="315" r="8" fill="#f7dfaa"/>
 </svg>
