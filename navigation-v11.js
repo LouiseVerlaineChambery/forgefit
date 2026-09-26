@@ -1,7 +1,8 @@
 // Denat Life V11 — navigation lifestyle
 (function(){
   const baseSetRoute=setRoute;
-  function active(name){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.route===name));}\n  function cloudLabel(){const s=window.DenatCloud?.status;return s==="cloud"?"Enregistré sur Denat Life Cloud":s==="enregistrement"?"Enregistrement…":s==="hors-ligne"?"Hors ligne · cache local actif":"Connexion…";}
+  function active(name){document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.route===name));}
+  function cloudLabel(){const s=window.DenatCloud?.status;return s==="cloud"?"Enregistré sur Denat Life Cloud":s==="enregistrement"?"Enregistrement…":s==="hors-ligne"?"Hors ligne · cache local actif":"Connexion…";}
   function renderMore(){
     title.textContent="Plus";
     view.innerHTML=`
