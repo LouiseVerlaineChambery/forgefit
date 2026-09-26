@@ -99,6 +99,6 @@
   render=function(){if(route==="meals"){title.textContent="Repas & courses";renderMeals();return;}baseRender();};
   const q=new URLSearchParams(location.search);
   if(q.get("duo")==="1"){localStorage.setItem(PERSON_KEY,"p2");localStorage.setItem(DUO_START_KEY,"1");}
-  loadWeekly();
+  if(loading) loadWeekly();
   if(q.get("view")==="meals"||localStorage.getItem(DUO_START_KEY)==="1")setRoute("meals");
 })();
