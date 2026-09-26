@@ -17,7 +17,8 @@
     .dl-duo{display:flex;align-items:center;gap:9px}
     .dl-dot{width:9px;height:9px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 4px rgba(214,164,91,.10)}
     .dl-link{cursor:pointer}
-    @media(max-width:420px){.dl-grid,.dl-actions{grid-template-columns:1fr 1fr}.dl-meal-title{font-size:19px}}
+    .dl-anais-grid{grid-template-columns:1fr}
+    @media(max-width:420px){.dl-grid,.dl-actions{grid-template-columns:1fr 1fr}.dl-anais-grid{grid-template-columns:1fr}.dl-meal-title{font-size:19px}}
   `;
   document.head.appendChild(style);
 
@@ -45,6 +46,7 @@
 
   renderSettings=function(){
     const profileName=window.DenatProfile?.label?.()||"Jocelyn";
+    const isAnais=window.DenatProfile?.is?.("anais");
     title.textContent=profileName;
     const meals=mealData();
     const di=(new Date().getDay()+6)%7;
@@ -66,10 +68,10 @@
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
-        <div class="dl-brand-hero"><img src="brand-logo-v5.svg?v=12.5" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">SPORT · NUTRITION · ÉQUILIBRE</div></div></div>
+        <div class="dl-brand-hero"><img src="brand-logo-v5.svg?v=12.5" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">${isAnais?"REPAS · COURSES · ÉQUILIBRE":"SPORT · NUTRITION · ÉQUILIBRE"}</div></div></div>
         <div class="hero-title" style="margin-top:18px">Bonjour ${escDash(profileName)} 👋</div>
         <div class="dl-date">${fmtDay()}</div>
-        <p class="muted" style="margin-bottom:0">Ton espace personnel, avec le foyer Denat Life partagé.</p>
+        <p class="muted" style="margin-bottom:0">${isAnais?"Tes repas et le quotidien du foyer en premier. Le sport reste disponible quand tu en as envie.":"Ton espace personnel, avec le foyer Denat Life partagé."}</p>
       </section>
 
       <section class="card">
@@ -82,10 +84,14 @@
         <p class="muted small" style="margin-bottom:0">Séances, journal alimentaire et suivi personnel sont séparés. Menu, recettes, courses et organisation du foyer restent communs.</p>
       </section>
 
-      <section class="card">
+      ${!isAnais?`<section class="card">
         <div class="row"><div><div class="eyebrow">FORME DU JOUR</div><h3 style="margin:6px 0">${escDash(recovery.label)}</h3></div><span class="pill">${recovery.fresh?`${recovery.score}/100`:"Coach RPE"}</span></div>
         ${recovery.fresh?`<div class="dl-grid" style="margin-top:10px"><div class="dl-tile"><div class="dl-label">SOMMEIL</div><div class="dl-big">${health.sleepHours!=null?health.sleepHours.toFixed(1).replace(".",",")+" h":"—"}</div></div><div class="dl-tile"><div class="dl-label">PAS</div><div class="dl-big">${health.steps!=null?Math.round(health.steps).toLocaleString("fr-FR"):"—"}</div></div></div><p class="muted small" style="margin:10px 0 0">${escDash(recovery.reasons.slice(0,2).join(" · ")||"Données Apple Santé reçues.")}</p>`:`<p class="muted small" style="margin-bottom:0">Le coach fonctionne déjà avec tes séances et ton RPE. Dès que le raccourci Apple Santé envoie ses données, sommeil et récupération enrichiront automatiquement les conseils.</p>`}
-      </section>
+      </section>`:`<section class="card">
+        <div class="row"><div><div class="eyebrow">MON SUIVI REPAS</div><h3 style="margin:6px 0">Journal d’Anaïs</h3></div><span class="pill">Personnel</span></div>
+        <p class="muted small">Note simplement ce que tu as réellement mangé. Le menu et les courses restent communs au foyer.</p>
+        <button class="primary full" id="dash-food-journal">Noter ce que j’ai mangé</button>
+      </section>`}
 
       <section class="card">
         <div class="row"><div><div class="eyebrow">CE SOIR</div><div class="dl-meal-title">${escDash(tonight)}</div></div><span class="pill">≈ 21 h</span></div>
@@ -99,13 +105,13 @@
         <p class="muted small" style="margin-bottom:0">Déjà prévu grâce au dîner de ce soir.</p>
       </section>
 
-      <div class="dl-grid">
-        <section class="dl-tile dl-link" id="dash-sport">
+      <div class="dl-grid ${isAnais?"dl-anais-grid":""}">
+        ${!isAnais?`<section class="dl-tile dl-link" id="dash-sport">
           <div class="dl-label">SPORT</div>
           <div class="dl-big">${weekly.length}/${goal}</div>
           <div class="small muted">séances cette semaine</div>
           <div class="dl-progress"><span style="width:${pct}%"></span></div>
-        </section>
+        </section>`:""}
         <section class="dl-tile dl-link" id="dash-shop">
           <div class="dl-label">COURSES</div>
           <div class="dl-big">${remaining}</div>
@@ -113,11 +119,11 @@
         </section>
       </div>
 
-      <section class="card">
+      ${!isAnais?`<section class="card">
         <div class="row"><div><div class="eyebrow">PROCHAINE SÉANCE</div><h3 style="margin:6px 0">${escDash(next?.name||"À définir")}</h3></div><span class="pill">${escDash(sportPhase)}</span></div>
         <p class="muted small">${last?`Dernière séance : ${escDash(last.workoutName)} · ${fmtDate(last.endedAt)}`:"Première séance à venir."}</p>
         <div class="dl-actions"><button class="primary" id="dash-start">Aller au Sport</button><button class="ghost" id="dash-progress">Progression</button></div>
-      </section>
+      </section>`:""}
 
       <section class="card">
         <div class="row"><div><div class="eyebrow">COURSES DE LA SEMAINE</div><h3 style="margin:6px 0">${remaining} / ${total} à acheter</h3></div><span class="pill">${meals?.weeklyEstimateEUR?`≈ ${Math.round(meals.weeklyEstimateEUR)} €`:"Budget —"}</span></div>
@@ -128,12 +134,13 @@
       <section class="card">
         <div class="eyebrow">DENAT LIFE</div>
         <h3 style="margin:6px 0">Réglages & sauvegarde</h3>
-        <p class="muted small">Progression, export des séances et paramètres techniques restent accessibles ici.</p>
+        <p class="muted small">${isAnais?"Profil, données et paramètres restent accessibles ici.":"Progression, export des séances et paramètres techniques restent accessibles ici."}</p>
         <button class="ghost full" id="dash-settings">Ouvrir les réglages</button>
       </section>`;
 
     view.querySelectorAll("[data-profile]").forEach(b=>b.addEventListener("click",()=>window.DenatProfile?.set?.(b.dataset.profile)));
     const goMeals=(v)=>{localStorage.setItem("forgefit_meals_view",v);setRoute("meals");};
+    view.querySelector("#dash-food-journal")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-meal")?.addEventListener("click",()=>goMeals("today"));
     view.querySelector("#dash-week")?.addEventListener("click",()=>goMeals("week"));
     view.querySelector("#dash-shop")?.addEventListener("click",()=>goMeals("weekshop"));
