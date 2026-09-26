@@ -72,7 +72,12 @@
     const item={id:crypto.randomUUID(),at:now.toISOString(),person:window.DenatProfile?.label?.()||"Jocelyn",type:opts.type||"meal",mealType:opts.mealType||mealType(text,now),text,kcalRange:e.kcal,proteinRange:e.protein,confidence:e.confidence||"low",parts:e.parts||[],rich:midK>=850};
     const x=read();x.push(item);write(x);return item;
   }
-  function remove(id){const x=read().filter(v=>v.id!==id);write(x);return x;}\n  function restore(item){\n    if(!item?.id)return false;\n    const x=read();if(x.some(v=>v.id===item.id))return true;\n    x.push(item);x.sort((a,b)=>new Date(a.at)-new Date(b.at));write(x);return true;\n  }
+  function remove(id){const x=read().filter(v=>v.id!==id);write(x);return x;}
+  function restore(item){
+    if(!item?.id)return false;
+    const x=read();if(x.some(v=>v.id===item.id))return true;
+    x.push(item);x.sort((a,b)=>new Date(a.at)-new Date(b.at));write(x);return true;
+  }
   const mid=r=>Array.isArray(r)&&r.length>=2?(Number(r[0])+Number(r[1]))/2:0;
   function rangeSum(items,k){
     const vals=items.map(x=>x[k]).filter(Array.isArray);if(!vals.length)return [0,0];
