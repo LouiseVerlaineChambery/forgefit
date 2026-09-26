@@ -1,0 +1,52 @@
+/* Denat Life V11 — Cercle & Chemin */
+:root{
+  --bg:#090909;--panel:#121212;--panel2:#181715;--text:#f8f3e8;--muted:#9e968a;
+  --line:#2b2823;--accent:#d7a846;--accent2:#f1d58c;--gold:#d7a846;
+  --cream:#f5efe4;--cream2:#fffaf0;--ink:#211d18;--warmline:#e5d8c5;
+  --radius:22px;
+}
+html,body{background:#090909!important}
+body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif!important}
+.topbar{padding-top:calc(14px + env(safe-area-inset-top,0px))!important;background:rgba(9,9,9,.92)!important;border-bottom:1px solid rgba(215,168,70,.11)!important}
+.brand-lockup{gap:10px!important}.brand-logo{width:44px!important;height:44px!important;border-radius:14px!important;box-shadow:0 8px 24px rgba(0,0,0,.42)!important}
+.brand-lockup .eyebrow{font-family:Georgia,"Times New Roman",serif!important;font-size:13px!important;letter-spacing:.19em!important;color:#f1d58c!important;font-weight:500!important}
+.brand-tagline{font-size:7px!important;letter-spacing:.20em!important;color:#7e776d!important}
+.topbar h1{font-size:20px!important;font-weight:720!important;letter-spacing:-.02em!important;margin-top:3px!important}
+.card{border-radius:22px!important;border-color:#28251f!important;background:linear-gradient(180deg,#171614,#111111)!important}
+.hero{background:radial-gradient(circle at 80% -10%,rgba(215,168,70,.18),transparent 42%),linear-gradient(150deg,#1b1916,#101010 72%)!important}
+.hero:before{height:1px!important;background:linear-gradient(90deg,transparent,#e0b85e,transparent)!important}
+.hero-title{font-family:Georgia,"Times New Roman",serif!important;font-weight:500!important;letter-spacing:-.025em!important}
+.primary{background:linear-gradient(135deg,#e4b94f,#c48c2d)!important;color:#17120a!important;border:0!important}
+.secondary{background:#1c1a17!important;border-color:#373127!important}.ghost{background:transparent!important;border-color:#35312a!important}
+.eyebrow{color:#d8a94b!important}.pill{border-color:#383126!important;background:#15130f!important;color:#c5bba9!important}
+.tabbar{padding-top:7px!important;background:rgba(8,8,8,.96)!important;border-top:1px solid #28251f!important;box-shadow:0 -16px 38px rgba(0,0,0,.35)!important}
+.tab{gap:4px!important;min-width:0!important}.tab span{font-size:18px!important;line-height:20px!important}.tab small{font-size:9px!important;letter-spacing:.01em!important}.tab.active{color:#e6bd69!important}
+.dl-brand-hero{display:grid;grid-template-columns:76px 1fr;gap:15px;align-items:center}.dl-brand-hero img{width:76px;height:76px;border-radius:23px;box-shadow:0 16px 34px rgba(0,0,0,.36)}.dl-brand-name{font-family:Georgia,"Times New Roman",serif;font-size:25px;letter-spacing:.08em;color:#f6e3b2}.dl-brand-sub{font-size:9px;letter-spacing:.16em;color:#9e968a;margin-top:5px}
+.dl-more-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.dl-more-item{padding:16px;border-radius:18px;border:1px solid var(--line);background:#111;cursor:pointer}.dl-more-item b{display:block;color:#f1d58c;margin-bottom:5px}.dl-more-item span{font-size:11px;color:var(--muted);line-height:1.35}
+
+/* Repas, recettes et courses : ivoire premium */
+body.meals-theme{background:#f4eee2!important;color:var(--ink)!important}
+body.meals-theme .topbar{background:rgba(250,246,238,.94)!important;border-bottom-color:#e4d8c6!important}
+body.meals-theme .brand-lockup .eyebrow{color:#8c6228!important}body.meals-theme .brand-tagline{color:#9a8e7d!important}
+body.meals-theme .card,body.meals-theme .hero{background:#fffaf0!important;border-color:#e4d8c6!important;box-shadow:0 12px 30px rgba(83,61,31,.07)!important}
+body.meals-theme .hero{background:radial-gradient(circle at 92% 0,rgba(215,168,70,.13),transparent 42%),#fffaf0!important}
+body.meals-theme .hero:before{background:linear-gradient(90deg,transparent,#c9953b,transparent)!important}
+body.meals-theme .hero-title{color:#211d18!important}
+body.meals-theme .primary{background:linear-gradient(135deg,#b88939,#8e672e)!important;color:#fffaf0!important}
+body.meals-theme .secondary{background:#f2e8d8!important;color:#332b22!important;border-color:#dfd0bc!important}
+body.meals-theme .ghost{background:#fffaf0!important;color:#3a3026!important;border-color:#ded0bd!important}
+body.meals-theme .tabbar{background:rgba(255,250,240,.97)!important;border-color:#dfd3c2!important;box-shadow:0 -12px 30px rgba(70,50,25,.09)!important}
+body.meals-theme .tab{color:#928777!important}body.meals-theme .tab.active{color:#946729!important}
+body.meals-theme .ff-price{font-family:Georgia,"Times New Roman",serif!important;color:#8f6329!important}
+body.meals-theme .ff-shop{padding:13px 2px!important}
+body.meals-theme .ff-shop input{accent-color:#9a6d2e!important}
+body.meals-theme .ff-recipe-card{border-radius:28px 28px 18px 18px!important;box-shadow:0 -12px 50px rgba(52,38,20,.16)!important}
+body.meals-theme .ff-recipe-card h2{font-family:Georgia,"Times New Roman",serif!important;font-weight:500!important;font-size:25px!important}
+body.meals-theme .ff-shop-cat{color:#946729!important;font-size:10px!important;letter-spacing:.16em!important}
+
+/* Coach sport */
+.dl-coach-card,.dl-coach-live{border-color:rgba(215,168,70,.30)!important}
+.dl-coach-target{font-family:Georgia,"Times New Roman",serif!important;font-weight:500!important;color:#f1d58c!important}
+.dl-coach-apply{background:linear-gradient(135deg,#e4b94f,#c48c2d)!important;color:#17120a!important}
+
+@media(max-width:380px){.dl-more-grid{grid-template-columns:1fr}.dl-brand-hero{grid-template-columns:62px 1fr}.dl-brand-hero img{width:62px;height:62px;border-radius:19px}.dl-brand-name{font-size:21px}}
