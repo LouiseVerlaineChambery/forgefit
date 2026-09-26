@@ -70,6 +70,8 @@
     const temporal=window.DenatTime?.snapshot?.();
     const temporalSport=temporal?.sport?.last?`${temporal.sport.last.workoutName} · ${temporal.sport.lastText}`:"Aucune séance enregistrée";
     const temporalMeal=temporal?.food?.last?`${temporal.food.last.mealType||"Repas"} · ${temporal.food.lastText}`:"Aucun repas noté";
+    const memory=window.DenatMemory?.context?.();
+    const memoryHint=window.DenatMemory?.coachHint?.()||"";
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
@@ -80,12 +82,15 @@
       </section>
 
       <section class="card">
-        <div class="row"><div><div class="eyebrow">FIL DU JOUR</div><h3 style="margin:6px 0">${escDash(temporal?.moment?.prompt||"Aujourd’hui")}</h3></div><span class="pill">${new Intl.DateTimeFormat("fr-FR",{hour:"2-digit",minute:"2-digit"}).format(new Date())}</span></div>
+        <div class="row"><div><div class="eyebrow">MÉMOIRE DU QUOTIDIEN</div><h3 style="margin:6px 0">${escDash(temporal?.moment?.prompt||"Aujourd’hui")}</h3></div><span class="pill">${new Intl.DateTimeFormat("fr-FR",{hour:"2-digit",minute:"2-digit"}).format(new Date())}</span></div>
         <div class="dl-grid" style="margin-top:10px">
-          ${!isAnais?`<div class="dl-tile"><div class="dl-label">DERNIER SPORT</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(temporalSport)}</div></div>`:`<div class="dl-tile"><div class="dl-label">DERNIER REPAS NOTÉ</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(temporalMeal)}</div></div>`}
-          <div class="dl-tile"><div class="dl-label">AUJOURD’HUI</div><div class="small" style="margin-top:6px;font-weight:750">${temporal?.food?.today?.length||0} repas / ajout${(temporal?.food?.today?.length||0)>1?"s":""} noté${(temporal?.food?.today?.length||0)>1?"s":""}</div></div>
+          <div class="dl-tile"><div class="dl-label">AUJOURD’HUI</div><div class="small" style="margin-top:6px;font-weight:750">${memory?.today?.meals?.length||0} repas · ${memory?.today?.sessions?.length||0} sport</div></div>
+          <div class="dl-tile"><div class="dl-label">HIER</div><div class="small" style="margin-top:6px;font-weight:750">${memory?.yesterday?.meals?.length||0} repas · ${memory?.yesterday?.sessions?.length||0} sport</div></div>
+          ${!isAnais?`<div class="dl-tile"><div class="dl-label">DERNIER SPORT</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(temporalSport)}</div></div>`:`<div class="dl-tile"><div class="dl-label">DERNIER REPAS</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(temporalMeal)}</div></div>`}
+          <div class="dl-tile"><div class="dl-label">7 JOURS</div><div class="small" style="margin-top:6px;font-weight:750">${memory?.seven?.meals?.length||0} repas · ${memory?.seven?.sessions?.length||0} séance${(memory?.seven?.sessions?.length||0)>1?"s":""}</div></div>
         </div>
-        <p class="muted small" style="margin:10px 0 0">${isAnais?"Denat Life se cale sur le moment de la journée pour mettre le bon repas en avant.":temporal?.sport?.last?"Le coach repas et le coach sport utilisent maintenant cette chronologie.":"Ta chronologie se construira automatiquement avec tes séances et tes repas."}</p>
+        <p class="muted small" style="margin:10px 0">${escDash(memoryHint)}</p>
+        <button class="ghost full" id="dash-memory">Interroger ma mémoire</button>
       </section>
 
       <section class="card">
@@ -155,6 +160,7 @@
     view.querySelectorAll("[data-profile]").forEach(b=>b.addEventListener("click",()=>window.DenatProfile?.set?.(b.dataset.profile)));
     const goMeals=(v)=>{localStorage.setItem("forgefit_meals_view",v);setRoute("meals");};
     view.querySelector("#dash-food-journal")?.addEventListener("click",()=>goMeals("coach"));
+    view.querySelector("#dash-memory")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-meal-coach")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-meal-coach-2")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-anais-sport")?.addEventListener("click",()=>setRoute("today"));
