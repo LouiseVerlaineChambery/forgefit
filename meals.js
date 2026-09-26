@@ -76,20 +76,23 @@
   }
 
   async function loadWeekly(){
-    if(window.DenatMealEngine){
-      data=DenatMealEngine.generate();
-      loading=false;
-      if(route==="meals")renderMeals();
-      return;
-    }
     try{
-      const r=await fetch(`weekly-menu.json?v=${Date.now()}`,{cache:"no-store"});
+      if(window.DenatMealEngine){
+        data=DenatMealEngine.generate();
+        loading=false;
+        if(route==="meals")renderMeals();
+        return;
+      }
+      const r=await fetch("weekly-menu.json",{cache:"default"});
       if(!r.ok)throw new Error("menu");
       const d=await r.json();
       if(Array.isArray(d.days)&&d.days.length===7)data=d;
-    }catch(e){}
-    loading=false;
-    if(route==="meals")renderMeals();
+    }catch(e){
+      console.error("Denat Life repas:",e);
+    }finally{
+      loading=false;
+      if(route==="meals")renderMeals();
+    }
   }
 
   const baseRender=render;
