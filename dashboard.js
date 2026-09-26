@@ -64,7 +64,9 @@
     const repriseDone=state.sessions.filter(s=>String(s.workoutName||"").startsWith("Reprise ")).length;
     const sportPhase=state.reprise?.enabled?`Reprise · ${Math.min(repriseDone,6)}/6`:state.reprise?.completed?"Programme esthétique":"Programme actif";
     const recovery=window.DenatHealth?.recovery?.()||{fresh:false,connected:false,score:null,label:"En attente Apple Santé",reasons:[]};
-    const health=recovery.data||{};\n    const nutrition=window.DenatNutrition?.summary?.(1)||{items:[],kcal:[0,0],protein:[0,0]};\n    const nutritionGuide=window.DenatNutrition?.guidance?.(1)||"Note tes repas pour construire le bilan du jour.";
+    const health=recovery.data||{};
+    const nutrition=window.DenatNutrition?.summary?.(1)||{items:[],kcal:[0,0],protein:[0,0]};
+    const nutritionGuide=window.DenatNutrition?.guidance?.(1)||"Note tes repas pour construire le bilan du jour.";
 
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
