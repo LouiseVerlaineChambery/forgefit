@@ -44,7 +44,7 @@
   function mealData(){try{return window.DenatMealEngine?.generate?.()||null;}catch(e){return null;}}
 
   renderSettings=function(){
-    title.textContent="Nous";
+    const profileName=window.DenatProfile?.label?.()||"Jocelyn";\n    title.textContent=profileName;
     const meals=mealData();
     const di=(new Date().getDay()+6)%7;
     const today=meals?.days?.[di];
@@ -66,9 +66,19 @@
     view.innerHTML=`
       <section class="card hero dl-dash-hero">
         <div class="dl-brand-hero"><img src="brand-logo-v5.svg?v=12.5" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">SPORT · NUTRITION · ÉQUILIBRE</div></div></div>
-        <div class="hero-title" style="margin-top:18px">Bonjour 👋</div>
+        <div class="hero-title" style="margin-top:18px">Bonjour ${escDash(profileName)} 👋</div>
         <div class="dl-date">${fmtDay()}</div>
-        <p class="muted" style="margin-bottom:0">Votre journée, en un coup d’œil.</p>
+        <p class="muted" style="margin-bottom:0">Ton espace personnel, avec le foyer Denat Life partagé.</p>
+      </section>
+
+      <section class="card">
+        <div class="eyebrow">PROFILS DENAT LIFE</div>
+        <h3 style="margin:6px 0 12px">Deux espaces personnels · un foyer</h3>
+        <div class="dl-actions">
+          <button class="${window.DenatProfile?.is?.("jocelyn")?"primary":"secondary"}" data-profile="jocelyn">Jocelyn</button>
+          <button class="${window.DenatProfile?.is?.("anais")?"primary":"secondary"}" data-profile="anais">Anaïs</button>
+        </div>
+        <p class="muted small" style="margin-bottom:0">Séances, journal alimentaire et suivi personnel sont séparés. Menu, recettes, courses et organisation du foyer restent communs.</p>
       </section>
 
       <section class="card">
