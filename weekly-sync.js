@@ -3,7 +3,7 @@
   const API="https://lv-social-publisher.jocelyn-denat.workers.dev/forge-sync";
   const HID_KEY="forgelife_household_id";
   const SECRET_KEY="forgelife_household_secret";
-  const OFFSET=50;
+  const OFFSET=500;
   let busy=false;
 
   function mondayDate(padded=true){
