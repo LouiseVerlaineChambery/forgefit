@@ -107,7 +107,8 @@
   function answer(text){
     const n=norm(text);
     let html="";
-    if(/bilan|aujourd hui|aujourdhui|ma journee|ma journée|cette semaine/.test(n)&&!/j ai|jai/.test(n)) html=summaryAnswer(/semaine/.test(n)?7:1);\n    else if(/j ai mange|jai mange|j ai pris|jai pris|j ai bu|jai bu|ce midi j ai|ce soir j ai/.test(n)) html=eatenAnswer(text);
+    if(/bilan|aujourd hui|aujourdhui|ma journee|ma journée|cette semaine/.test(n)&&!/j ai|jai/.test(n)) html=summaryAnswer(/semaine/.test(n)?7:1);
+    else if(/j ai mange|jai mange|j ai pris|jai pris|j ai bu|jai bu|ce midi j ai|ce soir j ai/.test(n)) html=eatenAnswer(text);
     else if(/resto|restaurant|brasserie|mange dehors|burger|pizza|sushi|kebab|tacos/.test(n)) html=restaurantAnswer(text);
     else if(/j ai|jai|il me reste|frigo|placard|a la maison|avec/.test(n)){
       const m=pantryMatch(text);
