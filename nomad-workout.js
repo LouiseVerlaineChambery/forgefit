@@ -6,7 +6,7 @@
   const slots=[
     {role:"jambes",choices:["Goblet squat","Fentes bulgares","Fentes arrière","Squat au poids du corps"]},
     {role:"poussée",choices:["Développé couché haltères","Pompes pieds surélevés","Pompes","Pompes serrées"]},
-    {role:"tirage",choices:["Tractions pronation","Rowing haltère","Rowing élastique"]},
+    {role:"tirage",choices:["Tractions pronation","Rowing haltère","Rowing élastique","Reverse snow angel"]},
     {role:"chaîne postérieure",choices:["Soulevé de terre roumain haltères","Pont fessier au sol"]},
     {role:"épaules",choices:["Développé épaules haltères","Élévations latérales haltères","Oiseau haltères"]},
     {role:"jambes 2",choices:["Fentes marchées","Fentes arrière","Mollets debout"]},
