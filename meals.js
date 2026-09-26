@@ -38,7 +38,9 @@
     view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{localStorage.setItem(PERSON_KEY,b.dataset.p);renderMeals();});
     view.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{localStorage.setItem(VIEW_KEY,b.dataset.v);renderMeals();});
     view.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{day=+b.dataset.day;renderMeals();});
-    view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{day=+b.dataset.open;localStorage.setItem(VIEW_KEY,"today");renderMeals();});\n    view.querySelectorAll("[data-replace-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.replaceMeal;if(window.DenatMealEngine){data=DenatMealEngine.replace(i,data.days[i]?.dinnerId);renderMeals();}});\n    view.querySelectorAll("[data-dislike-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.dislikeMeal;if(window.DenatMealEngine){data=DenatMealEngine.dislike(i,data.days[i]?.dinnerId);renderMeals();}});
+    view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{day=+b.dataset.open;localStorage.setItem(VIEW_KEY,"today");renderMeals();});
+    view.querySelectorAll("[data-replace-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.replaceMeal;if(window.DenatMealEngine){data=DenatMealEngine.replace(i,data.days[i]?.dinnerId);renderMeals();}});
+    view.querySelectorAll("[data-dislike-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.dislikeMeal;if(window.DenatMealEngine){data=DenatMealEngine.dislike(i,data.days[i]?.dinnerId);renderMeals();}});
     view.querySelectorAll("[data-shop]").forEach(c=>c.onchange=()=>{let a=readShop(day),i=+c.dataset.shop;a=c.checked?[...new Set([...a,i])]:a.filter(x=>x!==i);localStorage.setItem(shopKey(day),JSON.stringify(a));renderMeals();});
     view.querySelectorAll("[data-week-shop]").forEach(c=>c.onchange=()=>{let a=readWeekShop(),i=+c.dataset.weekShop;a=c.checked?[...new Set([...a,i])]:a.filter(x=>x!==i);localStorage.setItem(weekShopKey(),JSON.stringify(a));renderMeals();});
     view.querySelector("#reset-shop")?.addEventListener("click",()=>{localStorage.removeItem(shopKey(day));renderMeals();});
@@ -46,6 +48,12 @@
   }
 
   async function loadWeekly(){
+    if(window.DenatMealEngine){
+      data=DenatMealEngine.generate();
+      loading=false;
+      if(route==="meals")renderMeals();
+      return;
+    }
     try{
       const r=await fetch(`weekly-menu.json?v=${Date.now()}`,{cache:"no-store"});
       if(!r.ok)throw new Error("menu");
