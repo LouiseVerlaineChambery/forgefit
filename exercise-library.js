@@ -76,12 +76,65 @@
     D("Mountain climbers","Abdos",["Gainage","Abdominaux","Fléchisseurs de hanche"],["Poids du corps"],3,20,45)
   ];
 
+  const HISTORICAL_ALIASES={
+    "developpe incline avec halteres":"Développé incliné haltères",
+    "developpe incline haltere":"Développé incliné haltères",
+    "developpe incline halteres":"Développé incliné haltères",
+    "developpe couche avec halteres":"Développé couché haltères",
+    "developpe couche haltere":"Développé couché haltères",
+    "developpe couche halteres":"Développé couché haltères",
+    "developpe militaire halteres":"Développé épaules haltères",
+    "developpe epaules avec halteres":"Développé épaules haltères",
+    "tirage poitrine":"Tirage vertical",
+    "tirage vertical poulie haute":"Tirage vertical",
+    "tirage horizontal":"Rowing poulie basse",
+    "tirage horizontal poulie":"Rowing poulie basse",
+    "rowing poulie":"Rowing poulie basse",
+    "rowing assis poulie":"Rowing poulie basse",
+    "rowing un bras haltere":"Rowing haltère",
+    "rowing halteres":"Rowing haltère",
+    "elevation laterale halteres":"Élévations latérales haltères",
+    "elevations laterales":"Élévations latérales haltères",
+    "oiseau a la poulie":"Oiseau poulie",
+    "oiseau avec halteres":"Oiseau haltères",
+    "curl biceps halteres":"Curl haltères",
+    "curl avec halteres":"Curl haltères",
+    "curl marteau halteres":"Curl marteau",
+    "extension triceps poulie":"Extension triceps corde",
+    "extension triceps a la corde":"Extension triceps corde",
+    "triceps corde":"Extension triceps corde",
+    "presse horizontale":"Presse à cuisses",
+    "presse a cuisse":"Presse à cuisses",
+    "presse a cuisses":"Presse à cuisses",
+    "leg curl":"Leg curl assis",
+    "leg extension machine":"Leg extension",
+    "souleve de terre jambes tendues":"Soulevé de terre roumain",
+    "sdt roumain":"Soulevé de terre roumain",
+    "fente bulgare":"Fentes bulgares",
+    "fentes bulgare":"Fentes bulgares",
+    "fentes arriere":"Fentes arrière",
+    "hip thrust barre":"Hip thrust",
+    "mollets":"Mollets debout",
+    "releve de jambes":"Relevés de jambes",
+    "releves jambes":"Relevés de jambes",
+    "gainage":"Planche",
+    "pompe":"Pompes",
+    "pompes classiques":"Pompes"
+  };
   const byName=new Map();
   exercises.forEach(e=>{byName.set(norm(e.name),e);(e.aliases||[]).forEach(a=>byName.set(norm(a),e));});
   function find(name){
-    const n=norm(name);
+    const n=norm(name),historical=HISTORICAL_ALIASES[n];
+    if(historical&&byName.has(norm(historical)))return byName.get(norm(historical));
     if(byName.has(n))return byName.get(n);
     return exercises.find(e=>n.includes(norm(e.name))||norm(e.name).includes(n))||null;
+  }
+  function canonicalName(name){return find(name)?.name||String(name||"").trim();}
+  function sameExercise(a,b){return canonicalName(a)===canonicalName(b);}
+  function auditNames(names=[]){
+    const mapped=[],unknown=[];
+    [...new Set(names.filter(Boolean))].forEach(raw=>{const def=find(raw);(def?mapped:unknown).push(def?{raw,canonical:def.name}:raw);});
+    return {mapped,unknown,total:mapped.length+unknown.length};
   }
   function toExercise(def,keepId){
     return {id:keepId||crypto.randomUUID(),name:def.name,targetSets:def.sets,targetReps:def.reps,rest:def.rest,category:def.category,libraryId:def.id,muscles:[...def.muscles],equipment:[...def.equipment]};
@@ -140,5 +193,5 @@
     .dl-lib-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.dl-lib-copy b{color:var(--text);font-size:13px}.dl-lib-copy small{color:var(--muted);font-size:10px;font-weight:500}
   `;document.head.appendChild(style);
 
-  window.DenatExerciseLibrary={exercises,find,filtered,toExercise,groups,equipments,open,norm};
+  window.DenatExerciseLibrary={exercises,find,canonicalName,sameExercise,auditNames,filtered,toExercise,groups,equipments,open,norm};
 })();
