@@ -90,7 +90,7 @@
           <div class="dl-tile"><div class="dl-label">7 JOURS</div><div class="small" style="margin-top:6px;font-weight:750">${memory?.seven?.meals?.length||0} repas · ${memory?.seven?.sessions?.length||0} séance${(memory?.seven?.sessions?.length||0)>1?"s":""}</div></div>
         </div>
         <p class="muted small" style="margin:10px 0">${escDash(memoryHint)}</p>
-        <button class="ghost full" id="dash-memory">Interroger ma mémoire</button>
+        <div class="dl-actions"><button class="primary" id="dash-timeline">Ouvrir la timeline</button><button class="ghost" id="dash-memory">Interroger ma mémoire</button></div>
       </section>
 
       <section class="card">
@@ -161,6 +161,7 @@
     const goMeals=(v)=>{localStorage.setItem("forgefit_meals_view",v);setRoute("meals");};
     view.querySelector("#dash-food-journal")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-memory")?.addEventListener("click",()=>goMeals("coach"));
+    view.querySelector("#dash-timeline")?.addEventListener("click",()=>window.DenatTimeline?.open?.(0));
     view.querySelector("#dash-meal-coach")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-meal-coach-2")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-anais-sport")?.addEventListener("click",()=>setRoute("today"));
