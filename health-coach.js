@@ -1,9 +1,9 @@
 // Denat Life — récupération du jour depuis Apple Santé (optionnelle) + cache hors ligne.
 (function(){
-  const KEY="denat_health_cache_v1";
+  const KEY=()=>`denat_health_cache_${window.DenatProfile?.currentId?.()||"jocelyn"}_v1`;
   const num=v=>{const n=Number(v);return Number.isFinite(n)?n:null;};
   const pick=(o,keys)=>{for(const k of keys){if(o&&o[k]!=null){const n=num(o[k]);if(n!=null)return n;}}return null;};
-  function cached(){try{return JSON.parse(localStorage.getItem(KEY)||"null");}catch{return null;}}
+  function cached(){try{return JSON.parse(localStorage.getItem(KEY())||"null");}catch{return null;}}
   function normalize(raw){
     const root=raw?.payload||raw||{},s=root.summary||root.metrics||root;
     return {
@@ -47,11 +47,12 @@
     return {connected:true,fresh:true,score,band,label,reasons,data:d};
   }
   async function refresh(){
+    if(window.DenatProfile?.is?.("anais"))return recovery();
     if(!window.DenatCloud?.healthStatus)return recovery();
     try{
       const raw=await window.DenatCloud.healthStatus();
       if(raw?.connected){
-        const d=normalize(raw);localStorage.setItem(KEY,JSON.stringify(d));
+        const d=normalize(raw);localStorage.setItem(KEY(),JSON.stringify(d));
         window.dispatchEvent(new CustomEvent("denat-health-updated",{detail:d}));
       }
     }catch{}
