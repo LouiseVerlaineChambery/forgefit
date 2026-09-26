@@ -42,12 +42,95 @@
     };
     return `<svg viewBox="0 0 170 140" aria-hidden="true">${body}${extra[type]||""}</svg>`;
   }
+  function motionSvg(name,compact=false){
+    const d=info(name),type=d.type;
+    const s='stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"';
+    const poses={
+      squat:[
+        `<circle cx="60" cy="22" r="8" ${s}/><path d="M60 31v34M60 43L40 58M60 43l20 15M60 65L46 92M60 65l18 27M28 96h68" ${s}/>`,
+        `<circle cx="60" cy="31" r="8" ${s}/><path d="M60 40l-4 28M58 49L40 61M58 49l19 12M56 68L39 78l-9 18M56 68l22 9 8 19M28 96h68" ${s}/>`,
+        `<circle cx="60" cy="40" r="8" ${s}/><path d="M60 49l-8 25M56 57L38 66M56 57l20 9M52 74L34 78l-8 18M52 74l26 4 10 18M24 96h70" ${s}/>`
+      ],
+      press:[
+        `<path d="M18 84h88M31 84V72M91 84V72" ${s}/><circle cx="38" cy="62" r="7" ${s}/><path d="M45 64h32M53 64l-3-21M69 64l4-21M47 43h8M69 43h8" ${s}/>`,
+        `<path d="M18 84h88M31 84V72M91 84V72" ${s}/><circle cx="38" cy="62" r="7" ${s}/><path d="M45 64h32M53 64l-1-30M69 64l2-30M48 34h8M67 34h8" ${s}/>`,
+        `<path d="M18 84h88M31 84V72M91 84V72" ${s}/><circle cx="38" cy="62" r="7" ${s}/><path d="M45 64h32M53 64V22M69 64V22M49 22h8M65 22h8" ${s}/>`
+      ],
+      pull:[
+        `<path d="M20 14h80" ${s}/><circle cx="60" cy="42" r="8" ${s}/><path d="M60 51v28M60 56L35 18M60 56l25-38M60 79L48 98M60 79l12 19" ${s}/>`,
+        `<path d="M20 14h80" ${s}/><circle cx="60" cy="36" r="8" ${s}/><path d="M60 45v29M60 50L38 27l-3-13M60 50l22-23 3-13M60 74L48 96M60 74l12 22" ${s}/>`,
+        `<path d="M20 14h80" ${s}/><circle cx="60" cy="28" r="8" ${s}/><path d="M60 37v29M60 42L42 30l-7-16M60 42l18-12 7-16M60 66L48 94M60 66l12 28" ${s}/>`
+      ],
+      row:[
+        `<circle cx="45" cy="35" r="8" ${s}/><path d="M45 44l8 30M49 54L84 58M53 74L35 95M53 74l23 21M84 58h20" ${s}/>`,
+        `<circle cx="45" cy="35" r="8" ${s}/><path d="M45 44l8 30M49 54L72 57l15-4M53 74L35 95M53 74l23 21M87 53h17" ${s}/>`,
+        `<circle cx="45" cy="35" r="8" ${s}/><path d="M45 44l8 30M49 54L65 57l10-10M53 74L35 95M53 74l23 21M75 47h12" ${s}/>`
+      ],
+      hinge:[
+        `<circle cx="58" cy="22" r="8" ${s}/><path d="M58 31v37M58 44L42 61M58 44l16 17M58 68L48 96M58 68l16 28" ${s}/>`,
+        `<circle cx="73" cy="35" r="8" ${s}/><path d="M68 42L50 65M59 53L43 72M59 53l20 18M50 65L45 96M50 65l25 31" ${s}/>`,
+        `<circle cx="84" cy="49" r="8" ${s}/><path d="M77 53L49 68M65 60L44 76M65 60l22 20M49 68L45 96M49 68l27 28" ${s}/>`
+      ],
+      raise:[
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L48 70M60 44l12 26M60 71L48 98M60 71l12 27" ${s}/>`,
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L36 58M60 44l24 14M60 71L48 98M60 71l12 27" ${s}/>`,
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L25 44M60 44h35M60 71L48 98M60 71l12 27" ${s}/>`
+      ],
+      arms:[
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L45 60l-2 22M60 44l15 16 2 22M60 71L48 98M60 71l12 27" ${s}/>`,
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L45 58l8 15M60 44l15 14-8 15M60 71L48 98M60 71l12 27" ${s}/>`,
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L45 57l12 2M60 44l15 13-12 2M60 71L48 98M60 71l12 27" ${s}/>`
+      ],
+      fly:[
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L25 48M60 44l35 4M60 71L48 98M60 71l12 27" ${s}/>`,
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L38 50l8 7M60 44l22 6-8 7M60 71L48 98M60 71l12 27" ${s}/>`,
+        `<circle cx="60" cy="24" r="8" ${s}/><path d="M60 33v38M60 44L53 55h7M60 44l7 11h-7M60 71L48 98M60 71l12 27" ${s}/>`
+      ],
+      calf:[
+        `<circle cx="60" cy="22" r="8" ${s}/><path d="M60 31v38M60 69L48 95h-8M60 69l12 26h8M28 98h64" ${s}/>`,
+        `<circle cx="60" cy="18" r="8" ${s}/><path d="M60 27v38M60 65L48 91h-5M60 65l12 26h5M28 98h64" ${s}/>`,
+        `<circle cx="60" cy="14" r="8" ${s}/><path d="M60 23v38M60 61L48 87M60 61l12 26M28 98h64" ${s}/>`
+      ],
+      core:[
+        `<path d="M20 88h88" ${s}/><circle cx="38" cy="65" r="7" ${s}/><path d="M45 68l30 12M56 73L42 88M75 80l22 8" ${s}/>`,
+        `<path d="M20 88h88" ${s}/><circle cx="43" cy="56" r="7" ${s}/><path d="M49 61l25 19M58 68L44 84M74 80l23 8" ${s}/>`,
+        `<path d="M20 88h88" ${s}/><circle cx="50" cy="48" r="7" ${s}/><path d="M55 54l19 26M61 64L48 79M74 80l23 8" ${s}/>`
+      ],
+      legs:[
+        `<circle cx="60" cy="22" r="8" ${s}/><path d="M60 31v38M60 69L50 97M60 69l10 28M30 99h60" ${s}/>`,
+        `<circle cx="60" cy="22" r="8" ${s}/><path d="M60 31v38M60 69L42 92M60 69l20 23M30 99h60" ${s}/>`,
+        `<circle cx="60" cy="22" r="8" ${s}/><path d="M60 31v38M60 69L34 85M60 69l28 16M30 99h60" ${s}/>`
+      ],
+      machine:[
+        `<path d="M20 30v68M20 65h32M52 65v33" ${s}/><circle cx="45" cy="44" r="7" ${s}/><path d="M45 51l7 28M52 79l18 15" ${s}/>`,
+        `<path d="M20 30v68M20 65h32M52 65v33" ${s}/><circle cx="45" cy="44" r="7" ${s}/><path d="M45 51l7 28M52 79l27 6" ${s}/>`,
+        `<path d="M20 30v68M20 65h32M52 65v33" ${s}/><circle cx="45" cy="44" r="7" ${s}/><path d="M45 51l7 28M52 79h34" ${s}/>`
+      ]
+    };
+    const frames=poses[type]||poses.arms;
+    const cls=compact?"ff-motion ff-motion-mini":"ff-motion";
+    return `<div class="${cls}" aria-label="Animation en trois positions du mouvement"><svg viewBox="0 0 120 108" aria-hidden="true"><g class="ff-motion-frame ff-motion-f1">${frames[0]}</g><g class="ff-motion-frame ff-motion-f2">${frames[1]}</g><g class="ff-motion-frame ff-motion-f3">${frames[2]}</g></svg></div>`;
+  }
+
+  const motionStyle=document.createElement("style");
+  motionStyle.textContent=`
+    .ff-motion{width:100%;max-width:260px;margin:4px auto 14px;color:var(--accent2)}
+    .ff-motion svg{display:block;width:100%;height:auto}
+    .ff-motion-frame{opacity:0;animation:ffMotion3 2.1s steps(1,end) infinite}
+    .ff-motion-f1{animation-delay:0s}.ff-motion-f2{animation-delay:.7s}.ff-motion-f3{animation-delay:1.4s}
+    @keyframes ffMotion3{0%,32%{opacity:1}33%,100%{opacity:0}}
+    .ff-motion-mini{width:54px;min-width:54px;margin:0;color:var(--accent2)}
+    .ff-motion-mini svg{width:54px;height:48px}
+    @media (prefers-reduced-motion:reduce){.ff-motion-frame{animation:none;opacity:0}.ff-motion-f2{opacity:1}}
+  `;
+  document.head.appendChild(motionStyle);
+
   function open(name){
     document.querySelector(".ff-modal")?.remove();
     const d=info(name),modal=document.createElement("div");
     modal.className="ff-modal";
-    modal.innerHTML=`<div class="ff-modal-card"><div class="row"><div><div class="eyebrow">MOUVEMENT</div><h2 style="margin-top:5px">${esc(name)}</h2></div><button class="ghost" data-close>Fermer</button></div><div class="ff-modal-visual">${svg(d.type)}</div><div class="eyebrow">MUSCLES PRINCIPAUX</div><div class="ff-muscles">${d.muscles.map(m=>`<span class="pill">${esc(m)}</span>`).join("")}</div><div class="eyebrow">REPÈRES TECHNIQUES</div>${d.cues.map((c,i)=>`<div class="ff-cue"><b>${i+1}.</b> ${esc(c)}</div>`).join("")}<div class="notice" style="margin-top:14px"><b>À éviter :</b> ${esc(d.avoid)}</div></div>`;
+    modal.innerHTML=`<div class="ff-modal-card"><div class="row"><div><div class="eyebrow">MOUVEMENT</div><h2 style="margin-top:5px">${esc(name)}</h2></div><button class="ghost" data-close>Fermer</button></div><div class="ff-modal-visual">${motionSvg(name)}<div class="small muted" style="text-align:center;margin-top:-6px">Départ → mouvement → contraction</div></div><div class="eyebrow">MUSCLES PRINCIPAUX</div><div class="ff-muscles">${d.muscles.map(m=>`<span class="pill">${esc(m)}</span>`).join("")}</div><div class="eyebrow">REPÈRES TECHNIQUES</div>${d.cues.map((c,i)=>`<div class="ff-cue"><b>${i+1}.</b> ${esc(c)}</div>`).join("")}<div class="notice" style="margin-top:14px"><b>À éviter :</b> ${esc(d.avoid)}</div></div>`;
     document.body.appendChild(modal);modal.querySelector("[data-close]").onclick=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)modal.remove();};
   }
-  window.FFGuide={info,svg,open};
+  window.FFGuide={info,svg,motion:motionSvg,open};
 })();
