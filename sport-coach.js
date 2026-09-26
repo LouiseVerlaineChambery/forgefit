@@ -21,7 +21,8 @@
   }
   function sessionPlan(ex){
     const target=+ex.targetReps||10,step=stepFor(ex),h=history(ex.name,4);
-    if(state.reprise?.enabled&&ex.lightLower){return {weight:0,reps:target,rpe:"5–6",level:"knee-light",reason:"Bas du corps protégé : poids du corps ou charge symbolique. Pas de progression de charge tant que le genou est sensible.",confidence:"Priorité tolérance du genou"};}\n    if(state.reprise?.enabled){return {weight:0,reps:target,rpe:"6–7",level:"reprise",reason:"Reprise : choisis une première charge facile. Le coach ajuste les séries suivantes selon ton RPE.",confidence:h.length?"Historique disponible mais volontairement ignoré en reprise":"Nouvelle référence"};}
+    if(state.reprise?.enabled&&ex.lightLower){return {weight:0,reps:target,rpe:"5–6",level:"knee-light",reason:"Bas du corps protégé : poids du corps ou charge symbolique. Pas de progression de charge tant que le genou est sensible.",confidence:"Priorité tolérance du genou"};}
+    if(state.reprise?.enabled){return {weight:0,reps:target,rpe:"6–7",level:"reprise",reason:"Reprise : choisis une première charge facile. Le coach ajuste les séries suivantes selon ton RPE.",confidence:h.length?"Historique disponible mais volontairement ignoré en reprise":"Nouvelle référence"};}
     if(!h.length)return {weight:0,reps:target,rpe:"7–8",level:"new",reason:"Pas encore de référence fiable : démarre avec une charge propre et renseigne ton RPE.",confidence:"À calibrer"};
     const last=stats(h[0].ex),prev=h[1]?stats(h[1].ex):null;
     if(!last)return {weight:0,reps:target,rpe:"7–8",level:"new",reason:"Référence insuffisante.",confidence:"À calibrer"};
@@ -42,7 +43,13 @@
   function livePlan(ex){
     const target=+ex.targetReps||10,step=stepFor(ex),done=completed(ex),nextIndex=(ex.sets||[]).findIndex(s=>!s.done);
     if(nextIndex<0)return {finished:true,text:"Exercice terminé",reason:"Toutes les séries sont validées."};
-    if(state.reprise?.enabled&&ex.lightLower){\n      if(!done.length)return {weight:0,reps:target,rpe:"5–6",nextIndex,level:"knee-light",text:`${target} reps · poids du corps / très léger`,reason:"Mouvement contrôlé, amplitude confortable. Le but est de bouger sans chercher la charge."};\n      const last=done.at(-1),r=+last.reps||0,rpe=+last.rpe||0;\n      const reason=(rpe>=7||r<target-2)?"Réduis l’amplitude, les répétitions ou augmente le repos. Ne compense pas en forçant.":"Tolérance correcte : garde exactement la même charge et la même amplitude.";\n      return {weight:0,reps:target,rpe:"5–6",nextIndex,level:rpe>=7?"down":"hold",text:`${target} reps · même charge légère`,reason};\n    }\n    if(!done.length){const p=sessionPlan(ex);return {...p,nextIndex,text:p.weight?`${fmt(p.weight)} kg × ${p.reps}`:`${p.reps} reps · choisis une charge facile`};}
+    if(state.reprise?.enabled&&ex.lightLower){
+      if(!done.length)return {weight:0,reps:target,rpe:"5–6",nextIndex,level:"knee-light",text:`${target} reps · poids du corps / très léger`,reason:"Mouvement contrôlé, amplitude confortable. Le but est de bouger sans chercher la charge."};
+      const last=done.at(-1),r=+last.reps||0,rpe=+last.rpe||0;
+      const reason=(rpe>=7||r<target-2)?"Réduis l’amplitude, les répétitions ou augmente le repos. Ne compense pas en forçant.":"Tolérance correcte : garde exactement la même charge et la même amplitude.";
+      return {weight:0,reps:target,rpe:"5–6",nextIndex,level:rpe>=7?"down":"hold",text:`${target} reps · même charge légère`,reason};
+    }
+    if(!done.length){const p=sessionPlan(ex);return {...p,nextIndex,text:p.weight?`${fmt(p.weight)} kg × ${p.reps}`:`${p.reps} reps · choisis une charge facile`};}
     const last=done.at(-1),w=+last.weight||0,r=+last.reps||0,rpe=+last.rpe||0;
     let nw=w,reps=target,level="hold",reason="Série dans la cible : conserve la charge.";
     if(!w){return {weight:0,reps:target,rpe:state.reprise?.enabled?"6–7":"7–8,5",nextIndex,level:"new",text:`${target} reps`,reason:"Renseigne une charge pour permettre au coach d’ajuster la suite."};}
