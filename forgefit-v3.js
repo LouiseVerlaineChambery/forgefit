@@ -9,7 +9,7 @@
   const vol=e=>done(e).reduce((a,s)=>a+(+s.weight||0)*(+s.reps||0),0);
   const fmt=v=>{const n=+v||0;return Number.isInteger(n)?String(n):n.toFixed(1).replace(".",",");};
   const sessions=()=>[...state.sessions].filter(s=>s.source!=="nomad").sort((a,b)=>new Date(a.endedAt)-new Date(b.endedAt));
-  const hist=name=>sessions().map(s=>({s,e:(s.exercises||[]).find(x=>norm(x.name)===norm(name))})).filter(x=>x.e&&done(x.e).length);
+  const hist=name=>sessions().map(s=>({s,e:(s.exercises||[]).find(x=>window.DenatExerciseLibrary?.sameExercise?.(x.name,name)??(norm(x.name)===norm(name)))})).filter(x=>x.e&&done(x.e).length);
   const minutes=s=>{if(!s||s.source==="mybodynote"||!s.endedAt)return null;const d=(new Date(s.endedAt)-new Date(s.startedAt))/60000;return d>0?Math.max(1,Math.round(d)):null;};
   function best(name){let weight=0,reps=0,e1=0,volume=0;hist(name).forEach(({e})=>{done(e).forEach(s=>{weight=Math.max(weight,+s.weight||0);reps=Math.max(reps,+s.reps||0);e1=Math.max(e1,estimated1RM(+s.weight||0,+s.reps||0));});volume=Math.max(volume,vol(e));});return{weight,reps,e1,volume};}
   function target(ex){
