@@ -42,7 +42,7 @@
 
   function read(k,f){try{return JSON.parse(localStorage.getItem(k)||JSON.stringify(f));}catch(e){return f;}}
   function monday(d=new Date()){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
-  function iso(d){return d.toISOString().slice(0,10);}
+  function iso(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),x=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${x}`;}
   function seed(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
   function allowed(){const bad=new Set(read(DISLIKES,[]));const a=dinners.filter(x=>!bad.has(x.id));return a.length>=7?a:dinners;}
   function mealArray(m,suffix=""){return [m.t+suffix,m.p1,m.p2];}
