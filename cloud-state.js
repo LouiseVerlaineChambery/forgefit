@@ -1,7 +1,7 @@
 // Denat Life Cloud — le serveur est la source de vérité, localStorage sert de cache hors ligne.
 (function(){
   const API="https://lv-social-publisher.jocelyn-denat.workers.dev/denat-life/state";
-  const AUTH="denat_life_cloud_auth_v1";
+  const AUTH="denat_life_cloud_auth_v1";\n  const MIGRATED_PREFIX="denat_life_cloud_migrated_";
   const TIMEOUT=3000;
   let revision=0,status="initialisation",suppress=false,timer=null;
   const dirty=new Set();
@@ -17,7 +17,7 @@
   function acceptAccess(){
     const m=location.hash.match(/(?:^#|&)denat-access=([^&]+)/);if(!m)return;
     try{
-      const s=atob(decodeURIComponent(m[1]).replace(/-/g,"+").replace(/_/g,"/"));
+      let b=decodeURIComponent(m[1]).replace(/-/g,"+").replace(/_/g,"/");while(b.length%4)b+="=";const s=atob(b);
       const x=JSON.parse(s);
       if(/^[A-Za-z0-9_-]{16,100}$/.test(x.h)&&/^[A-Za-z0-9_-]{16,100}$/.test(x.k))rawSet.call(localStorage,AUTH,JSON.stringify(x));
     }catch{}
@@ -93,12 +93,18 @@
 
   async function init(){
     try{
-      const remote=await pull(),local=snapshot();
+      const remote=await pull(),local=snapshot(),id=identity(),migratedKey=MIGRATED_PREFIX+id.h;
       revision=Number(remote.revision||0);
-      const merged=mergeMaps(remote.state||{},local);
-      hydrate(merged);
-      if(!remote.exists||JSON.stringify(merged)!==JSON.stringify(remote.state||{})){Object.keys(merged).forEach(k=>dirty.add(k));await pushNow();}
-      else setStatus("cloud");
+      const already=localStorage.getItem(migratedKey)==="1";
+      if(already&&remote.exists){
+        hydrate(remote.state||{});setStatus("cloud");
+      }else{
+        const merged=mergeMaps(remote.state||{},local);
+        hydrate(merged);
+        if(!remote.exists||JSON.stringify(merged)!==JSON.stringify(remote.state||{})){Object.keys(merged).forEach(k=>dirty.add(k));await pushNow();}
+        else setStatus("cloud");
+        rawSet.call(localStorage,migratedKey,"1");
+      }
     }catch(e){setStatus("hors-ligne");}
     return status;
   }
@@ -111,6 +117,6 @@
     if(navigator.share){try{await navigator.share({title:"Denat Life",text:"Accès à mon Denat Life",url});return true;}catch(e){if(e?.name==="AbortError")return false;}}
     try{await navigator.clipboard.writeText(url);alert("Lien d’accès Denat Life copié.");return true;}catch{prompt("Copie ce lien d’accès Denat Life",url);return false;}
   }
-  window.addEventListener("online",()=>{pull().then(d=>{revision=Number(d.revision||revision);schedule();}).catch(()=>{});});
+  window.addEventListener("online",()=>{init().catch(()=>{});});
   window.DenatCloud={init,pushNow,pull,shareAccess,accessLink,get status(){return status;}};
 })();
