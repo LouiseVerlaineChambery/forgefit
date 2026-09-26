@@ -177,5 +177,6 @@
   function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);return generate();}
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
   function preferences(){return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t}))};}
-  function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}\n  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences};
+  function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences};
 })();
