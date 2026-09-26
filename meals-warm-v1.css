@@ -1,0 +1,19 @@
+body.meals-theme{background:#f4efe6!important;color:#211d18!important}
+body.meals-theme .topbar{background:#f8f3eb!important;border-color:#e4d8c7!important}
+body.meals-theme .topbar h1,body.meals-theme h2,body.meals-theme h3{color:#211d18!important}
+body.meals-theme .card,body.meals-theme .hero{background:#fffaf1!important;border-color:#e4d8c7!important;color:#211d18!important}
+body.meals-theme .hero .hero-title,body.meals-theme .hero h2,body.meals-theme .hero h3{color:#211d18!important}
+body.meals-theme .hero p,body.meals-theme .hero .muted,body.meals-theme .muted,body.meals-theme .small{color:#756d63!important}
+body.meals-theme .eyebrow{color:#a47437!important}
+body.meals-theme .ff-switch,body.meals-theme .hero .ff-switch{background:#f2eadf!important;border-color:#e2d5c4!important}
+body.meals-theme .ff-switch button,body.meals-theme .hero .ff-switch button{color:#756c61!important}
+body.meals-theme .ff-switch button.active,body.meals-theme .hero .ff-switch button.active{background:#211d18!important;color:#f4d7a2!important}
+body.meals-theme .ff-days button{background:#fffaf2!important;border-color:#dfd2c1!important;color:#766d62!important}
+body.meals-theme .ff-days button.active{background:#211d18!important;color:#f0d09a!important;border-color:#211d18!important}
+body.meals-theme .ff-portion,body.meals-theme .ff-budget>div{background:#fffdf8!important;border-color:#e5d9c9!important;color:#211d18!important}
+body.meals-theme .ff-portion b,body.meals-theme .ff-price{color:#9a692f!important}
+body.meals-theme .pill{background:#f5ecdf!important;border-color:#e4d5c0!important;color:#765d3b!important}
+body.meals-theme .notice{background:#f7eddd!important;border-color:#e4cfad!important;color:#72552e!important}
+body.meals-theme .ghost{background:#fffaf2!important;color:#3b332b!important;border-color:#dfd2c1!important}
+body.meals-theme .tabbar{background:#fffaf2!important;border-color:#e1d5c5!important}
+body.meals-theme .tab{color:#8a8176!important}body.meals-theme .tab.active{color:#9b6b2f!important}
