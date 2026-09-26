@@ -1,10 +1,10 @@
 // Denat Life — coach repas partagé, sans API payante.
 (function(){
-  const KEY="denat_meal_coach_v1";
+  const KEY=()=>`denat_profile_${window.DenatProfile?.currentId?.()||"jocelyn"}_meal_coach_v1`;
   const norm=s=>String(s||"").normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
   const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
-  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{"history":[],"restaurants":[]}');}catch{return {history:[],restaurants:[]};}};
-  const save=x=>localStorage.setItem(KEY,JSON.stringify(x));
+  const read=()=>{try{return JSON.parse(localStorage.getItem(KEY())||'{"history":[],"restaurants":[]}');}catch{return {history:[],restaurants:[]};}};
+  const save=x=>localStorage.setItem(KEY(),JSON.stringify(x));
   const person=()=>window.DenatProfile?.current?.().meal||localStorage.getItem("forgefit_meals_person")||"p1";
   const personName=()=>window.DenatProfile?.label?.()||(person()==="p1"?"Jocelyn":"Anaïs");
   const journalKey=()=>window.DenatProfile?.journalKey?.()||`denat_profile_${person()==="p2"?"anais":"jocelyn"}_food_journal_v1`;
