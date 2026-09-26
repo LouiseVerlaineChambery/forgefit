@@ -38,7 +38,8 @@
     modal.innerHTML=`<div class="ff-recipe-card"><div class="row"><div><div class="eyebrow">RECETTE · 4 PORTIONS</div><h2 style="margin:6px 0">${r.title}</h2></div><button class="ghost" data-close-recipe>Fermer</button></div><div class="ff-recipe-meta"><span class="pill">${r.category}</span><span class="pill">Prépa ${r.prep} min</span><span class="pill">Cuisson ${r.cook} min</span><span class="pill">Total ≈ ${r.total} min</span></div><div class="notice"><b>Organisation :</b> 2 portions ce soir + 2 portions pour le repas du midi suivant.</div><h3 style="margin:18px 0 6px">Ingrédients</h3><ul class="ff-recipe-list">${r.ingredients.map(x=>`<li>${x}</li>`).join("")}</ul><h3 style="margin:20px 0 6px">Préparation</h3><div class="ff-recipe-steps">${r.steps.map(x=>`<div class="ff-recipe-step"><div>${x}</div></div>`).join("")}</div><div class="ff-portions" style="margin-top:16px"><div class="ff-portion"><b>Jocelyn</b>${r.p1}</div><div class="ff-portion"><b>Anaïs</b>${r.p2}</div></div><button class="ghost full" data-recipe-favorite="${r.id}" style="margin-top:14px">${r.favorite?"♥ Retirer des favoris":"♡ Ajouter aux favoris"}</button><p class="muted small" style="margin-bottom:0;margin-top:14px">Pour les restes : refroidir rapidement, conserver au réfrigérateur et réchauffer complètement avant de servir.</p></div>`;
     document.body.appendChild(modal);
     const close=()=>modal.remove();
-    modal.querySelector("[data-close-recipe]")?.addEventListener("click",close);\n    modal.querySelector("[data-recipe-favorite]")?.addEventListener("click",e=>{window.DenatMealEngine?.toggleFavorite?.(e.currentTarget.dataset.recipeFavorite);data=DenatMealEngine.generate();close();renderMeals();});
+    modal.querySelector("[data-close-recipe]")?.addEventListener("click",close);
+    modal.querySelector("[data-recipe-favorite]")?.addEventListener("click",e=>{window.DenatMealEngine?.toggleFavorite?.(e.currentTarget.dataset.recipeFavorite);data=DenatMealEngine.generate();close();renderMeals();});
     modal.addEventListener("click",e=>{if(e.target===modal)close();});
   }
 
@@ -57,7 +58,8 @@
     view.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{localStorage.setItem(VIEW_KEY,b.dataset.v);renderMeals();});
     view.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{day=+b.dataset.day;renderMeals();});
     view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{day=+b.dataset.open;localStorage.setItem(VIEW_KEY,"today");renderMeals();});
-    view.querySelectorAll("[data-recipe]").forEach(b=>b.onclick=()=>showRecipe(b.dataset.recipe));\n    view.querySelectorAll("[data-replace-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.replaceMeal;if(window.DenatMealEngine){data=DenatMealEngine.replace(i,data.days[i]?.dinnerId);renderMeals();}});
+    view.querySelectorAll("[data-recipe]").forEach(b=>b.onclick=()=>showRecipe(b.dataset.recipe));
+    view.querySelectorAll("[data-replace-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.replaceMeal;if(window.DenatMealEngine){data=DenatMealEngine.replace(i,data.days[i]?.dinnerId);renderMeals();}});
     view.querySelectorAll("[data-quick-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.quickMeal;if(window.DenatMealEngine){data=DenatMealEngine.replaceQuick(i,data.days[i]?.dinnerId);renderMeals();}});
     view.querySelectorAll("[data-favorite-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.favoriteMeal;if(window.DenatMealEngine){DenatMealEngine.toggleFavorite(data.days[i]?.dinnerId);data=DenatMealEngine.generate();renderMeals();}});
     view.querySelectorAll("[data-unfav]").forEach(b=>b.onclick=()=>{DenatMealEngine.toggleFavorite(b.dataset.unfav);data=DenatMealEngine.generate();renderMeals();});
