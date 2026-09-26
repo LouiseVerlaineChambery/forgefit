@@ -3,11 +3,15 @@
   const API="https://lv-social-publisher.jocelyn-denat.workers.dev/denat-life/state";
   const HEALTH_API="https://lv-social-publisher.jocelyn-denat.workers.dev/denat-life/apple-health";
   const AUTH="denat_life_cloud_auth_v1";
+  const DIRTY_STORE="denat_life_cloud_dirty_v1";
   const MIGRATED_PREFIX="denat_life_cloud_migrated_";
   const TIMEOUT=3000;
   let revision=0,status="initialisation",suppress=false,timer=null;
-  const dirty=new Set();
   const rawSet=Storage.prototype.setItem,rawRemove=Storage.prototype.removeItem;
+  const dirty=new Set((()=>{try{const x=JSON.parse(localStorage.getItem(DIRTY_STORE)||"[]");return Array.isArray(x)?x:[];}catch{return[];}})());
+  function persistDirty(){try{rawSet.call(localStorage,DIRTY_STORE,JSON.stringify([...dirty]));}catch{}}
+  function markDirty(k){dirty.add(String(k));persistDirty();}
+  function clearDirty(){dirty.clear();try{rawRemove.call(localStorage,DIRTY_STORE);}catch{}}
 
   const tracked=k=>k==="forgefit_v2_state"||k.startsWith("denat_profile_")||k.startsWith("denat_meal_")||k.startsWith("forgefit_shop_")||k.startsWith("forgelife_week_shop_");
   const b64u=a=>{let s="";a.forEach(b=>s+=String.fromCharCode(b));return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");};
@@ -96,12 +100,12 @@
         revision=Number(latest.revision||0);hydrate(merged);res=await put(merged,revision);
       }
       if(res.conflict)throw new Error("conflit");
-      revision=Number(res.revision||revision);dirty.clear();setStatus("cloud");return true;
+      revision=Number(res.revision||revision);clearDirty();setStatus("cloud");return true;
     }catch(e){setStatus("hors-ligne");return false;}
   }
   function schedule(){if(suppress)return;clearTimeout(timer);timer=setTimeout(pushNow,650);}
-  Storage.prototype.setItem=function(k,v){rawSet.call(this,k,v);if(this===localStorage&&tracked(String(k))&&!suppress){dirty.add(String(k));schedule();}};
-  Storage.prototype.removeItem=function(k){rawRemove.call(this,k);if(this===localStorage&&tracked(String(k))&&!suppress){dirty.add(String(k));schedule();}};
+  Storage.prototype.setItem=function(k,v){rawSet.call(this,k,v);if(this===localStorage&&tracked(String(k))&&!suppress){markDirty(String(k));schedule();}};
+  Storage.prototype.removeItem=function(k){rawRemove.call(this,k);if(this===localStorage&&tracked(String(k))&&!suppress){markDirty(String(k));schedule();}};
 
   async function init(){
     try{
@@ -109,12 +113,18 @@
       revision=Number(remote.revision||0);
       const already=localStorage.getItem(migratedKey)==="1";
       if(already&&remote.exists){
-        hydrate(remote.state||{});setStatus("cloud");
+        if(dirty.size){
+          const merged={...(remote.state||{})};
+          for(const k of dirty)if(k in local)merged[k]=local[k];else delete merged[k];
+          hydrate(merged);
+          const saved=await pushNow();
+          if(!saved)setStatus("hors-ligne");
+        }else{hydrate(remote.state||{});setStatus("cloud");}
       }else{
         const merged=mergeMaps(remote.state||{},local);
         hydrate(merged);
         let saved=true;
-        if(!remote.exists||JSON.stringify(merged)!==JSON.stringify(remote.state||{})){Object.keys(merged).forEach(k=>dirty.add(k));saved=await pushNow();}
+        if(!remote.exists||JSON.stringify(merged)!==JSON.stringify(remote.state||{})){Object.keys(merged).forEach(markDirty);saved=await pushNow();}
         else setStatus("cloud");
         if(saved)rawSet.call(localStorage,migratedKey,"1");
       }
