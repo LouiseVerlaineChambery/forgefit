@@ -42,10 +42,85 @@
     };
     return `<svg viewBox="0 0 170 140" aria-hidden="true">${body}${extra[type]||""}</svg>`;
   }
+  function motionType(name){
+    const n=norm(name);
+    if(n.includes("presse a cuisses")||n.includes("presse horizontale"))return "legpress";
+    if(n.includes("hack squat"))return "hacksquat";
+    if(n.includes("goblet squat")||n.includes("squat guide"))return "squat";
+    if(n.includes("developpe incline")||n.includes("chest press inclinee"))return "inclinepress";
+    if(n.includes("developpe couche")||n.includes("chest press"))return "press";
+    if(n.includes("tirage vertical"))return "latpulldown";
+    if(n.includes("traction"))return "pull";
+    if(n.includes("rowing")||n.includes("tirage horizontal"))return "row";
+    if(n.includes("souleve de terre roumain")||n.includes("hip hinge"))return "hinge";
+    if(n.includes("pont fessier")||n.includes("hip thrust"))return "hipthrust";
+    if(n.includes("abduction"))return "abduction";
+    if(n.includes("leg curl"))return "legcurl";
+    if(n.includes("leg extension"))return "legextension";
+    if(n.includes("elevation laterale"))return "raise";
+    if(n.includes("curl"))return "curl";
+    if(n.includes("extension triceps"))return "triceps";
+    if(n.includes("ecarte")||n.includes("pec deck"))return "fly";
+    if(n.includes("mollet"))return "calf";
+    if(n.includes("crunch")||n.includes("releve")||n.includes("reverse crunch"))return "core";
+    return null;
+  }
+
   function motionSvg(name,compact=false){
-    const d=info(name),type=d.type;
+    const type=motionType(name);
+    if(!type)return "";
     const s='stroke="currentColor" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"';
     const poses={
+      legpress:[
+        `<path d="M14 18l26 76M88 12l18 72M84 14h24M91 84h18" ${s}/><circle cx="45" cy="38" r="7" ${s}/><path d="M41 45l-10 24M31 69l24 10 25-8M55 79l20 17M80 71l17 17" ${s}/>`,
+        `<path d="M14 18l26 76M88 12l18 72M84 14h24M91 84h18" ${s}/><circle cx="45" cy="38" r="7" ${s}/><path d="M41 45l-10 24M31 69l31 1 22-16M62 70l24 19M84 54l13 34" ${s}/>`,
+        `<path d="M14 18l26 76M88 12l18 72M84 14h24M91 84h18" ${s}/><circle cx="45" cy="38" r="7" ${s}/><path d="M41 45l-10 24M31 69l38-8 20-27M69 61l23 27M89 34l8 54" ${s}/>`
+      ],
+      hacksquat:[
+        `<path d="M24 10l22 90M82 10l22 90M20 98h88" ${s}/><circle cx="58" cy="27" r="7" ${s}/><path d="M58 34l6 34M62 47l20-8M64 68L50 96M64 68l20 28" ${s}/>`,
+        `<path d="M24 10l22 90M82 10l22 90M20 98h88" ${s}/><circle cx="62" cy="39" r="7" ${s}/><path d="M62 46l5 27M65 55l19-7M67 73L49 84l-5 12M67 73l22 10 7 13" ${s}/>`,
+        `<path d="M24 10l22 90M82 10l22 90M20 98h88" ${s}/><circle cx="66" cy="51" r="7" ${s}/><path d="M66 58l4 21M68 64l18-7M70 79L48 82l-8 14M70 79l23 3 9 14" ${s}/>`
+      ],
+      inclinepress:[
+        `<path d="M22 88l42-28M64 60h38M28 88v10M98 60v38" ${s}/><circle cx="50" cy="55" r="7" ${s}/><path d="M55 60l20 14M62 65l8-22M74 73l13-20M67 43h8M84 53h8" ${s}/>`,
+        `<path d="M22 88l42-28M64 60h38M28 88v10M98 60v38" ${s}/><circle cx="50" cy="55" r="7" ${s}/><path d="M55 60l20 14M62 65l13-31M74 73l18-31M72 34h8M89 42h8" ${s}/>`,
+        `<path d="M22 88l42-28M64 60h38M28 88v10M98 60v38" ${s}/><circle cx="50" cy="55" r="7" ${s}/><path d="M55 60l20 14M62 65l19-39M74 73l24-39M78 26h8M95 34h8" ${s}/>`
+      ],
+      latpulldown:[
+        `<path d="M20 14h80M60 14v12M30 92h60" ${s}/><circle cx="60" cy="45" r="7" ${s}/><path d="M60 52v27M60 57L35 18M60 57l25-39M60 79L50 94M60 79l10 15" ${s}/>`,
+        `<path d="M20 14h80M60 14v12M30 92h60" ${s}/><circle cx="60" cy="45" r="7" ${s}/><path d="M60 52v27M60 57L40 31l-5-13M60 57l20-26 5-13M60 79L50 94M60 79l10 15" ${s}/>`,
+        `<path d="M20 14h80M60 14v12M30 92h60" ${s}/><circle cx="60" cy="45" r="7" ${s}/><path d="M60 52v27M60 57L44 47l-9-29M60 57l16-10 9-29M60 79L50 94M60 79l10 15" ${s}/>`
+      ],
+      hipthrust:[
+        `<path d="M12 66h38M12 66v28M50 66v28M18 94h88" ${s}/><circle cx="48" cy="58" r="7" ${s}/><path d="M54 61l28 19M82 80L67 94M82 80l22 14" ${s}/>`,
+        `<path d="M12 66h38M12 66v28M50 66v28M18 94h88" ${s}/><circle cx="48" cy="58" r="7" ${s}/><path d="M54 61l31 10M85 71L68 94M85 71l19 23" ${s}/>`,
+        `<path d="M12 66h38M12 66v28M50 66v28M18 94h88" ${s}/><circle cx="48" cy="58" r="7" ${s}/><path d="M54 61h34M88 61L69 94M88 61l16 33" ${s}/>`
+      ],
+      abduction:[
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v38M60 67L52 96M60 67l8 29" ${s}/>`,
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v38M60 67L48 96M60 67l18 25" ${s}/>`,
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v38M60 67L44 96M60 67l29 19" ${s}/>`
+      ],
+      legcurl:[
+        `<path d="M15 55h76M22 55v39M84 55v39" ${s}/><circle cx="30" cy="45" r="7" ${s}/><path d="M37 48l35 8M72 56l26 26" ${s}/>`,
+        `<path d="M15 55h76M22 55v39M84 55v39" ${s}/><circle cx="30" cy="45" r="7" ${s}/><path d="M37 48l35 8M72 56l18 12 8-20" ${s}/>`,
+        `<path d="M15 55h76M22 55v39M84 55v39" ${s}/><circle cx="30" cy="45" r="7" ${s}/><path d="M37 48l35 8M72 56l12 2 4-28" ${s}/>`
+      ],
+      legextension:[
+        `<path d="M20 38v55M20 60h45M65 60v33" ${s}/><circle cx="48" cy="43" r="7" ${s}/><path d="M48 50l10 27M58 77l23 17" ${s}/>`,
+        `<path d="M20 38v55M20 60h45M65 60v33" ${s}/><circle cx="48" cy="43" r="7" ${s}/><path d="M48 50l10 27M58 77l31 7" ${s}/>`,
+        `<path d="M20 38v55M20 60h45M65 60v33" ${s}/><circle cx="48" cy="43" r="7" ${s}/><path d="M48 50l10 27M58 77h36" ${s}/>`
+      ],
+      curl:[
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v39M60 42L46 61l-2 24M60 42l14 19 2 24M60 68L50 97M60 68l10 29" ${s}/>`,
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v39M60 42L46 60l8 14M60 42l14 18-8 14M60 68L50 97M60 68l10 29" ${s}/>`,
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v39M60 42L46 58l13 2M60 42l14 16-13 2M60 68L50 97M60 68l10 29" ${s}/>`
+      ],
+      triceps:[
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v39M60 42L47 58l5 8M60 42l13 16-5 8M60 68L50 97M60 68l10 29" ${s}/>`,
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v39M60 42L47 58l-1 18M60 42l13 16 1 18M60 68L50 97M60 68l10 29" ${s}/>`,
+        `<circle cx="60" cy="22" r="7" ${s}/><path d="M60 29v39M60 42L47 58l-5 28M60 42l13 16 5 28M60 68L50 97M60 68l10 29" ${s}/>`
+      ],
       squat:[
         `<circle cx="60" cy="22" r="8" ${s}/><path d="M60 31v34M60 43L40 58M60 43l20 15M60 65L46 92M60 65l18 27M28 96h68" ${s}/>`,
         `<circle cx="60" cy="31" r="8" ${s}/><path d="M60 40l-4 28M58 49L40 61M58 49l19 12M56 68L39 78l-9 18M56 68l22 9 8 19M28 96h68" ${s}/>`,
@@ -107,7 +182,8 @@
         `<path d="M20 30v68M20 65h32M52 65v33" ${s}/><circle cx="45" cy="44" r="7" ${s}/><path d="M45 51l7 28M52 79h34" ${s}/>`
       ]
     };
-    const frames=poses[type]||poses.arms;
+    const frames=poses[type];
+    if(!frames)return "";
     const cls=compact?"ff-motion ff-motion-mini":"ff-motion";
     return `<div class="${cls}" aria-label="Animation en trois positions du mouvement"><svg viewBox="0 0 120 108" aria-hidden="true"><g class="ff-motion-frame ff-motion-f1">${frames[0]}</g><g class="ff-motion-frame ff-motion-f2">${frames[1]}</g><g class="ff-motion-frame ff-motion-f3">${frames[2]}</g></svg></div>`;
   }
@@ -129,7 +205,7 @@
     document.querySelector(".ff-modal")?.remove();
     const d=info(name),modal=document.createElement("div");
     modal.className="ff-modal";
-    modal.innerHTML=`<div class="ff-modal-card"><div class="row"><div><div class="eyebrow">MOUVEMENT</div><h2 style="margin-top:5px">${esc(name)}</h2></div><button class="ghost" data-close>Fermer</button></div><div class="ff-modal-visual">${motionSvg(name)}<div class="small muted" style="text-align:center;margin-top:-6px">Départ → mouvement → contraction</div></div><div class="eyebrow">MUSCLES PRINCIPAUX</div><div class="ff-muscles">${d.muscles.map(m=>`<span class="pill">${esc(m)}</span>`).join("")}</div><div class="eyebrow">REPÈRES TECHNIQUES</div>${d.cues.map((c,i)=>`<div class="ff-cue"><b>${i+1}.</b> ${esc(c)}</div>`).join("")}<div class="notice" style="margin-top:14px"><b>À éviter :</b> ${esc(d.avoid)}</div></div>`;
+    modal.innerHTML=`<div class="ff-modal-card"><div class="row"><div><div class="eyebrow">MOUVEMENT</div><h2 style="margin-top:5px">${esc(name)}</h2></div><button class="ghost" data-close>Fermer</button></div><div class="ff-modal-visual">${motionSvg(name)||svg(d.type)}${motionSvg(name)?`<div class="small muted" style="text-align:center;margin-top:-6px">Départ → mouvement → contraction</div>`:""}</div><div class="eyebrow">MUSCLES PRINCIPAUX</div><div class="ff-muscles">${d.muscles.map(m=>`<span class="pill">${esc(m)}</span>`).join("")}</div><div class="eyebrow">REPÈRES TECHNIQUES</div>${d.cues.map((c,i)=>`<div class="ff-cue"><b>${i+1}.</b> ${esc(c)}</div>`).join("")}<div class="notice" style="margin-top:14px"><b>À éviter :</b> ${esc(d.avoid)}</div></div>`;
     document.body.appendChild(modal);modal.querySelector("[data-close]").onclick=()=>modal.remove();modal.onclick=e=>{if(e.target===modal)modal.remove();};
   }
   window.FFGuide={info,svg,motion:motionSvg,open};
