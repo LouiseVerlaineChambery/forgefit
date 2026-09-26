@@ -22,7 +22,7 @@
   setRoute=function(r){
     if(r==="courses"){
       localStorage.setItem("forgefit_meals_view","weekshop");
-      baseSetRoute("meals");active("courses");return;
+      baseSetRoute("meals");title.textContent="Courses";active("courses");return;
     }
     if(r==="meals"){
       localStorage.setItem("forgefit_meals_view","today");
