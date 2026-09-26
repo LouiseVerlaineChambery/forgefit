@@ -43,9 +43,9 @@
   }
 
   function renderMeals(){
-    if(loading){view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE DUO</div><div class="hero-title">Repas & courses</div><p class="muted">Chargement du menu de la semaine…</p></section>`;return;}
+    if(loading){view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Repas & courses</div><p class="muted">Chargement du menu de la semaine…</p></section>`;return;}
     const v=getView();
-    view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE DUO</div><div class="hero-title">Repas & courses</div><p class="muted">Nouveau menu automatique chaque lundi · petit-déj express optionnel · dîner cuisiné en double pour le repas du midi du lendemain.</p>${selectors()}</section>${days()}${v==="today"?dayView():v==="week"?weekView():v==="shop"?shopView():weekShopView()}<section class="card"><div class="eyebrow">ACCÈS DUO</div><h3 style="margin-top:6px">Partager Denat Life à Anaïs</h3><p class="muted small">Repas et listes de courses partagées. Les courses se synchronisent entre vos deux téléphones.</p><button class="primary full" id="share-duo">Partager le lien</button></section>`;
+    view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Repas & courses</div><p class="muted">Menu de la semaine · recettes détaillées · dîner cuisiné en double pour le repas du midi du lendemain.</p>${selectors()}</section>${days()}${v==="today"?dayView():v==="week"?weekView():v==="shop"?shopView():weekShopView()}`;
     view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{localStorage.setItem(PERSON_KEY,b.dataset.p);renderMeals();});
     view.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{localStorage.setItem(VIEW_KEY,b.dataset.v);renderMeals();});
     view.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{day=+b.dataset.day;renderMeals();});
