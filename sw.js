@@ -1,5 +1,5 @@
-const CACHE="denat-life-v3-7-blue";
-const ASSETS=["./","./index.html","./sport.html","./repas.html","./sport/","./repas/","./styles.css","./app.js","./mybodynote.js","./training-plan.js","./metrics.js","./exercise-guide.js","./forgefit-v3.js","./meals.js","./duo-sync.js","./weekly-sync.js","./entry-links.js","./weekly-menu.json","./manifest.json","./brand-logo.svg","./icon-192.png","./icon-512.png"];
+const CACHE="denat-life-v4-premium";
+const ASSETS=["./","./index.html","./sport.html","./repas.html","./sport/","./repas/","./styles.css","./denat-life-theme.css","./app.js","./mybodynote.js","./training-plan.js","./metrics.js","./exercise-guide.js","./forgefit-v3.js","./meals.js","./duo-sync.js","./weekly-sync.js","./entry-links.js","./weekly-menu.json","./manifest.json","./brand-logo.svg","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener("fetch",e=>{
