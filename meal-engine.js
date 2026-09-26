@@ -1,7 +1,8 @@
 // Denat Life — moteur de menus, recettes et courses intelligentes
 (function(){
   const DISLIKES="denat_meal_dislikes_v1";
-  const OVERRIDES="denat_meal_overrides_v1";\n  const FAVS="denat_meal_favorites_v1";
+  const OVERRIDES="denat_meal_overrides_v1";
+  const FAVS="denat_meal_favorites_v1";
   const NAMES=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
   const dinners=[
@@ -100,7 +101,9 @@
     }
     return {key:`x|${normName(s)}`,qty:1,unit:"x",name:s};
   }
-  function formatQty(q){return Math.abs(q-Math.round(q))<.001?String(Math.round(q)):String(Math.round(q*100)/100).replace(".",",");}\n  function plural(name,qty){if(qty<=1)return name;const n=normName(name),special={"banane":"bananes","pomme":"pommes","poire":"poires","kiwi":"kiwis","citron":"citrons","fruit":"fruits","poivron":"poivrons","oignon":"oignons","avocat":"avocats","salade":"salades","œuf":"œufs","bocal sauce tomate":"bocaux sauce tomate","pate a pizza":"pâtes à pizza","tortilla":"tortillas"};return special[n]||name;}\n  function formatItem(x){if(x.unit==="x")return x.name;if(x.unit==="u")return `${formatQty(x.qty)} ${plural(x.name,x.qty)}`;if(x.unit==="g"&&x.qty>=1000)return `${formatQty(x.qty/1000)} kg ${x.name}`;if(x.unit==="ml"&&x.qty>=1000)return `${formatQty(x.qty/1000)} L ${x.name}`;return `${formatQty(x.qty)} ${x.unit} ${x.name}`;}
+  function formatQty(q){return Math.abs(q-Math.round(q))<.001?String(Math.round(q)):String(Math.round(q*100)/100).replace(".",",");}
+  function plural(name,qty){if(qty<=1)return name;const n=normName(name),special={"banane":"bananes","pomme":"pommes","poire":"poires","kiwi":"kiwis","citron":"citrons","fruit":"fruits","poivron":"poivrons","oignon":"oignons","avocat":"avocats","salade":"salades","œuf":"œufs","bocal sauce tomate":"bocaux sauce tomate","pate a pizza":"pâtes à pizza","tortilla":"tortillas"};return special[n]||name;}
+  function formatItem(x){if(x.unit==="x")return x.name;if(x.unit==="u")return `${formatQty(x.qty)} ${plural(x.name,x.qty)}`;if(x.unit==="g"&&x.qty>=1000)return `${formatQty(x.qty/1000)} kg ${x.name}`;if(x.unit==="ml"&&x.qty>=1000)return `${formatQty(x.qty/1000)} L ${x.name}`;return `${formatQty(x.qty)} ${x.unit} ${x.name}`;}
   function category(name){
     const n=normName(name);
     if(/poulet|dinde|boeuf|saumon|cabillaud|thon/.test(n))return "Viandes & poissons";
