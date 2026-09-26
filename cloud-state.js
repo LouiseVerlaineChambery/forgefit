@@ -85,8 +85,8 @@
         revision=Number(latest.revision||0);hydrate(merged);res=await put(merged,revision);
       }
       if(res.conflict)throw new Error("conflit");
-      revision=Number(res.revision||revision);dirty.clear();setStatus("cloud");
-    }catch(e){setStatus("hors-ligne");}
+      revision=Number(res.revision||revision);dirty.clear();setStatus("cloud");return true;
+    }catch(e){setStatus("hors-ligne");return false;}
   }
   function schedule(){if(suppress)return;clearTimeout(timer);timer=setTimeout(pushNow,650);}
   Storage.prototype.setItem=function(k,v){rawSet.call(this,k,v);if(this===localStorage&&tracked(String(k))&&!suppress){dirty.add(String(k));schedule();}};
@@ -102,9 +102,10 @@
       }else{
         const merged=mergeMaps(remote.state||{},local);
         hydrate(merged);
-        if(!remote.exists||JSON.stringify(merged)!==JSON.stringify(remote.state||{})){Object.keys(merged).forEach(k=>dirty.add(k));await pushNow();}
+        let saved=true;
+        if(!remote.exists||JSON.stringify(merged)!==JSON.stringify(remote.state||{})){Object.keys(merged).forEach(k=>dirty.add(k));saved=await pushNow();}
         else setStatus("cloud");
-        rawSet.call(localStorage,migratedKey,"1");
+        if(saved)rawSet.call(localStorage,migratedKey,"1");
       }
     }catch(e){setStatus("hors-ligne");}
     return status;
