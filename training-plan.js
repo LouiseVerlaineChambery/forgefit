@@ -218,7 +218,7 @@
       box.innerHTML=`
         <button type="button" class="ghost full ff-variant-toggle">↔ Variante / machine prise</button>
         <div class="ff-variant-list hidden" style="margin-top:8px;display:grid;gap:8px">
-          ${choices.map((v,i)=>{const m=variantMeta(v),motion=window.FFGuide?.motion?.(v,true)||`<span class="ff-variant-icon">${m.icon}</span>`;return `<button type="button" class="secondary full ff-variant-choice" data-ff-variant="${i}">${motion}<span class="ff-variant-copy"><b>${esc(v)}</b><small>${esc(m.equipment)} · ${esc(m.muscle)}</small></span></button>`;}).join("")}
+          ${choices.map((v,i)=>{const m=variantMeta(v);return `<button type="button" class="secondary full ff-variant-choice" data-ff-variant="${i}"><span class="ff-variant-icon">${m.icon}</span><span class="ff-variant-copy"><b>${esc(v)}</b><small>${esc(m.equipment)} · ${esc(m.muscle)}</small></span></button>`;}).join("")}
           <div class="small muted">La charge est remise à zéro lors d'un changement : les machines ne sont pas directement comparables.</div>
         </div>`;
       card.appendChild(box);
