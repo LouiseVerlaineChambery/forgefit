@@ -69,7 +69,7 @@
     if(n.includes("leg curl"))return "legcurl";
     if(n.includes("leg extension"))return "legextension";
     if(n.includes("oiseau")||n.includes("reverse pec deck")||n.includes("face pull"))return "rearraise";
-    if(n.includes("elevation laterale"))return "raise";
+    if(n.includes("elevation"))return "raise";
     if(n.includes("curl"))return "curl";
     if(n.includes("extension triceps")||n.includes("barre au front"))return "triceps";
     if(n.includes("ecarte")||n.includes("pec deck"))return "fly";
