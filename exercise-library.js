@@ -136,6 +136,16 @@
     [...new Set(names.filter(Boolean))].forEach(raw=>{const def=find(raw);(def?mapped:unknown).push(def?{raw,canonical:def.name}:raw);});
     return {mapped,unknown,total:mapped.length+unknown.length};
   }
+  function auditState(){
+    const names=(state.sessions||[]).flatMap(s=>(s.exercises||[]).map(e=>e.name));
+    const a=auditNames(names),legacy=a.mapped.filter(x=>norm(x.raw)!==norm(x.canonical));
+    return {...a,legacy,coverage:a.total?Math.round(a.mapped.length/a.total*100):100};
+  }
+  const baseSettings=renderSettings;renderSettings=function(){
+    baseSettings();const a=auditState(),section=document.createElement("section");section.className="card";
+    section.innerHTML=`<div class="row"><div><div class="eyebrow">HISTORIQUE MUSCULATION</div><h3 style="margin-top:6px">Compatibilité des exercices</h3></div><span class="pill">${a.coverage}% reconnus</span></div><p class="muted small">Les anciens noms sont rapprochés de la bibliothèque à la lecture. Aucune ancienne séance n’est réécrite.</p><div class="stat-grid"><div class="stat"><b>${a.mapped.length}</b><span>noms reconnus</span></div><div class="stat"><b>${a.legacy.length}</b><span>anciens alias reliés</span></div><div class="stat"><b>${a.unknown.length}</b><span>à identifier</span></div></div>${a.unknown.length?`<details style="margin-top:10px"><summary class="muted">Voir les noms non reconnus</summary><div class="small muted" style="margin-top:8px">${a.unknown.map(esc).join(" · ")}</div></details>`:`<div class="notice small" style="margin-top:10px">✓ Tout l’historique connu est raccordé à la bibliothèque.</div>`}`;
+    const first=view.querySelector(".card");first?.insertAdjacentElement("afterend",section);
+  };
   function toExercise(def,keepId){
     return {id:keepId||crypto.randomUUID(),name:def.name,targetSets:def.sets,targetReps:def.reps,rest:def.rest,category:def.category,libraryId:def.id,muscles:[...def.muscles],equipment:[...def.equipment]};
   }
@@ -193,5 +203,5 @@
     .dl-lib-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.dl-lib-copy b{color:var(--text);font-size:13px}.dl-lib-copy small{color:var(--muted);font-size:10px;font-weight:500}
   `;document.head.appendChild(style);
 
-  window.DenatExerciseLibrary={exercises,find,canonicalName,sameExercise,auditNames,filtered,toExercise,groups,equipments,open,norm};
+  window.DenatExerciseLibrary={exercises,find,canonicalName,sameExercise,auditNames,auditState,filtered,toExercise,groups,equipments,open,norm};
 })();
