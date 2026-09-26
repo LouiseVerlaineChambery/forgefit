@@ -181,13 +181,13 @@
 
   function variantMeta(name){
     const n=norm(name);
-    let icon="↔",equipment="Alternative";
-    if(n.includes("machine")||n.includes("pec deck")||n.includes("assiste")){icon="▣";equipment="Machine";}
-    else if(n.includes("poulie")||n.includes("cable")){icon="◉";equipment="Poulie";}
-    else if(n.includes("haltere")){icon="◆";equipment="Haltères";}
-    else if(n.includes("barre")){icon="━";equipment="Barre";}
-    else if(n.includes("elastique")){icon="≈";equipment="Élastique";}
-    else if(n.includes("pompe")||n.includes("poids du corps")||n.includes("au sol")||n.includes("traction")){icon="●";equipment="Poids du corps";}
+    let icon="AUTRE",equipment="Alternative";
+    if(n.includes("machine")||n.includes("pec deck")||n.includes("assiste")){icon="MACHINE";equipment="Machine";}
+    else if(n.includes("poulie")||n.includes("cable")){icon="POULIE";equipment="Poulie";}
+    else if(n.includes("haltere")){icon="HALTÈRES";equipment="Haltères";}
+    else if(n.includes("barre")){icon="BARRE";equipment="Barre";}
+    else if(n.includes("elastique")){icon="ÉLASTIQUE";equipment="Élastique";}
+    else if(n.includes("pompe")||n.includes("poids du corps")||n.includes("au sol")||n.includes("traction")){icon="PDC";equipment="Poids du corps";}
     const info=window.FFGuide?.info?.(name);
     const muscle=info?.muscles?.[0]||"Même zone";
     return {icon,equipment,muscle};
@@ -327,7 +327,7 @@
   const style=document.createElement("style");
   style.textContent=`
     .ff-variant-list.hidden{display:none!important}
-    .ff-variant-toggle{font-size:13px}.ff-variant-choice{display:flex!important;align-items:center!important;gap:11px!important;text-align:left!important}.ff-variant-icon{width:34px;height:34px;flex:0 0 34px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;color:var(--accent2);font-size:17px}.ff-variant-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.ff-variant-copy b{font-size:13px;color:var(--text)}.ff-variant-copy small{font-size:10px;color:var(--muted);font-weight:500}
+    .ff-variant-toggle{font-size:13px}.ff-variant-choice{display:flex!important;align-items:center!important;gap:11px!important;text-align:left!important}.ff-variant-icon{min-width:58px;height:28px;flex:0 0 auto;padding:0 8px;border:1px solid rgba(214,164,91,.35);border-radius:999px;display:grid;place-items:center;color:var(--accent2);font-size:9px;font-weight:850;letter-spacing:.04em}.ff-variant-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.ff-variant-copy b{font-size:13px;color:var(--text)}.ff-variant-copy small{font-size:10px;color:var(--muted);font-weight:500}
   `;
   document.head.appendChild(style);
 
