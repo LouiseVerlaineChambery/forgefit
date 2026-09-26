@@ -13,12 +13,15 @@
         <div class="dl-more-item" data-more="history"><b>Progression</b><span>Historique, charges et statistiques.</span></div>
         <div class="dl-more-item" data-more="settings"><b>Réglages</b><span>Sauvegarde, import et paramètres.</span></div>
         <div class="dl-more-item" data-more="week"><b>Menu 7 jours</b><span>Voir toute la semaine de repas.</span></div>
-      </div></section>`;
+      </div></section>
+      <section class="card"><div class="row"><div><div class="eyebrow">DONNÉES DENAT LIFE</div><h3 style="margin:6px 0">Votre espace privé</h3></div><span class="pill" id="cloud-pill">${cloudLabel()}</span></div><p class="muted small">Séances, progression, préférences repas et listes de courses sont enregistrées dans votre espace Denat Life. Le téléphone conserve seulement un cache de secours hors connexion.</p><button class="secondary full" id="cloud-share">Connecter un autre appareil</button></section>`;
     view.querySelector('[data-more="program"]')?.addEventListener("click",()=>baseSetRoute("program"));
     view.querySelector('[data-more="history"]')?.addEventListener("click",()=>baseSetRoute("history"));
     view.querySelector('[data-more="week"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","week");baseSetRoute("meals");active("meals");});
     view.querySelector('[data-more="settings"]')?.addEventListener("click",()=>{baseSetRoute("settings");setTimeout(()=>document.querySelector("#dash-settings")?.click(),0);});
+    view.querySelector("#cloud-share")?.addEventListener("click",()=>window.DenatCloud?.shareAccess?.());
   }
+  window.addEventListener("denat-cloud-status",e=>{const p=document.querySelector("#cloud-pill");if(p)p.textContent=cloudLabel();});
   setRoute=function(r){
     if(r==="courses"){
       localStorage.setItem("forgefit_meals_view","weekshop");
