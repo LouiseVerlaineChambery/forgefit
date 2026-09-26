@@ -16,6 +16,7 @@
   const counts={15:4,30:6,45:8};
   function available(def){
     if(!def||def.equipment.includes("Machine")||def.equipment.includes("Poulie")||def.equipment.includes("Barre"))return false;
+    if(def.name==="Dips"&&!cfg.equipment.has("Banc"))return false;
     return def.equipment.every(e=>e==="Poids du corps"||cfg.equipment.has(e));
   }
   function pick(){
