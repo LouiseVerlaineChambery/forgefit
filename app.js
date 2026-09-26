@@ -1,4 +1,4 @@
-const STORAGE_KEY = "forgefit_v2_state";
+const STORAGE_KEY = window.DenatProfile?.sportKey?.() || "forgefit_v2_state";
 const DEFAULT_STATE = {
   version: 2,
   settings: {
