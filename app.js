@@ -412,23 +412,7 @@ function renderSettings(){
         <label class="secondary full" style="text-align:center;display:block">Importer une sauvegarde<input id="import-data" type="file" accept="application/json" hidden></label>
       </div>
     </section>
-    <section class="card">
-      <div class="row"><div><div class="eyebrow">APPLE SANTÉ</div><h3 style="margin:6px 0 0" id="health-title">Connecter Apple Santé</h3></div><span class="pill" id="health-status">Vérification…</span></div>
-      <p class="muted small" id="health-copy">Sommeil, pas, activité et poids peuvent enrichir automatiquement ton coach Denat Life.</p>
-      <div class="stack" id="health-actions">
-        <button class="primary full" id="health-connect">Connecter Apple Santé</button>
-      </div>
-      <div class="notice small hidden" id="health-shortcut-steps" style="margin-top:12px">
-        <b>Une seule configuration sur l’iPhone</b><br>
-        <span id="health-step-copy">Denat Life a copié automatiquement la connexion nécessaire.</span><br><br>
-        1. Ouvre <b>Raccourcis</b> et crée « Denat Life Santé ».<br>
-        2. Ajoute les données Santé souhaitées : <b>Sommeil, Pas, FC au repos, VFC, Énergie active, Exercice et Poids</b>.<br>
-        3. Ajoute <b>Obtenir le contenu de l’URL</b> et utilise la connexion copiée par Denat Life.<br>
-        4. Lance-le une première fois et autorise l’accès à Santé.<br><br>
-        <button class="secondary full" id="health-copy-again">Recopier la connexion</button>
-        <p class="muted" style="margin:10px 0 0">Après le premier envoi, reviens ici : Denat Life affichera automatiquement « Connecté ».</p>
-      </div>
-    </section>`;
+    <div id="health-connector-root"></div>\n`;
   document.querySelector("#save-settings").addEventListener("click",()=>{
     state.settings.upperIncrement=+document.querySelector("#upper-inc").value.replace(",",".")||2.5;
     state.settings.lowerIncrement=+document.querySelector("#lower-inc").value.replace(",",".")||5;
@@ -443,6 +427,8 @@ function renderSettings(){
     const f=e.target.files[0];if(!f)return;
     try{const data=JSON.parse(await f.text());state=data;saveState();render();alert("Sauvegarde importée.");}catch(err){alert("Fichier invalide.");}
   });
+  const healthRoot=document.querySelector("#health-connector-root");
+  if(healthRoot&&window.DenatHealthConnector){healthRoot.innerHTML=window.DenatHealthConnector.view();window.DenatHealthConnector.bind(healthRoot);}
   const healthBtn=document.querySelector("#health-connect"),healthPill=document.querySelector("#health-status"),healthTitle=document.querySelector("#health-title"),healthCopy=document.querySelector("#health-copy"),healthSteps=document.querySelector("#health-shortcut-steps");
   const copyHealth=async()=>{
     const ok=await window.DenatCloud?.copyHealthConfig?.();
@@ -468,6 +454,6 @@ window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPro
 document.querySelector("#install-btn").addEventListener("click",async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.querySelector("#install-btn").classList.add("hidden");});
 
 // Service Worker
-if("serviceWorker" in navigator){const reg=()=>navigator.serviceWorker.register("sw.js?v=14.7").catch(()=>{});if(document.readyState==="complete")reg();else window.addEventListener("load",reg,{once:true});}
+if("serviceWorker" in navigator){const reg=()=>navigator.serviceWorker.register("sw.js?v=16.0").catch(()=>{});if(document.readyState==="complete")reg();else window.addEventListener("load",reg,{once:true});}
 
 render();
