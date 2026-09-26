@@ -1,6 +1,7 @@
 // Denat Life Cloud — le serveur est la source de vérité, localStorage sert de cache hors ligne.
 (function(){
   const API="https://lv-social-publisher.jocelyn-denat.workers.dev/denat-life/state";
+  const HEALTH_API="https://lv-social-publisher.jocelyn-denat.workers.dev/denat-life/apple-health";
   const AUTH="denat_life_cloud_auth_v1";
   const MIGRATED_PREFIX="denat_life_cloud_migrated_";
   const TIMEOUT=3000;
@@ -119,6 +120,19 @@
     if(navigator.share){try{await navigator.share({title:"Denat Life",text:"Accès à mon Denat Life",url});return true;}catch(e){if(e?.name==="AbortError")return false;}}
     try{await navigator.clipboard.writeText(url);alert("Lien d’accès Denat Life copié.");return true;}catch{prompt("Copie ce lien d’accès Denat Life",url);return false;}
   }
+  function healthConfig(){const x=identity();return {url:HEALTH_API,household:x.h,authorization:`Bearer ${x.k}`};}
+  async function healthStatus(){
+    const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),TIMEOUT);
+    try{
+      const r=await fetch(HEALTH_API,{method:"GET",headers:headers(),cache:"no-store",signal:ctl.signal});
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      return await r.json();
+    }finally{clearTimeout(to);}
+  }
+  async function copyHealthConfig(){
+    const x=healthConfig(),value=`URL : ${x.url}\nX-Denat-Household : ${x.household}\nAuthorization : ${x.authorization}`;
+    try{await navigator.clipboard.writeText(value);return true;}catch{prompt("Configuration Apple Santé",value);return false;}
+  }
   window.addEventListener("online",()=>{init().catch(()=>{});});
-  window.DenatCloud={init,pushNow,pull,shareAccess,accessLink,get status(){return status;}};
+  window.DenatCloud={init,pushNow,pull,shareAccess,accessLink,healthConfig,healthStatus,copyHealthConfig,get status(){return status;}};
 })();
