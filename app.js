@@ -413,13 +413,21 @@ function renderSettings(){
       </div>
     </section>
     <section class="card">
-      <div class="row"><div><div class="eyebrow">APPLE SANTÉ</div><h3 style="margin:6px 0 0">Connexion disponible</h3></div><span class="pill" id="health-status">Vérification…</span></div>
-      <p class="muted small">Pas besoin d’abonnement : on utilise l’app <b>Raccourcis</b> déjà présente sur l’iPhone pour lire les données Apple Santé autorisées et les envoyer à ton espace Denat Life.</p>
-      <div class="stack">
-        <button class="primary full" id="copy-health-config">1. Copier la connexion Denat Life</button>
-        <button class="secondary full" id="health-shortcut-help">2. Voir le raccourci gratuit à créer</button>
+      <div class="row"><div><div class="eyebrow">APPLE SANTÉ</div><h3 style="margin:6px 0 0" id="health-title">Connecter Apple Santé</h3></div><span class="pill" id="health-status">Vérification…</span></div>
+      <p class="muted small" id="health-copy">Sommeil, pas, activité et poids peuvent enrichir automatiquement ton coach Denat Life.</p>
+      <div class="stack" id="health-actions">
+        <button class="primary full" id="health-connect">Connecter Apple Santé</button>
       </div>
-      <div class="notice small hidden" id="health-shortcut-steps" style="margin-top:12px"><b>Raccourcis iPhone — gratuit</b><br>1. Crée un nouveau raccourci « Denat Life Santé ».<br>2. Ajoute <b>Rechercher des échantillons de santé</b> pour les données que tu veux partager (par exemple Pas, Sommeil, FC au repos, VFC, Énergie active, Minutes d’exercice et Poids).<br>3. Construis un dictionnaire <b>summary</b> avec les clés : <b>sleepHours</b>, <b>steps</b>, <b>restingHeartRate</b>, <b>hrvMs</b>, <b>activeEnergyKcal</b>, <b>exerciseMinutes</b> et <b>weightKg</b> (tu peux commencer seulement par sommeil + pas).<br>4. Ajoute <b>Obtenir le contenu de l’URL</b>, méthode POST, corps JSON.<br>5. Utilise l’URL et les en-têtes copiés par Denat Life.<br>6. Dans Automatisation, lance ce raccourci chaque jour à l’heure de ton choix.</div>
+      <div class="notice small hidden" id="health-shortcut-steps" style="margin-top:12px">
+        <b>Une seule configuration sur l’iPhone</b><br>
+        <span id="health-step-copy">Denat Life a copié automatiquement la connexion nécessaire.</span><br><br>
+        1. Ouvre <b>Raccourcis</b> et crée « Denat Life Santé ».<br>
+        2. Ajoute les données Santé souhaitées : <b>Sommeil, Pas, FC au repos, VFC, Énergie active, Exercice et Poids</b>.<br>
+        3. Ajoute <b>Obtenir le contenu de l’URL</b> et utilise la connexion copiée par Denat Life.<br>
+        4. Lance-le une première fois et autorise l’accès à Santé.<br><br>
+        <button class="secondary full" id="health-copy-again">Recopier la connexion</button>
+        <p class="muted" style="margin:10px 0 0">Après le premier envoi, reviens ici : Denat Life affichera automatiquement « Connecté ».</p>
+      </div>
     </section>`;
   document.querySelector("#save-settings").addEventListener("click",()=>{
     state.settings.upperIncrement=+document.querySelector("#upper-inc").value.replace(",",".")||2.5;
@@ -435,22 +443,24 @@ function renderSettings(){
     const f=e.target.files[0];if(!f)return;
     try{const data=JSON.parse(await f.text());state=data;saveState();render();alert("Sauvegarde importée.");}catch(err){alert("Fichier invalide.");}
   });
-  const healthBtn=document.querySelector("#copy-health-config"),healthPill=document.querySelector("#health-status");
-  healthBtn?.addEventListener("click",async()=>{
+  const healthBtn=document.querySelector("#health-connect"),healthPill=document.querySelector("#health-status"),healthTitle=document.querySelector("#health-title"),healthCopy=document.querySelector("#health-copy"),healthSteps=document.querySelector("#health-shortcut-steps");
+  const copyHealth=async()=>{
     const ok=await window.DenatCloud?.copyHealthConfig?.();
-    if(ok)alert("Connexion Apple Santé copiée. Garde ces 3 lignes pour le raccourci iPhone : URL, X-Denat-Household et Authorization.");
-  });
-  document.querySelector("#health-shortcut-help")?.addEventListener("click",()=>{
-    document.querySelector("#health-shortcut-steps")?.classList.toggle("hidden");
-  });
+    healthSteps?.classList.remove("hidden");
+    if(!ok)document.querySelector("#health-step-copy").textContent="Copie la connexion affichée puis poursuis dans Raccourcis.";
+  };
+  healthBtn?.addEventListener("click",copyHealth);
+  document.querySelector("#health-copy-again")?.addEventListener("click",copyHealth);
   window.DenatCloud?.healthStatus?.().then(x=>{
     if(!healthPill)return;
     if(x?.connected&&x?.lastSync){
       const d=new Date(x.lastSync);
-      healthPill.textContent="Connecté";
-      healthPill.title="Dernier envoi : "+d.toLocaleString("fr-FR");
+      healthPill.textContent="Connecté ✓";
+      healthTitle.textContent="Apple Santé connecté";
+      healthCopy.textContent="Dernière mise à jour : "+d.toLocaleString("fr-FR",{dateStyle:"short",timeStyle:"short"})+" · Sommeil · Pas · Activité · Poids";
+      healthBtn.textContent="Mettre à jour la connexion";
     }else healthPill.textContent="À connecter";
-  }).catch(()=>{if(healthPill)healthPill.textContent="Serveur indisponible";});
+  }).catch(()=>{if(healthPill)healthPill.textContent="À connecter";});
 }
 
 // PWA install
