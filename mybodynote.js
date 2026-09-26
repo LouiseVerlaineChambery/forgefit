@@ -4,20 +4,9 @@
 
   function normalizeExerciseName(name){
     const raw=String(name||"").trim().replace(/\s+/g," ");
-    const aliases={
-      "squat saute":"Squat sauté",
-      "squat sauté":"Squat sauté",
-      "squat 1 jambe":"Squat 1 jambe",
-      "traction table":"Traction table",
-      "pompe genoux":"Pompes genoux",
-      "pompes genoux":"Pompes genoux",
-      "pompe chaise basse":"Pompes chaise basse",
-      "développé incliné avec haltères":"Développé incliné haltères",
-      "developpé incliné avec haltères":"Développé incliné haltères",
-      "crunch":"Crunch",
-      "dips":"Dips",
-      "pompes":"Pompes"
-    };
+    const canonical=window.DenatExerciseLibrary?.canonicalName?.(raw);
+    if(canonical&&canonical!==raw)return canonical;
+    const aliases={"squat saute":"Squat sauté","squat sauté":"Squat sauté","squat 1 jambe":"Squat 1 jambe","traction table":"Traction table","pompe genoux":"Pompes genoux","pompes genoux":"Pompes genoux","pompe chaise basse":"Pompes chaise basse","crunch":"Crunch","dips":"Dips","pompes":"Pompes"};
     const key=raw.toLocaleLowerCase("fr-FR");
     return aliases[key] || raw.charAt(0).toLocaleUpperCase("fr-FR")+raw.slice(1);
   }
