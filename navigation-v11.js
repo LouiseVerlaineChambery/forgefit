@@ -50,8 +50,8 @@
   function personalizeTabs(){
     const isAnais=window.DenatProfile?.is?.("anais")===true;
     const sport=document.querySelector('.tab[data-route="today"]'),meals=document.querySelector('.tab[data-route="meals"]');
-    if(sport){sport.querySelector("span").textContent=isAnais?"Activité":"Sport";sport.querySelector("small").textContent=isAnais?"Optionnel":"Séance";}
-    if(meals){meals.querySelector("span").textContent="Repas";meals.querySelector("small").textContent=isAnais?"Mon quotidien":"Menus";}
+    if(sport){sport.querySelector("span").textContent="◇";sport.querySelector("small").textContent=isAnais?"Activité":"Sport";}
+    if(meals){meals.querySelector("span").textContent="◫";meals.querySelector("small").textContent="Repas";}
   }
   personalizeTabs();
   // Anaïs arrive d'abord sur les repas ; l'activité reste disponible sans objectif imposé.
