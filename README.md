@@ -1,6 +1,16 @@
-# Denat Life V23 — Sport, nutrition & équilibre
+# Denat Life V24 — Sport, nutrition & équilibre
 
 Denat Life est une PWA personnelle et familiale installable sur iPhone. Elle réunit le suivi sportif de Jocelyn, le quotidien repas d’Anaïs et les fonctions partagées du foyer.
+
+## V24
+- Bibliothèque structurée de plus de 60 exercices de musculation, recherchables par zone et matériel
+- Métadonnées muscles, matériel, séries, répétitions et repos pour les exercices de la bibliothèque
+- Sélecteur de bibliothèque lors de l’édition d’un programme, sans supprimer la saisie libre
+- Animations « petit bonhomme » étendues aux pompes, dips, développé épaules, oiseau/reverse fly, fentes et gainage
+- Mode Hôtel / Nomade : séances Full Body de 15, 30 ou 45 minutes
+- Matériel nomade optionnel : haltères, élastique, banc et barre de traction ; aucune machine requise
+- Les séances nomades restent dans l’historique et contribuent au suivi des muscles travaillés
+- Les séances nomades ne déplacent pas la rotation du programme principal et ne servent pas de référence aux recommandations de charge
 
 ## V23
 - Adaptation nutritionnelle quotidienne à partir des repas réellement enregistrés
