@@ -5,8 +5,12 @@
   const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[m]));
   const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'{"history":[],"restaurants":[]}');}catch{return {history:[],restaurants:[]};}};
   const save=x=>localStorage.setItem(KEY,JSON.stringify(x));
-  const person=()=>localStorage.getItem("forgefit_meals_person")||"both";
-  const personName=()=>person()==="p1"?"Jocelyn":person()==="p2"?"Anaïs":"Vous deux";
+  const person=()=>window.DenatProfile?.current?.().meal||localStorage.getItem("forgefit_meals_person")||"p1";
+  const personName=()=>window.DenatProfile?.label?.()||(person()==="p1"?"Jocelyn":"Anaïs");
+  const journalKey=()=>window.DenatProfile?.journalKey?.()||`denat_profile_${person()==="p2"?"anais":"jocelyn"}_food_journal_v1`;
+  const readJournal=()=>{try{const x=JSON.parse(localStorage.getItem(journalKey())||"[]");return Array.isArray(x)?x:[];}catch{return[];}};
+  const saveJournal=x=>localStorage.setItem(journalKey(),JSON.stringify(x.slice(-365)));
+  function addJournal(entry){const x=readJournal();x.push({id:crypto.randomUUID(),at:new Date().toISOString(),person:personName(),...entry});saveJournal(x);}
 
   const STOP=new Set("j ai jai de du des le la les un une et avec dans mon ma mes au aux a pour ce cette ca ça il me reste frigo placard maison fais fait moi repas recette stp s il te plait quoi manger peux peut on".split(" "));
   const SYN={patate:"pomme de terre",patates:"pomme de terre",pdt:"pomme de terre",poulets:"poulet",courgette:"courgettes",tomate:"tomates",oeuf:"oeufs",œuf:"oeufs",riz:"riz",pates:"pates",pâte:"pates",thon:"thon",saumon:"saumon",boeuf:"boeuf",bœuf:"boeuf"};
@@ -57,9 +61,27 @@
   }
   function restaurantAnswer(text){
     const e=restaurantEstimate(text),midK=Math.round((e.kcal[0]+e.kcal[1])/2),midP=Math.round((e.protein[0]+e.protein[1])/2);
-    const db=read();db.restaurants=db.restaurants||[];db.restaurants.push({at:new Date().toISOString(),person:personName(),text,kcalRange:e.kcal,proteinRange:e.protein});db.restaurants=db.restaurants.slice(-90);save(db);
+    const db=read();db.restaurants=db.restaurants||[];db.restaurants.push({at:new Date().toISOString(),person:personName(),text,kcalRange:e.kcal,proteinRange:e.protein});db.restaurants=db.restaurants.slice(-90);save(db);\n    addJournal({type:"restaurant",text,kcalRange:e.kcal,proteinRange:e.protein,rich:midK>=900});
     const rich=midK>=900?"rich":"balanced";
     return `<div class="dlmc-answer"><b>Restaurant enregistré · ${esc(personName())}</b><p class="small">Pour ${esc(e.name)}, je garde une estimation large : <b>≈ ${e.kcal[0]}–${e.kcal[1]} kcal</b> et <b>≈ ${e.protein[0]}–${e.protein[1]} g de protéines</b>. Sans poids ni fiche nutritionnelle du restaurant, ce n’est pas une mesure exacte.</p><div class="notice small">${absNote(rich)}</div><p class="small muted">Pas de compensation punitive demain : on reprend simplement le menu prévu, avec protéines, légumes et faim normale.</p></div>`;
+  }
+  function foodEstimate(text){
+    const e=restaurantEstimate(text),n=norm(text);
+    if(e.name!=="repas au restaurant")return e;
+    if(/yaourt|skyr|fromage blanc/.test(n))return {name:"collation lactée",kcal:[100,300],protein:[8,25]};
+    if(/sandwich/.test(n))return {name:"sandwich",kcal:[400,800],protein:[20,40]};
+    if(/poulet|dinde|oeuf|oeufs|thon/.test(n))return {name:"repas protéiné",kcal:[400,850],protein:[30,60]};
+    return {name:"repas déclaré",kcal:[350,900],protein:[15,45]};
+  }
+  function eatenAnswer(text){
+    const e=foodEstimate(text),mid=Math.round((e.kcal[0]+e.kcal[1])/2),rich=mid>=850;
+    addJournal({type:"meal",text,kcalRange:e.kcal,proteinRange:e.protein,rich});
+    return `<div class="dlmc-answer"><b>Ajouté au journal de ${esc(personName())}</b><p class="small">${esc(text)}</p><p class="small">Estimation prudente : <b>≈ ${e.kcal[0]}–${e.kcal[1]} kcal</b> · <b>≈ ${e.protein[0]}–${e.protein[1]} g protéines</b>. Si tu précises les quantités, je pourrai resserrer la fourchette.</p><div class="notice small">${rich?"Repas plutôt riche. Pour Jocelyn : pas idéal pour les abdos si ça devient fréquent 😄. Pas besoin de compenser brutalement : le prochain repas reste normal, avec une bonne source de protéines et des légumes.":"Repas enregistré. On juge surtout la tendance de la semaine, pas un repas isolé."}</div></div>`;
+  }
+  function journalSummary(){
+    const now=Date.now(),week=readJournal().filter(x=>now-new Date(x.at).getTime()<7*86400000),today=week.filter(x=>new Date(x.at).toDateString()===new Date().toDateString());
+    const rich=week.filter(x=>x.rich).length;
+    return {week,today,rich};
   }
   function quickRecipe(text){
     const rs=recipes().filter(r=>r.total<=25).sort((a,b)=>a.total-b.total);
@@ -68,7 +90,7 @@
   function answer(text){
     const n=norm(text);
     let html="";
-    if(/resto|restaurant|brasserie|mange dehors|burger|pizza|sushi|kebab|tacos/.test(n)) html=restaurantAnswer(text);
+    if(/j ai mange|jai mange|j ai pris|jai pris|j ai bu|jai bu|ce midi j ai|ce soir j ai/.test(n)) html=eatenAnswer(text);\n    else if(/resto|restaurant|brasserie|mange dehors|burger|pizza|sushi|kebab|tacos/.test(n)) html=restaurantAnswer(text);
     else if(/j ai|jai|il me reste|frigo|placard|a la maison|avec/.test(n)){
       const m=pantryMatch(text);
       html=m.best?recipeAnswer(m.best.r,m.tokens):`<div class="dlmc-answer">Je n’ai pas trouvé de recette suffisamment proche dans la bibliothèque. Essaie de me donner 2 ou 3 ingrédients principaux, par exemple : <b>« J’ai poulet, riz et courgettes »</b>.</div>`;
@@ -86,7 +108,7 @@
   }
   function view(){
     const outs=weekRestaurants();
-    return `<section class="card dlmc-card"><div class="row"><div><div class="eyebrow">COACH REPAS PARTAGÉ</div><h2 style="margin:5px 0">Qu’est-ce qu’on mange ?</h2></div><span class="pill">${esc(personName())}</span></div><p class="muted small">Écris naturellement : ingrédients disponibles, restaurant, envie rapide… Les informations sont partagées dans votre espace Denat Life.</p><div class="dlmc-chips"><button data-dlmc-fill="J’ai poulet, riz et courgettes à la maison. Fais-moi un repas avec la recette.">J’ai des ingrédients</button><button data-dlmc-fill="Je mange au restaurant ce soir : ">Je mange au resto</button><button data-dlmc-fill="Fais-moi un repas rapide en moins de 25 minutes.">Repas rapide</button></div><textarea id="dlmc-input" rows="4" placeholder="Ex. J’ai du poulet, des courgettes et du riz. Fais-moi un repas avec la recette."></textarea><button class="primary full" id="dlmc-send">Demander au coach</button><div id="dlmc-result"></div></section><section class="card"><div class="row"><div><div class="eyebrow">SUIVI ALIMENTAIRE</div><h3 style="margin:6px 0">Cette semaine</h3></div><span class="pill">${outs.length} resto${outs.length>1?"s":""}</span></div><p class="muted small">Les repas au restaurant sont enregistrés pour donner du contexte au suivi. Les estimations restent des fourchettes, pas des mesures de laboratoire.</p><button class="ghost full" id="dlmc-share">Partager / connecter un autre téléphone</button></section>`;
+    return `<section class="card dlmc-card"><div class="row"><div><div class="eyebrow">COACH REPAS PARTAGÉ</div><h2 style="margin:5px 0">Qu’est-ce qu’on mange ?</h2></div><span class="pill">${esc(personName())}</span></div><p class="muted small">Écris naturellement : ingrédients disponibles, restaurant, envie rapide… Les informations sont partagées dans votre espace Denat Life.</p><div class="dlmc-chips"><button data-dlmc-fill="J’ai poulet, riz et courgettes à la maison. Fais-moi un repas avec la recette.">J’ai des ingrédients</button><button data-dlmc-fill="J’ai mangé ce midi : ">J’ai mangé…</button><button data-dlmc-fill="Je mange au restaurant ce soir : ">Je mange au resto</button><button data-dlmc-fill="Fais-moi un repas rapide en moins de 25 minutes.">Repas rapide</button></div><textarea id="dlmc-input" rows="4" placeholder="Ex. J’ai du poulet, des courgettes et du riz. Fais-moi un repas avec la recette."></textarea><button class="primary full" id="dlmc-send">Demander au coach</button><div id="dlmc-result"></div></section><section class="card"><div class="row"><div><div class="eyebrow">JOURNAL · ${esc(personName())}</div><h3 style="margin:6px 0">Ce que tu as réellement mangé</h3></div><span class="pill">${js.week.length} entrée${js.week.length>1?"s":""}</span></div><div class="dlmc-portions"><div><b>Aujourd’hui</b><br>${js.today.length} repas / ajout${js.today.length>1?"s":""}</div><div><b>7 jours</b><br>${js.rich} repas riche${js.rich>1?"s":""}</div></div><p class="muted small">Le menu reste commun au foyer. Ce journal, les restos et le suivi nutritionnel sont personnels à ${esc(personName())}.</p><button class="ghost full" id="dlmc-share">Partager / connecter un autre téléphone</button></section>`;
   }
   function bind(root=document){
     const input=root.querySelector("#dlmc-input"),result=root.querySelector("#dlmc-result");
