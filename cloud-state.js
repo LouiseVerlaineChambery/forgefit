@@ -52,7 +52,7 @@
       [...(Array.isArray(a)?a:[]),...(Array.isArray(b)?b:[])].forEach(v=>m.set(String(v?.id||v?.at||"")+"|"+String(v?.text||""),v));
       return JSON.stringify([...m.values()].sort((x,y)=>new Date(x?.at||0)-new Date(y?.at||0)).slice(-365));
     }
-    if(k==="denat_meal_coach_v1"){
+    if(k==="denat_meal_coach_v1"||/^denat_profile_(jocelyn|anais)_meal_coach_v1$/.test(k)){
       const a=parse(r,{history:[],restaurants:[]}),b=parse(l,{history:[],restaurants:[]});
       const mergeRows=(x,y,limit)=>{const m=new Map();[...(Array.isArray(x)?x:[]),...(Array.isArray(y)?y:[])].forEach(v=>m.set(String(v?.at||"")+"|"+String(v?.person||"")+"|"+String(v?.q||v?.text||""),v));return [...m.values()].sort((x,y)=>new Date(x?.at||0)-new Date(y?.at||0)).slice(-limit);};
       return JSON.stringify({history:mergeRows(a.history,b.history,60),restaurants:mergeRows(a.restaurants,b.restaurants,90)});
