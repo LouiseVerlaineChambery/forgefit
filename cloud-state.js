@@ -130,7 +130,7 @@
     if(navigator.share){try{await navigator.share({title:"Denat Life",text:"Accès à mon Denat Life",url});return true;}catch(e){if(e?.name==="AbortError")return false;}}
     try{await navigator.clipboard.writeText(url);alert("Lien d’accès Denat Life copié.");return true;}catch{prompt("Copie ce lien d’accès Denat Life",url);return false;}
   }
-  function healthConfig(){const x=identity();return {url:HEALTH_API,household:x.h,authorization:`Bearer ${x.k}`};}
+  function healthConfig(){const x=identity();return {url:HEALTH_API,household:x.h,authorization:`Bearer ${x.k}`,shortcutAuthorization:`Denat ${x.h}.${x.k}`};}
   async function healthStatus(){
     const ctl=new AbortController(),to=setTimeout(()=>ctl.abort(),TIMEOUT);
     try{
@@ -140,7 +140,7 @@
     }finally{clearTimeout(to);}
   }
   async function copyHealthConfig(){
-    const x=healthConfig(),value=`URL : ${x.url}\nX-Denat-Household : ${x.household}\nAuthorization : ${x.authorization}`;
+    const x=healthConfig(),value=`URL : ${x.url}\nAuthorization : ${x.shortcutAuthorization}`;
     try{await navigator.clipboard.writeText(value);return true;}catch{prompt("Configuration Apple Santé",value);return false;}
   }
   window.addEventListener("online",()=>{init().catch(()=>{});});
