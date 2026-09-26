@@ -458,6 +458,6 @@ window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPro
 document.querySelector("#install-btn").addEventListener("click",async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.querySelector("#install-btn").classList.add("hidden");});
 
 // Service Worker
-if("serviceWorker" in navigator){const reg=()=>navigator.serviceWorker.register("sw.js?v=15.1").catch(()=>{});if(document.readyState==="complete")reg();else window.addEventListener("load",reg,{once:true});}
+if("serviceWorker" in navigator){const reg=()=>navigator.serviceWorker.register("sw.js?v=15.2").catch(()=>{});if(document.readyState==="complete")reg();else window.addEventListener("load",reg,{once:true});}
 
 render();
