@@ -36,7 +36,7 @@
     return [...state.sessions]
       .filter(s=>s?.endedAt&&s.source!=="nomad")
       .sort((a,b)=>new Date(b.endedAt)-new Date(a.endedAt))
-      .map(s=>({session:s,ex:(s.exercises||[]).find(e=>norm(e.name)===norm(name))}))
+      .map(s=>({session:s,ex:(s.exercises||[]).find(e=>window.DenatExerciseLibrary?.sameExercise?.(e.name,name)??(norm(e.name)===norm(name)))}))
       .filter(x=>x.ex&&completed(x.ex).length)
       .slice(0,limit);
   }
