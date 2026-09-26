@@ -142,7 +142,7 @@
     const prevKey=iso(new Date(m.getFullYear(),m.getMonth(),m.getDate()-7));
     const prevSunday=chooseForWeek(prevKey)[6];
     const days=chosen.map((d,i)=>{
-      const prev=i===0?prevSunday:chosen[i-1],b=breakfast[(seed(weekKey)+i)%breakfasts.length],s=snacks[(seed(weekKey)+i*2)%snacks.length];
+      const prev=i===0?prevSunday:chosen[i-1],b=breakfasts[(seed(weekKey)+i)%breakfasts.length],s=snacks[(seed(weekKey)+i*2)%snacks.length];
       const daily=consolidate([...b[3],...d.shop,...s[3]]);
       return {name:NAMES[i],estimateEUR:d.cost+5,breakfast:b.slice(0,3),lunch:mealArray(prev," — restes de la veille"),dinner:mealArray(d),dinnerId:d.id,dinnerCategory:mealCategory(d),dinnerMinutes:d.prep+d.cook,dinnerFavorite:isFavorite(d.id),snack:s.slice(0,3),shop:daily.map(x=>x.text)};
     });
