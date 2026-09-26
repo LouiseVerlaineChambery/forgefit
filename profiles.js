@@ -13,6 +13,10 @@
   function migrate(){
     const old=localStorage.getItem("forgefit_v2_state");
     if(old&&!localStorage.getItem(sportKey("jocelyn")))localStorage.setItem(sportKey("jocelyn"),old);
+    const oldCoach=localStorage.getItem("denat_meal_coach_v1");
+    if(oldCoach&&!localStorage.getItem("denat_profile_jocelyn_meal_coach_v1"))localStorage.setItem("denat_profile_jocelyn_meal_coach_v1",oldCoach);
+    const oldHealth=localStorage.getItem("denat_health_cache_v1");
+    if(oldHealth&&!localStorage.getItem("denat_health_cache_jocelyn_v1"))localStorage.setItem("denat_health_cache_jocelyn_v1",oldHealth);
     if(!localStorage.getItem(DEVICE_KEY))localStorage.setItem(DEVICE_KEY,"jocelyn");
     localStorage.setItem("forgefit_meals_person",current().meal);
   }
