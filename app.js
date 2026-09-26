@@ -362,7 +362,7 @@ function renderHistory(){
 function renderExerciseStats(name){
   const points=[];
   state.sessions.forEach(s=>{
-    const e=s.exercises.find(x=>x.name===name);
+    const e=s.exercises.find(x=>window.DenatExerciseLibrary?.sameExercise?.(x.name,name)??(x.name===name));
     if(!e) return;
     const done=e.sets.filter(x=>x.done);
     if(!done.length) return;
