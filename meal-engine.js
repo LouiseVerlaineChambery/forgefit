@@ -49,7 +49,7 @@
 
   function normName(s){return String(s||"").trim().toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");}
   function singular(s){
-    const map={"bananes":"banane","pommes":"pomme","poires":"poire","kiwis":"kiwi","citrons":"citron","fruits":"fruit","poivrons":"poivron","oignons":"oignon","avocats":"avocat","salades":"salade","oeufs":"œuf","bocaux sauce tomate":"bocal sauce tomate","pates a pizza":"pâte à pizza","tortillas":"tortilla"};
+    const map={"bananes":"banane","pommes":"pomme","poires":"poire","kiwis":"kiwi","citrons":"citron","fruits":"fruit","poivrons":"poivron","oignons":"oignon","avocats":"avocat","salades":"salade","oeufs":"œuf","œufs":"œuf","bocaux sauce tomate":"bocal sauce tomate","pates a pizza":"pâte à pizza","tortillas":"tortilla"};
     return map[normName(s)]||String(s).trim();
   }
   function parseItem(raw){
@@ -67,11 +67,11 @@
     }
     return {key:`x|${normName(s)}`,qty:1,unit:"x",name:s};
   }
-  function formatQty(q){return Math.abs(q-Math.round(q))<.001?String(Math.round(q)):String(Math.round(q*100)/100).replace(".",",");}
+  function formatQty(q){return Math.abs(q-Math.round(q))<.001?String(Math.round(q)):String(Math.round(q*100)/100).replace(".",",");}\n  function plural(name,qty){if(qty<=1)return name;const n=normName(name),special={"banane":"bananes","pomme":"pommes","poire":"poires","kiwi":"kiwis","citron":"citrons","fruit":"fruits","poivron":"poivrons","oignon":"oignons","avocat":"avocats","salade":"salades","œuf":"œufs","bocal sauce tomate":"bocaux sauce tomate","pate a pizza":"pâtes à pizza","tortilla":"tortillas"};return special[n]||name;}\n  function formatItem(x){if(x.unit==="x")return x.name;if(x.unit==="u")return `${formatQty(x.qty)} ${plural(x.name,x.qty)}`;if(x.unit==="g"&&x.qty>=1000)return `${formatQty(x.qty/1000)} kg ${x.name}`;if(x.unit==="ml"&&x.qty>=1000)return `${formatQty(x.qty/1000)} L ${x.name}`;return `${formatQty(x.qty)} ${x.unit} ${x.name}`;}
   function category(name){
     const n=normName(name);
     if(/poulet|dinde|boeuf|saumon|cabillaud|thon/.test(n))return "Viandes & poissons";
-    if(/skyr|yaourt|fromage|mozzarella|oeuf/.test(n))return "Frais";
+    if(/skyr|yaourt|fromage|mozzarella|oeuf|œuf/.test(n))return "Frais";
     if(/brocoli|haricot|pomme$|banane|poire|kiwi|fruit|citron|poivron|oignon|avocat|salade|courgette|epinard|tomate|champignon|carotte|petits pois|legume|ratatouille|pommes de terre/.test(n))return "Fruits & légumes";
     if(/riz|pate|quinoa|semoule|boulgour|pain|tortilla/.test(n))return "Féculents & boulangerie";
     return "Épicerie";
@@ -84,7 +84,7 @@
     });
     const order=["Fruits & légumes","Viandes & poissons","Frais","Féculents & boulangerie","Épicerie"];
     return [...map.values()].map(x=>{
-      const text=x.unit==="x"?x.name:x.unit==="u"?`${formatQty(x.qty)} ${x.name}`:`${formatQty(x.qty)} ${x.unit} ${x.name}`;
+      const text=formatItem(x);
       return {text,category:category(x.name)};
     }).sort((a,b)=>order.indexOf(a.category)-order.indexOf(b.category)||a.text.localeCompare(b.text,"fr"));
   }
