@@ -1,6 +1,12 @@
-# Denat Life V20 — Sport, nutrition & équilibre
+# Denat Life V20.1 — Sport, nutrition & équilibre
 
 Denat Life est une PWA personnelle et familiale installable sur iPhone. Elle réunit le suivi sportif de Jocelyn, le quotidien repas d’Anaïs et les fonctions partagées du foyer.
+
+## V20.1
+- Suppression sécurisée dans la timeline avec annulation pendant 6 secondes
+- Restauration fidèle des repas, signaux d’équilibre et séances supprimés par erreur
+- Saisie antidatée améliorée : `le 24/09`, `le 24/09/2026`, `il y a 3 jours`
+- Protection contre la confusion entre une note comme `Énergie 8/10` et une date
 
 ## V20
 - Deux profils personnels : Jocelyn et Anaïs
