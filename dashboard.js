@@ -57,7 +57,6 @@
     const total=meals?.weekShop?.length||0;
     const remaining=Math.max(0,total-done);
     const weekly=weekSessions();
-    const isAnais=window.DenatProfile?.is?.("anais")===true;
     const goal=isAnais?0:3;
     const pct=goal?Math.min(100,Math.round(weekly.length/goal*100)):0;
     const next=state.program?.[typeof nextWorkoutIndex==="function"?nextWorkoutIndex():0];
