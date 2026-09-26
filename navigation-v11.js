@@ -7,7 +7,7 @@
     title.textContent="Plus";
     view.innerHTML=`
       <section class="card hero">
-        <div class="dl-brand-hero"><img src="brand-logo-v5.svg?v=12.4" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">SPORT · NUTRITION · ÉQUILIBRE</div></div></div>
+        <div class="dl-brand-hero"><img src="brand-logo-v5.svg?v=12.5" alt="Denat Life"><div><div class="dl-brand-name">DENAT LIFE</div><div class="dl-brand-sub">SPORT · NUTRITION · ÉQUILIBRE</div></div></div>
       </section>
       <section class="card"><div class="eyebrow">VOTRE ESPACE</div><h2 style="margin:6px 0 14px">Plus</h2><div class="dl-more-grid">
         <div class="dl-more-item" data-more="program"><b>Programme</b><span>Voir et modifier les séances.</span></div>
