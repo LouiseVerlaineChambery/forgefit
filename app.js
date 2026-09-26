@@ -69,7 +69,7 @@ function roundTo(x,step){return Math.round(x/step)*step;}
 function sessionVolume(s){return s.exercises.reduce((a,e)=>a+e.sets.filter(x=>x.done).reduce((b,x)=>b+(+x.weight||0)*(+x.reps||0),0),0);}
 function completedSets(s){return s.exercises.reduce((a,e)=>a+e.sets.filter(x=>x.done).length,0);}
 function lastExercisePerformance(name){
-  const sessions=[...state.sessions].sort((a,b)=>new Date(b.endedAt)-new Date(a.endedAt));
+  const sessions=[...state.sessions].filter(s=>s.source!=="nomad").sort((a,b)=>new Date(b.endedAt)-new Date(a.endedAt));
   for(const s of sessions){
     const ex=s.exercises.find(e=>e.name===name);
     if(ex && ex.sets.some(x=>x.done)) return ex;
@@ -115,7 +115,8 @@ function render(){
 
 function nextWorkoutIndex(){
   if(!state.sessions.length) return 0;
-  const lastName=state.sessions[state.sessions.length-1]?.workoutName;
+  const lastProgramSession=[...state.sessions].reverse().find(s=>s.source!=="nomad");
+  const lastName=lastProgramSession?.workoutName;
   const idx=state.program.findIndex(x=>x.name===lastName);
   return idx<0?0:(idx+1)%state.program.length;
 }
@@ -454,6 +455,6 @@ window.addEventListener("beforeinstallprompt",e=>{e.preventDefault();deferredPro
 document.querySelector("#install-btn").addEventListener("click",async()=>{if(!deferredPrompt)return;deferredPrompt.prompt();await deferredPrompt.userChoice;deferredPrompt=null;document.querySelector("#install-btn").classList.add("hidden");});
 
 // Service Worker
-if("serviceWorker" in navigator){const reg=()=>navigator.serviceWorker.register("sw.js?v=19.1").catch(()=>{});if(document.readyState==="complete")reg();else window.addEventListener("load",reg,{once:true});}
+if("serviceWorker" in navigator){const reg=()=>navigator.serviceWorker.register("sw.js?v=24").catch(()=>{});if(document.readyState==="complete")reg();else window.addEventListener("load",reg,{once:true});}
 
 render();
