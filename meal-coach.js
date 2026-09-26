@@ -11,7 +11,7 @@
   const readJournal=()=>{try{const x=JSON.parse(localStorage.getItem(journalKey())||"[]");return Array.isArray(x)?x:[];}catch{return[];}};
   const saveJournal=x=>localStorage.setItem(journalKey(),JSON.stringify(x.slice(-365)));
   function addJournal(entry){
-    if(entry?.text&&window.DenatNutrition?.add)return window.DenatNutrition.add(entry.text,{type:entry.type||"meal",kcalRange:entry.kcalRange,proteinRange:entry.proteinRange,confidence:entry.confidence});
+    if(entry?.text&&window.DenatNutrition?.add)return window.DenatNutrition.add(entry.text,{type:entry.type||"meal",at:entry.at,mealType:entry.mealType,kcalRange:entry.kcalRange,proteinRange:entry.proteinRange,confidence:entry.confidence});
     const x=readJournal();x.push({id:crypto.randomUUID(),at:new Date().toISOString(),person:personName(),...entry});saveJournal(x);return x[x.length-1];
   }
 
@@ -32,10 +32,18 @@
     const ts=tokens(text),rs=recipes();
     const ranked=rs.map(r=>{
       const hay=norm([r.title,...r.ingredients].join(" "));
-      let score=0;ts.forEach(t=>{if(hay.includes(t))score+=r.title&&norm(r.title).includes(t)?4:2;});
-      return {r,score};
-    }).sort((a,b)=>b.score-a.score||a.r.total-b.r.total);
-    return {tokens:ts,best:ranked[0]?.score?ranked[0]:null};
+      let matched=0,score=0;ts.forEach(t=>{if(hay.includes(t)){matched++;score+=r.title&&norm(r.title).includes(t)?4:2;}});
+      const missing=missingFor(r,ts),total=Number(r.total)||99;
+      score+=matched*3-Math.min(5,missing.length)-total/60;
+      return {r,score,matched,missing,total};
+    }).filter(x=>x.matched>0).sort((a,b)=>b.score-a.score||a.missing.length-b.missing.length||a.total-b.total);
+    return {tokens:ts,best:ranked[0]||null,ranked:ranked.slice(0,3)};
+  }
+  function pantryOptionsAnswer(text){
+    const m=pantryMatch(text);
+    if(!m.ranked.length)return `<div class="dlmc-answer">Je n’ai pas trouvé de recette suffisamment proche. Donne-moi 2 ou 3 ingrédients principaux, par exemple <b>« poulet, riz, courgettes »</b>.</div>`;
+    const fastest=[...m.ranked].sort((a,b)=>a.total-b.total)[0]?.r?.id;
+    return `<div class="dlmc-answer"><b>3 idées avec ce que tu as</b><p class="small muted">Je privilégie les ingrédients reconnus, puis le moins d’achats manquants et le temps de préparation.</p><div class="dlmc-options">${m.ranked.map((x,i)=>`<button class="dlmc-option" data-dlmc-recipe="${esc(x.r.id)}"><span>${i===0?"LE PLUS PROCHE":x.r.id===fastest?"LE PLUS RAPIDE":"ALTERNATIVE"}</span><b>${esc(x.r.title)}</b><small>≈ ${x.total} min · ${x.missing.length?x.missing.length+" élément"+(x.missing.length>1?"s":"")+" à vérifier":"rien de majeur à compléter"}</small></button>`).join("")}</div></div>`;
   }
   function missingFor(r,ts){
     return r.ingredients.filter(x=>!ts.some(t=>cleanIngredient(x).includes(t))).slice(0,4);
@@ -61,12 +69,12 @@
   }
   function recipeAnswer(r,ts=[]){
     const miss=missingFor(r,ts),rich=richness(r);
-    return `<div class="dlmc-answer"><b>${esc(r.title)}</b><div class="small muted" style="margin-top:5px">≈ ${r.total} min · 4 portions</div><div class="dlmc-portions"><div><b>Jocelyn</b><br>${esc(r.p1)}</div><div><b>Anaïs</b><br>${esc(r.p2)}</div></div>${miss.length?`<p class="small"><b>À vérifier / compléter :</b> ${miss.map(esc).join(" · ")}</p>`:""}<p class="small"><b>Recette :</b></p><ol class="dlmc-steps">${r.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol><div class="notice small">${absNote(rich)}</div></div>`;
+    return `<div class="dlmc-answer"><b>${esc(r.title)}</b><div class="small muted" style="margin-top:5px">≈ ${r.total} min · 4 portions</div><div class="dlmc-portions"><div><b>Jocelyn</b><br>${esc(r.p1)}</div><div><b>Anaïs</b><br>${esc(r.p2)}</div></div>${miss.length?`<p class="small"><b>À vérifier / compléter :</b> ${miss.map(esc).join(" · ")}</p>`:""}<p class="small"><b>Recette :</b></p><ol class="dlmc-steps">${r.steps.map(s=>`<li>${esc(s)}</li>`).join("")}</ol><div class="notice small">${absNote(rich)}</div><button class="secondary full dlmc-eat-recipe" data-dlmc-eat-recipe="${esc(r.id)}" style="margin-top:10px">J’ai mangé ce repas</button></div>`;
   }
   function restaurantAnswer(text){
-    const e=restaurantEstimate(text),midK=Math.round((e.kcal[0]+e.kcal[1])/2),midP=Math.round((e.protein[0]+e.protein[1])/2);
-    const db=read();db.restaurants=db.restaurants||[];db.restaurants.push({at:new Date().toISOString(),person:personName(),text,kcalRange:e.kcal,proteinRange:e.protein});db.restaurants=db.restaurants.slice(-90);save(db);
-    addJournal({type:"restaurant",text,kcalRange:e.kcal,proteinRange:e.protein,rich:midK>=900});
+    const e=restaurantEstimate(text),midK=Math.round((e.kcal[0]+e.kcal[1])/2),midP=Math.round((e.protein[0]+e.protein[1])/2),when=window.DenatTimeline?.parseWhen?.(text);
+    const at=when?.explicit?when.iso:new Date().toISOString(),db=read();db.restaurants=db.restaurants||[];db.restaurants.push({at,person:personName(),text,kcalRange:e.kcal,proteinRange:e.protein});db.restaurants=db.restaurants.slice(-90);save(db);
+    addJournal({type:"restaurant",text,at,kcalRange:e.kcal,proteinRange:e.protein,rich:midK>=900});
     const rich=midK>=900?"rich":"balanced";
     return `<div class="dlmc-answer"><b>Restaurant enregistré · ${esc(personName())}</b><p class="small">Pour ${esc(e.name)}, je garde une estimation large : <b>≈ ${e.kcal[0]}–${e.kcal[1]} kcal</b> et <b>≈ ${e.protein[0]}–${e.protein[1]} g de protéines</b>. Sans poids ni fiche nutritionnelle du restaurant, ce n’est pas une mesure exacte.</p><div class="notice small">${absNote(rich)}</div><p class="small muted">Pas de compensation punitive demain : on reprend simplement le menu prévu, avec protéines, légumes et faim normale.</p></div>`;
   }
@@ -80,9 +88,9 @@
     return {name:"repas déclaré",kcal:[350,900],protein:[15,45]};
   }
   function eatenAnswer(text){
-    const e=foodEstimate(text),mid=Math.round((e.kcal[0]+e.kcal[1])/2),rich=mid>=850;
-    const logged=addJournal({type:"meal",text,kcalRange:e.kcal,proteinRange:e.protein,rich});
-    return `<div class="dlmc-answer"><b>Ajouté au journal de ${esc(personName())}</b><p class="small">${esc(text)}</p><p class="small">Estimation prudente : <b>≈ ${e.kcal[0]}–${e.kcal[1]} kcal</b> · <b>≈ ${e.protein[0]}–${e.protein[1]} g protéines</b>. ${e.confidence==="high"?"Les quantités indiquées permettent une estimation plus resserrée.":"Si tu précises les quantités (ex. 180 g poulet + 150 g riz), je pourrai resserrer la fourchette."}</p><div class="notice small">${absNote(rich?"rich":"balanced")}</div></div>`;
+    const e=foodEstimate(text),mid=Math.round((e.kcal[0]+e.kcal[1])/2),rich=mid>=850,when=window.DenatTimeline?.parseWhen?.(text),at=when?.explicit?when.iso:new Date().toISOString();
+    const logged=addJournal({type:"meal",text,at,kcalRange:e.kcal,proteinRange:e.protein,rich});
+    return `<div class="dlmc-answer"><b>Ajouté au journal de ${esc(personName())}</b><p class="small">${esc(text)}</p>${when?.explicit?`<p class="small muted">Rangé dans la mémoire : <b>${esc(when.label)}</b>.</p>`:""}<p class="small">Estimation prudente : <b>≈ ${e.kcal[0]}–${e.kcal[1]} kcal</b> · <b>≈ ${e.protein[0]}–${e.protein[1]} g protéines</b>. ${e.confidence==="high"?"Les quantités indiquées permettent une estimation plus resserrée.":"Si tu précises les quantités (ex. 180 g poulet + 150 g riz), je pourrai resserrer la fourchette."}</p><div class="notice small">${absNote(rich?"rich":"balanced")}</div></div>`;
   }
   function journalSummary(){
     const now=Date.now(),week=readJournal().filter(x=>now-new Date(x.at).getTime()<7*86400000),today=week.filter(x=>new Date(x.at).toDateString()===new Date().toDateString());
@@ -158,7 +166,12 @@
   function answer(text){
     const n=norm(text);
     let html="";
-    if(/qu.*(j ai|jai|ai je).*(mange|fait|enregistre|note)|j ai mange quoi|jai mange quoi|j ai fait quoi|jai fait quoi|rappelle.*(matin|midi|hier|soir|semaine)|point.*(matin|midi|hier|soir|7 jours|semaine|derniere seance)|depuis.*(derniere|dernier).*(seance|sport)|sur.*7 jours/.test(n)) html=memoryAnswer(text);
+    if(window.DenatTimeline?.sportStatement?.(text)){
+      const r=window.DenatTimeline.recordSport(text);
+      html=r?`<div class="dlmc-answer"><b>Séance ajoutée à ta mémoire</b><p class="small">${esc(r.item.workoutName)} · ${esc(r.when.label)}</p><p class="small muted">Saisie manuelle : elle compte dans la chronologie, sans inventer de séries ni de charges.</p></div>`:`<div class="dlmc-answer">Je n’ai pas pu enregistrer cette séance.</div>`;
+    }
+    else if(window.DenatTimeline?.mealStatement?.(text)&&!/quoi|qu est|rappelle|point|bilan/.test(n)) html=eatenAnswer(text);
+    else if(/qu.*(j ai|jai|ai je).*(mange|fait|enregistre|note)|j ai mange quoi|jai mange quoi|j ai fait quoi|jai fait quoi|rappelle.*(matin|midi|hier|soir|semaine)|point.*(matin|midi|hier|soir|7 jours|semaine|derniere seance)|depuis.*(derniere|dernier).*(seance|sport)|sur.*7 jours/.test(n)) html=memoryAnswer(text);
     else if(/quand.*sport|quand.*seance|derniere.*seance|dernier.*sport|fait.*sport|sport.*quand/.test(n)) html=timingAnswer();
     else if(/j ai mange.*repas prevu|jai mange.*repas prevu|enregistre.*repas prevu|j ai mange.*menu|jai mange.*menu/.test(n)) html=logPlannedAnswer();
     else if(/recette.*soir|recette.*diner|recette.*dîner|comment.*preparer.*soir|comment.*préparer.*soir/.test(n)) html=plannedRecipeAnswer();
@@ -167,8 +180,7 @@
     else if(/j ai mange|jai mange|j ai pris|jai pris|j ai bu|jai bu|ce midi j ai|ce soir j ai|ce matin j ai/.test(n)) html=eatenAnswer(text);
     else if(/resto|restaurant|brasserie|mange dehors|burger|pizza|sushi|kebab|tacos/.test(n)) html=restaurantAnswer(text);
     else if(/j ai|jai|il me reste|frigo|placard|a la maison|avec/.test(n)){
-      const m=pantryMatch(text);
-      html=m.best?recipeAnswer(m.best.r,m.tokens):`<div class="dlmc-answer">Je n’ai pas trouvé de recette suffisamment proche dans la bibliothèque. Essaie de me donner 2 ou 3 ingrédients principaux, par exemple : <b>« J’ai poulet, riz et courgettes »</b>.</div>`;
+      html=pantryOptionsAnswer(text);
     }else if(/rapide|vite|20 min|25 min/.test(n)) html=quickRecipe(text);
     else {
       const today=window.DenatMealEngine?.generate?.()?.days?.[(new Date().getDay()+6)%7],r=today&&window.DenatMealEngine?.getRecipe?.(today.dinnerId);
@@ -191,6 +203,12 @@
     root.querySelectorAll("[data-dlmc-fill]").forEach(b=>b.addEventListener("click",()=>{if(input){input.value=b.dataset.dlmcFill;input.focus();}}));
     root.querySelectorAll("[data-dlmc-ask]").forEach(b=>b.addEventListener("click",()=>{const q=b.dataset.dlmcAsk;if(input)input.value=q;if(result)result.innerHTML=answer(q);window.DenatCloud?.pushNow?.().catch?.(()=>{});}));
     root.querySelector("#dlmc-send")?.addEventListener("click",()=>{const q=input?.value.trim();if(!q)return;result.innerHTML=answer(q);window.DenatCloud?.pushNow?.().catch?.(()=>{});});
+    result?.addEventListener("click",e=>{
+      const recipeBtn=e.target.closest?.("[data-dlmc-recipe]");
+      if(recipeBtn){const r=window.DenatMealEngine?.getRecipe?.(recipeBtn.dataset.dlmcRecipe);if(r)result.innerHTML=recipeAnswer(r,[]);return;}
+      const eat=e.target.closest?.("[data-dlmc-eat-recipe]");
+      if(eat){const r=window.DenatMealEngine?.getRecipe?.(eat.dataset.dlmcEatRecipe);if(!r)return;const portion=window.DenatProfile?.is?.("anais")?r.p2:r.p1,text=`${r.title} · ${portion}`,est=foodEstimate(text);addJournal({type:"meal",text,kcalRange:est.kcal,proteinRange:est.protein,confidence:est.confidence});result.innerHTML=`<div class="dlmc-answer"><b>Repas enregistré</b><p class="small">${esc(r.title)} · ${esc(personName())}</p><p class="small muted">Ajouté à la timeline à l’heure actuelle.</p></div>`;window.DenatCloud?.pushNow?.().catch?.(()=>{});}
+    });
     root.querySelectorAll("[data-dlmc-delete]").forEach(b=>b.addEventListener("click",()=>{
       window.DenatNutrition?.remove?.(b.dataset.dlmcDelete);
       window.DenatCloud?.pushNow?.().catch?.(()=>{});
@@ -199,7 +217,7 @@
     root.querySelector("#dlmc-share")?.addEventListener("click",()=>window.DenatCloud?.shareAccess?.());
   }
   const style=document.createElement("style");
-  style.textContent=`.dlmc-card textarea{width:100%;box-sizing:border-box;margin:10px 0;padding:13px;border-radius:14px;border:1px solid var(--line);background:#101012;color:var(--text);font:inherit;resize:vertical}.dlmc-chips{display:flex;gap:7px;overflow:auto;margin:10px 0}.dlmc-chips button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlmc-answer{margin-top:14px;padding:14px;border-radius:16px;background:#101012;border:1px solid var(--line);line-height:1.45}.dlmc-portions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.dlmc-portions>div{padding:10px;border:1px solid var(--line);border-radius:12px;font-size:11px}.dlmc-steps{padding-left:20px}.dlmc-steps li{margin:7px 0;font-size:12px}.dlmc-journal-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:11px}.dlmc-journal-row span{color:var(--muted);line-height:1.4}.dlmc-delete{padding:7px 9px;font-size:10px}.dlmc-memory{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:#0d0d0f}.dlmc-memory-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.dlmc-memory-grid>div{padding:9px;border:1px solid var(--line);border-radius:11px}.dlmc-memory-grid span,.dlmc-memory-grid b{display:block}.dlmc-memory-grid span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.dlmc-memory-grid b{font-size:11px;line-height:1.35;margin-top:4px}.dlmc-memory-events{display:grid;gap:7px;margin:10px 0}.dlmc-memory-events>div{padding:9px 10px;border-left:2px solid var(--accent);background:#0d0d0f;border-radius:8px;font-size:11px;line-height:1.4}.dlmc-now{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}.dlmc-now>div{padding:10px;border:1px solid var(--line);border-radius:12px}.dlmc-now span,.dlmc-now b{display:block}.dlmc-now span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.dlmc-now b{font-size:11px;margin-top:4px;line-height:1.3}@media(max-width:420px){.dlmc-now{grid-template-columns:1fr}.dlmc-portions,.dlmc-memory-grid{grid-template-columns:1fr}}@media(max-width:420px){.dlmc-portions{grid-template-columns:1fr}}`;
+  style.textContent=`.dlmc-card textarea{width:100%;box-sizing:border-box;margin:10px 0;padding:13px;border-radius:14px;border:1px solid var(--line);background:#101012;color:var(--text);font:inherit;resize:vertical}.dlmc-chips{display:flex;gap:7px;overflow:auto;margin:10px 0}.dlmc-chips button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlmc-answer{margin-top:14px;padding:14px;border-radius:16px;background:#101012;border:1px solid var(--line);line-height:1.45}.dlmc-options{display:grid;gap:8px;margin-top:10px}.dlmc-option{width:100%;text-align:left;padding:11px;border:1px solid var(--line);border-radius:13px;background:#0d0d0f;color:var(--text)}.dlmc-option span,.dlmc-option b,.dlmc-option small{display:block}.dlmc-option span{font-size:9px;letter-spacing:.08em;color:var(--accent2)}.dlmc-option b{margin-top:4px;font-size:12px}.dlmc-option small{margin-top:4px;color:var(--muted);font-size:10px}.dlmc-portions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}.dlmc-portions>div{padding:10px;border:1px solid var(--line);border-radius:12px;font-size:11px}.dlmc-steps{padding-left:20px}.dlmc-steps li{margin:7px 0;font-size:12px}.dlmc-journal-row{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);font-size:11px}.dlmc-journal-row span{color:var(--muted);line-height:1.4}.dlmc-delete{padding:7px 9px;font-size:10px}.dlmc-memory{margin:12px 0;padding:12px;border:1px solid var(--line);border-radius:14px;background:#0d0d0f}.dlmc-memory-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px}.dlmc-memory-grid>div{padding:9px;border:1px solid var(--line);border-radius:11px}.dlmc-memory-grid span,.dlmc-memory-grid b{display:block}.dlmc-memory-grid span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.dlmc-memory-grid b{font-size:11px;line-height:1.35;margin-top:4px}.dlmc-memory-events{display:grid;gap:7px;margin:10px 0}.dlmc-memory-events>div{padding:9px 10px;border-left:2px solid var(--accent);background:#0d0d0f;border-radius:8px;font-size:11px;line-height:1.4}.dlmc-now{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}.dlmc-now>div{padding:10px;border:1px solid var(--line);border-radius:12px}.dlmc-now span,.dlmc-now b{display:block}.dlmc-now span{font-size:9px;letter-spacing:.08em;color:var(--muted)}.dlmc-now b{font-size:11px;margin-top:4px;line-height:1.3}@media(max-width:420px){.dlmc-now{grid-template-columns:1fr}.dlmc-portions,.dlmc-memory-grid{grid-template-columns:1fr}}@media(max-width:420px){.dlmc-portions{grid-template-columns:1fr}}`;
   document.head.appendChild(style);
   window.DenatMealCoach={view,bind,answer,weekRestaurants};
 })();
