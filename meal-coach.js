@@ -170,13 +170,14 @@
       const r=window.DenatTimeline.recordSport(text);
       html=r?`<div class="dlmc-answer"><b>Séance ajoutée à ta mémoire</b><p class="small">${esc(r.item.workoutName)} · ${esc(r.when.label)}</p><p class="small muted">Saisie manuelle : elle compte dans la chronologie, sans inventer de séries ni de charges.</p></div>`:`<div class="dlmc-answer">Je n’ai pas pu enregistrer cette séance.</div>`;
     }
-    else if(window.DenatTimeline?.mealStatement?.(text)&&!/quoi|qu est|rappelle|point|bilan/.test(n)) html=eatenAnswer(text);
     else if(/qu.*(j ai|jai|ai je).*(mange|fait|enregistre|note)|j ai mange quoi|jai mange quoi|j ai fait quoi|jai fait quoi|rappelle.*(matin|midi|hier|soir|semaine)|point.*(matin|midi|hier|soir|7 jours|semaine|derniere seance)|depuis.*(derniere|dernier).*(seance|sport)|sur.*7 jours/.test(n)) html=memoryAnswer(text);
     else if(/quand.*sport|quand.*seance|derniere.*seance|dernier.*sport|fait.*sport|sport.*quand/.test(n)) html=timingAnswer();
     else if(/j ai mange.*repas prevu|jai mange.*repas prevu|enregistre.*repas prevu|j ai mange.*menu|jai mange.*menu/.test(n)) html=logPlannedAnswer();
     else if(/recette.*soir|recette.*diner|recette.*dîner|comment.*preparer.*soir|comment.*préparer.*soir/.test(n)) html=plannedRecipeAnswer();
     else if(/quoi.*manger|mange.*maintenant|repas.*maintenant|qu est ce qu on mange|qu est ce que je mange|prochain repas/.test(n)) html=currentMealAnswer();
     else if(/bilan|aujourd hui|aujourdhui|ma journee|ma journée|cette semaine/.test(n)&&!/j ai|jai/.test(n)) html=summaryAnswer(/semaine/.test(n)?7:1);
+    else if(/resto|restaurant|brasserie|mange dehors|burger|pizza|sushi|kebab|tacos/.test(n)&&window.DenatTimeline?.mealStatement?.(text)) html=restaurantAnswer(text);
+    else if(window.DenatTimeline?.mealStatement?.(text)&&!/quoi|qu est|rappelle|point|bilan/.test(n)) html=eatenAnswer(text);
     else if(/j ai mange|jai mange|j ai pris|jai pris|j ai bu|jai bu|ce midi j ai|ce soir j ai|ce matin j ai/.test(n)) html=eatenAnswer(text);
     else if(/resto|restaurant|brasserie|mange dehors|burger|pizza|sushi|kebab|tacos/.test(n)) html=restaurantAnswer(text);
     else if(/j ai|jai|il me reste|frigo|placard|a la maison|avec/.test(n)){
