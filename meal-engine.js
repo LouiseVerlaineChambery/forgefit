@@ -158,6 +158,21 @@
   function overridesFor(weekKey){const all=read(OVERRIDES,{});return all[weekKey]||{};}
   function saveOverride(weekKey,day,id){const all=read(OVERRIDES,{});all[weekKey]=all[weekKey]||{};all[weekKey][day]=id;localStorage.setItem(OVERRIDES,JSON.stringify(all));}
 
+  function macroSum(list){
+    const out={kcal:0,protein:0,carbs:0,fat:0,fiber:0};
+    for(const m of list.filter(Boolean))for(const k of Object.keys(out))out[k]+=Number(m[k])||0;
+    return {kcal:Math.round(out.kcal),protein:Math.round(out.protein*10)/10,carbs:Math.round(out.carbs*10)/10,fat:Math.round(out.fat*10)/10,fiber:Math.round(out.fiber*10)/10};
+  }
+  function mealMacros(d,person){
+    return window.DenatNutritionCore?.recipePortion?.(d,person)?.macros||null;
+  }
+  function simpleMacros(text){return window.DenatNutritionCore?.estimateText?.(text)?.macros||null;}
+  function dayMacros(d,prev,b,s,person){
+    const idx=person==="p2"?2:1;
+    const breakfast=simpleMacros(b[idx]),lunch=mealMacros(prev,person),dinner=mealMacros(d,person),snack=simpleMacros(s[idx]);
+    return {breakfast,lunch,dinner,snack,total:macroSum([breakfast,lunch,dinner,snack])};
+  }
+
   function generate(){
     const m=monday(),weekKey=iso(m),chosen=chooseForWeek(weekKey),ov=overridesFor(weekKey),pool=allowed();
     Object.keys(ov).forEach(k=>{const hit=pool.find(x=>x.id===ov[k]);if(hit)chosen[+k]=hit;});
@@ -165,8 +180,8 @@
     const prevSunday=chooseForWeek(prevKey)[6];
     const days=chosen.map((d,i)=>{
       const prev=i===0?prevSunday:chosen[i-1],b=breakfasts[(seed(weekKey)+i)%breakfasts.length],s=snacks[(seed(weekKey)+i*2)%snacks.length];
-      const daily=consolidate([...b[3],...d.shop,...s[3]]);
-      return {name:NAMES[i],estimateEUR:d.cost+5,breakfast:b.slice(0,3),lunch:mealArray(prev," — restes de la veille"),dinner:mealArray(d),dinnerId:d.id,dinnerCategory:mealCategory(d),dinnerMinutes:d.prep+d.cook,dinnerFavorite:isFavorite(d.id),snack:s.slice(0,3),shop:daily.map(x=>x.text)};
+      const daily=consolidate([...b[3],...d.shop,...s[3]]),nutrition={p1:dayMacros(d,prev,b,s,"p1"),p2:dayMacros(d,prev,b,s,"p2")};
+      return {name:NAMES[i],estimateEUR:d.cost+5,breakfast:b.slice(0,3),lunch:mealArray(prev," — restes de la veille"),dinner:mealArray(d),dinnerId:d.id,dinnerCategory:mealCategory(d),dinnerMinutes:d.prep+d.cook,dinnerFavorite:isFavorite(d.id),snack:s.slice(0,3),nutrition,shop:daily.map(x=>x.text)};
     });
     const total=days.reduce((n,d)=>n+d.estimateEUR,0);
     const consolidated=consolidate(days.flatMap(d=>d.shop));
@@ -196,7 +211,7 @@
   }
   function getRecipe(id){
     const d=dinners.find(x=>x.id===id);if(!d)return null;
-    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),steps:d.steps.slice(),p1:d.p1,p2:d.p2,category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
+    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps:d.steps.slice(),p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
   }
   function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);localStorage.removeItem(HISTORY);return generate();}
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
