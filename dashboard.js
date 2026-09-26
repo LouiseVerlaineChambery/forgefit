@@ -72,6 +72,8 @@
     const macroText=m=>m?`≈ ${Math.round(m.kcal||0)} kcal · P ${Math.round(m.protein||0)} g · G ${Math.round(m.carbs||0)} g · L ${Math.round(m.fat||0)} g · fibres ${Math.round(m.fiber||0)} g`:"—";
     const targets=nutrition.targets||window.DenatNutritionCore?.targets?.()||{};
     const targetOn=Object.values(targets).some(v=>Number(v)>0);
+    const adaptive=window.DenatAdaptiveNutrition?.snapshot?.()||null;
+    const adaptiveText=adaptive?window.DenatAdaptiveNutrition?.shortText?.(adaptive)||"":""; 
     const temporal=window.DenatTime?.snapshot?.();
     const temporalSport=temporal?.sport?.last?`${temporal.sport.last.workoutName} · ${temporal.sport.lastText}`:"Aucune séance enregistrée";
     const temporalMeal=temporal?.food?.last?`${temporal.food.last.mealType||"Repas"} · ${temporal.food.lastText}`:"Aucun repas noté";
@@ -138,6 +140,7 @@
           <div class="dl-tile"><div class="dl-label">RÉEL ENREGISTRÉ</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(nutrition.items?.length?macroText(actualMacros):"Rien enregistré")}</div></div>
         </div>
         <p class="muted small" style="margin:10px 0">${escDash(nutritionGuide)}${targetOn?" Objectifs personnels actifs.":""}</p>
+        ${adaptive?.items?.length&&!adaptive?.dinnerLogged?`<div class="notice small" style="margin:10px 0"><b>Adaptation du dîner</b><br>${escDash(adaptiveText)}<br><span class="muted">${escDash(adaptive.adjusted?.text||"Portion prévue")}</span></div>`:""}
         <button class="secondary full" id="dash-nutrition">Ouvrir mon suivi nutrition</button>
       </section>
 
