@@ -70,6 +70,13 @@
   function foodFor(name){const n=norm(name);return aliases.find(x=>n.includes(x.a))?.f||null;}
   function gramsFrom(text,food){
     const n=norm(text),names=food.a.slice().sort((a,b)=>b.length-a.length);
+    if(food.id==="riceCooked"&&/riz\s+(?:basmati\s+)?sec/.test(n))return null;
+    if(food.id==="pastaCooked"&&/(?:pates|tagliatelles|orzo|nouilles)\s+(?:completes\s+)?sech/.test(n))return null;
+    if(food.id==="quinoaCooked"&&/quinoa\s+sec/.test(n))return null;
+    if(food.id==="beef"&&/boeuf(?:\s+hache)?\s+5%/.test(n))return null;
+    if(food.id==="apple"&&/pommes?\s+de\s+terre/.test(n))return null;
+    if(food.id==="redBeans"&&/haricots?\s+verts?/.test(n))return null;
+    if(food.id==="cheese"&&/fromage\s+blanc/.test(n))return null;
     for(const name of names){
       const e=escRe(name);
       let m=n.match(new RegExp("(\\d+(?:[.,]\\d+)?)\\s*(kg|g|ml|cl|l)\\s+(?:de\\s+)?"+e));
