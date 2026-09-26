@@ -67,6 +67,11 @@
     const health=recovery.data||{};
     const nutrition=window.DenatNutrition?.summary?.(1)||{items:[],kcal:[0,0],protein:[0,0]};
     const nutritionGuide=window.DenatNutrition?.guidance?.(1)||"Note tes repas pour construire le bilan du jour.";
+    const plannedNutrition=today?.nutrition?.[isAnais?"p2":"p1"]?.total||null;
+    const actualMacros=nutrition.macros||{kcal:nutrition.midKcal||0,protein:nutrition.midProtein||0,carbs:0,fat:0,fiber:0};
+    const macroText=m=>m?`≈ ${Math.round(m.kcal||0)} kcal · P ${Math.round(m.protein||0)} g · G ${Math.round(m.carbs||0)} g · L ${Math.round(m.fat||0)} g · fibres ${Math.round(m.fiber||0)} g`:"—";
+    const targets=nutrition.targets||window.DenatNutritionCore?.targets?.()||{};
+    const targetOn=Object.values(targets).some(v=>Number(v)>0);
     const temporal=window.DenatTime?.snapshot?.();
     const temporalSport=temporal?.sport?.last?`${temporal.sport.last.workoutName} · ${temporal.sport.lastText}`:"Aucune séance enregistrée";
     const temporalMeal=temporal?.food?.last?`${temporal.food.last.mealType||"Repas"} · ${temporal.food.lastText}`:"Aucun repas noté";
@@ -127,6 +132,16 @@
       </section>`}
 
       <section class="card">
+        <div class="row"><div><div class="eyebrow">NUTRITION AUJOURD’HUI</div><h3 style="margin:6px 0">Prévu vs réellement mangé</h3></div><span class="pill">${nutrition.items?.length||0} entrée${(nutrition.items?.length||0)>1?"s":""}</span></div>
+        <div class="dl-grid" style="margin-top:10px">
+          <div class="dl-tile"><div class="dl-label">MENU PRÉVU</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(macroText(plannedNutrition))}</div></div>
+          <div class="dl-tile"><div class="dl-label">RÉEL ENREGISTRÉ</div><div class="small" style="margin-top:6px;font-weight:750">${escDash(nutrition.items?.length?macroText(actualMacros):"Rien enregistré")}</div></div>
+        </div>
+        <p class="muted small" style="margin:10px 0">${escDash(nutritionGuide)}${targetOn?" Objectifs personnels actifs.":""}</p>
+        <button class="secondary full" id="dash-nutrition">Ouvrir mon suivi nutrition</button>
+      </section>
+
+      <section class="card">
         <div class="row"><div><div class="eyebrow">CE SOIR</div><div class="dl-meal-title">${escDash(tonight)}</div></div><span class="pill">≈ 21 h</span></div>
         <p class="muted small">Préparé en double pour simplifier le repas du midi suivant.</p>
         <div class="dl-actions"><button class="primary" id="dash-meal">Voir le repas</button><button class="ghost" id="dash-week">Voir la semaine</button></div>
@@ -174,6 +189,7 @@
     view.querySelectorAll("[data-profile]").forEach(b=>b.addEventListener("click",()=>window.DenatProfile?.set?.(b.dataset.profile)));
     const goMeals=(v)=>{localStorage.setItem("forgefit_meals_view",v);setRoute("meals");};
     view.querySelector("#dash-food-journal")?.addEventListener("click",()=>goMeals("coach"));
+    view.querySelector("#dash-nutrition")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-memory")?.addEventListener("click",()=>goMeals("coach"));
     view.querySelector("#dash-timeline")?.addEventListener("click",()=>window.DenatTimeline?.open?.(0));
     view.querySelector("#dash-balance")?.addEventListener("click",()=>window.DenatTimeline?.open?.(0));
