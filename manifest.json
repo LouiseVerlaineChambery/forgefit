@@ -1,7 +1,7 @@
 {
-  "name": "ForgeFit — Musculation",
-  "short_name": "ForgeFit",
-  "description": "Suivi de musculation en français : séances, charges, RPE, repos et progression.",
+  "name": "ForgeLife — Sport, repas & quotidien",
+  "short_name": "ForgeLife",
+  "description": "Application personnelle pour la musculation, la progression, les repas et les courses partagées.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0c0c0d",
