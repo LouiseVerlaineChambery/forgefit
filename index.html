@@ -12,54 +12,16 @@
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="denat-life-theme.css">
+  <link rel="stylesheet" href="meals-warm-v1.css">
   <title>Denat Life — Sport, repas & quotidien</title>
 </head>
 <body>
   <div id="app">
-    <header class="topbar">
-      <div class="brand-lockup">
-        <img class="brand-logo" src="brand-logo-v5.svg" alt="Denat Life">
-        <div>
-          <div class="eyebrow">DENAT LIFE</div>
-          <div class="brand-tagline">SPORT • REPAS • QUOTIDIEN</div>
-          <h1 id="screen-title">Sport</h1>
-        </div>
-      </div>
-      <button id="install-btn" class="ghost hidden" type="button">Installer</button>
-    </header>
-
+    <header class="topbar"><div class="brand-lockup"><img class="brand-logo" src="brand-logo-v5.svg" alt="Denat Life"><div><div class="eyebrow">DENAT LIFE</div><div class="brand-tagline">SPORT • REPAS • QUOTIDIEN</div><h1 id="screen-title">Sport</h1></div></div><button id="install-btn" class="ghost hidden" type="button">Installer</button></header>
     <main id="view" class="view"></main>
-
-    <nav class="tabbar" aria-label="Navigation principale">
-      <button class="tab active" data-route="today"><span>◉</span><small>Sport</small></button>
-      <button class="tab" data-route="program"><span>▦</span><small>Programme</small></button>
-      <button class="tab" data-route="history"><span>↗</span><small>Progression</small></button>
-      <button class="tab" data-route="meals"><span>🍽</span><small>Repas</small></button>
-      <button class="tab" data-route="settings"><span>♡</span><small>Nous</small></button>
-    </nav>
+    <nav class="tabbar" aria-label="Navigation principale"><button class="tab active" data-route="today"><span>◉</span><small>Sport</small></button><button class="tab" data-route="program"><span>▦</span><small>Programme</small></button><button class="tab" data-route="history"><span>↗</span><small>Progression</small></button><button class="tab" data-route="meals"><span>🍽</span><small>Repas</small></button><button class="tab" data-route="settings"><span>♡</span><small>Nous</small></button></nav>
   </div>
-
-  <div id="timer-sheet" class="sheet hidden" role="dialog" aria-modal="true">
-    <div class="sheet-card">
-      <div class="eyebrow">REPOS</div>
-      <div id="timer-value" class="timer-value">01:30</div>
-      <div class="timer-actions">
-        <button id="timer-minus" class="secondary" type="button">−15 s</button>
-        <button id="timer-skip" class="primary" type="button">Terminer</button>
-        <button id="timer-plus" class="secondary" type="button">+15 s</button>
-      </div>
-    </div>
-  </div>
-
-  <script src="app.js"></script>
-  <script src="mybodynote.js"></script>
-  <script src="training-plan.js"></script>
-  <script src="metrics.js"></script>
-  <script src="exercise-guide.js"></script>
-  <script src="forgefit-v3.js"></script>
-  <script src="meals.js"></script>
-  <script src="duo-sync.js"></script>
-  <script src="weekly-sync.js"></script>
-  <script src="entry-links.js"></script>
+  <div id="timer-sheet" class="sheet hidden" role="dialog" aria-modal="true"><div class="sheet-card"><div class="eyebrow">REPOS</div><div id="timer-value" class="timer-value">01:30</div><div class="timer-actions"><button id="timer-minus" class="secondary" type="button">−15 s</button><button id="timer-skip" class="primary" type="button">Terminer</button><button id="timer-plus" class="secondary" type="button">+15 s</button></div></div></div>
+  <script src="app.js"></script><script src="mybodynote.js"></script><script src="training-plan.js"></script><script src="metrics.js"></script><script src="exercise-guide.js"></script><script src="forgefit-v3.js"></script><script src="meals.js"></script><script src="duo-sync.js"></script><script src="weekly-sync.js"></script><script src="entry-links.js"></script><script src="split-theme.js"></script>
 </body>
 </html>
