@@ -414,12 +414,12 @@ function renderSettings(){
     </section>
     <section class="card">
       <div class="row"><div><div class="eyebrow">APPLE SANTÉ</div><h3 style="margin:6px 0 0">Connexion disponible</h3></div><span class="pill" id="health-status">Vérification…</span></div>
-      <p class="muted small">Denat Life peut maintenant recevoir les données Apple Santé via un pont iPhone sécurisé. Pour l’automatisation complète, utilise Health Auto Export et autorise uniquement les métriques utiles.</p>
+      <p class="muted small">Pas besoin d’abonnement : on utilise l’app <b>Raccourcis</b> déjà présente sur l’iPhone pour lire les données Apple Santé autorisées et les envoyer à ton espace Denat Life.</p>
       <div class="stack">
-        <a class="secondary full" style="text-align:center;display:block" href="https://apps.apple.com/fr/app/health-auto-export-json-csv/id1115567069" target="_blank" rel="noopener">1. Installer Health Auto Export</a>
-        <button class="primary full" id="copy-health-config">2. Copier la connexion Denat Life</button>
+        <button class="primary full" id="copy-health-config">1. Copier la connexion Denat Life</button>
+        <button class="secondary full" id="health-shortcut-help">2. Voir le raccourci gratuit à créer</button>
       </div>
-      <div class="notice small" style="margin-top:12px"><b>Dans Health Auto Export :</b> Automatisations → Nouvelle automatisation → REST API → JSON v2. Sélectionne Pas, Sommeil, Fréquence cardiaque au repos, VFC, Énergie active, Minutes d’exercice et Poids. Colle ensuite l’URL et les deux en-têtes copiés par Denat Life.</div>
+      <div class="notice small hidden" id="health-shortcut-steps" style="margin-top:12px"><b>Raccourcis iPhone — gratuit</b><br>1. Crée un nouveau raccourci « Denat Life Santé ».<br>2. Ajoute <b>Rechercher des échantillons de santé</b> pour les données que tu veux partager (par exemple Pas, Sommeil, FC au repos, VFC, Énergie active, Minutes d’exercice et Poids).<br>3. Construis un dictionnaire avec les résultats utiles.<br>4. Ajoute <b>Obtenir le contenu de l’URL</b>, méthode POST, corps JSON.<br>5. Utilise l’URL et les en-têtes copiés par Denat Life.<br>6. Dans Automatisation, lance ce raccourci chaque jour à l’heure de ton choix.</div>
     </section>`;
   document.querySelector("#save-settings").addEventListener("click",()=>{
     state.settings.upperIncrement=+document.querySelector("#upper-inc").value.replace(",",".")||2.5;
@@ -438,7 +438,10 @@ function renderSettings(){
   const healthBtn=document.querySelector("#copy-health-config"),healthPill=document.querySelector("#health-status");
   healthBtn?.addEventListener("click",async()=>{
     const ok=await window.DenatCloud?.copyHealthConfig?.();
-    if(ok)alert("Connexion Apple Santé copiée. Dans Health Auto Export, colle l’URL puis les en-têtes X-Denat-Household et Authorization.");
+    if(ok)alert("Connexion Apple Santé copiée. Garde ces 3 lignes pour le raccourci iPhone : URL, X-Denat-Household et Authorization.");
+  });
+  document.querySelector("#health-shortcut-help")?.addEventListener("click",()=>{
+    document.querySelector("#health-shortcut-steps")?.classList.toggle("hidden");
   });
   window.DenatCloud?.healthStatus?.().then(x=>{
     if(!healthPill)return;
