@@ -61,7 +61,7 @@
     }else{
       view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Repas & courses</div><p class="muted">Menu de la semaine · recettes détaillées · dîner cuisiné en double pour le repas du midi du lendemain.</p>${selectors()}</section>${days()}${v==="today"?dayView():v==="week"?weekView():shopView()}${v==="week"?preferencesCard():""}`;
     }
-    view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{localStorage.setItem(PERSON_KEY,b.dataset.p);renderMeals();});
+    if(v==="coach")window.DenatMealCoach?.bind?.(view);\n    view.querySelectorAll("[data-p]").forEach(b=>b.onclick=()=>{localStorage.setItem(PERSON_KEY,b.dataset.p);renderMeals();});
     view.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{localStorage.setItem(VIEW_KEY,b.dataset.v);renderMeals();});
     view.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{day=+b.dataset.day;renderMeals();});
     view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{day=+b.dataset.open;localStorage.setItem(VIEW_KEY,"today");renderMeals();});
