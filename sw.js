@@ -1,4 +1,4 @@
-const CACHE="denat-life-v13-2-clear-variant-labels";
+const CACHE="denat-life-v13-3-motion-previews";
 const ASSETS=["./","./index.html","./styles.css","./denat-life-theme.css","./meals-warm-v1.css","./brand-v11.css","./cloud-state.js","./boot.js","./app.js","./mybodynote.js","./training-plan.js","./metrics.js","./exercise-guide.js","./forgefit-v3.js","./sport-coach.js","./meal-engine.js","./meals.js","./entry-links.js","./split-theme.js","./dashboard.js","./navigation-v11.js","./weekly-menu.json","./manifest.json","./brand-logo-v5.svg","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
