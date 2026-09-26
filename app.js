@@ -405,18 +405,21 @@ function renderSettings(){
     </section>
     <section class="card">
       <div class="eyebrow">DONNÉES</div>
-      <h3 style="margin-top:6px">Sauvegarde locale</h3>
-      <p class="muted small">Tes séances sont stockées sur cet iPhone dans Safari. Exporte régulièrement une sauvegarde JSON.</p>
+      <h3 style="margin-top:6px">Denat Life Cloud + sauvegarde</h3>
+      <p class="muted small">Tes données Denat Life sont conservées dans ton espace privé et restent aussi disponibles localement hors ligne. L’export JSON reste une sauvegarde manuelle supplémentaire.</p>
       <div class="stack">
         <button class="secondary full" id="export-data">Exporter mes données</button>
         <label class="secondary full" style="text-align:center;display:block">Importer une sauvegarde<input id="import-data" type="file" accept="application/json" hidden></label>
       </div>
     </section>
     <section class="card">
-      <div class="eyebrow">APPLE SANTÉ</div>
-      <h3 style="margin-top:6px">Connexion future</h3>
-      <p class="muted">Apple Santé nécessite une application iPhone native pour accéder directement aux données HealthKit. Denat Life Web reste utilisable normalement sans cette connexion.</p>
-      <div class="notice"><b>Coach intelligent actif</b><br><span class="small">Le coach adapte déjà tes séances à partir de ton historique, de tes répétitions et de ton RPE. Une connexion Apple Santé pourra ensuite enrichir ces données.</span></div>
+      <div class="row"><div><div class="eyebrow">APPLE SANTÉ</div><h3 style="margin:6px 0 0">Connexion disponible</h3></div><span class="pill" id="health-status">Vérification…</span></div>
+      <p class="muted small">Denat Life peut maintenant recevoir les données Apple Santé via un pont iPhone sécurisé. Pour l’automatisation complète, utilise Health Auto Export et autorise uniquement les métriques utiles.</p>
+      <div class="stack">
+        <a class="secondary full" style="text-align:center;display:block" href="https://apps.apple.com/fr/app/health-auto-export-json-csv/id1115567069" target="_blank" rel="noopener">1. Installer Health Auto Export</a>
+        <button class="primary full" id="copy-health-config">2. Copier la connexion Denat Life</button>
+      </div>
+      <div class="notice small" style="margin-top:12px"><b>Dans Health Auto Export :</b> Automatisations → Nouvelle automatisation → REST API → JSON v2. Sélectionne Pas, Sommeil, Fréquence cardiaque au repos, VFC, Énergie active, Minutes d’exercice et Poids. Colle ensuite l’URL et les deux en-têtes copiés par Denat Life.</div>
     </section>`;
   document.querySelector("#save-settings").addEventListener("click",()=>{
     state.settings.upperIncrement=+document.querySelector("#upper-inc").value.replace(",",".")||2.5;
@@ -432,6 +435,19 @@ function renderSettings(){
     const f=e.target.files[0];if(!f)return;
     try{const data=JSON.parse(await f.text());state=data;saveState();render();alert("Sauvegarde importée.");}catch(err){alert("Fichier invalide.");}
   });
+  const healthBtn=document.querySelector("#copy-health-config"),healthPill=document.querySelector("#health-status");
+  healthBtn?.addEventListener("click",async()=>{
+    const ok=await window.DenatCloud?.copyHealthConfig?.();
+    if(ok)alert("Connexion Apple Santé copiée. Dans Health Auto Export, colle l’URL puis les en-têtes X-Denat-Household et Authorization.");
+  });
+  window.DenatCloud?.healthStatus?.().then(x=>{
+    if(!healthPill)return;
+    if(x?.connected&&x?.lastSync){
+      const d=new Date(x.lastSync);
+      healthPill.textContent="Connecté";
+      healthPill.title="Dernier envoi : "+d.toLocaleString("fr-FR");
+    }else healthPill.textContent="À connecter";
+  }).catch(()=>{if(healthPill)healthPill.textContent="Serveur indisponible";});
 }
 
 // PWA install
