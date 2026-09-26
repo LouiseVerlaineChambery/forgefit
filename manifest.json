@@ -4,8 +4,8 @@
   "description": "Application familiale pour la musculation, la progression, les repas et les courses partagées.",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#08111f",
-  "theme_color": "#08111f",
+  "background_color": "#f4efe8",
+  "theme_color": "#0f4f8f",
   "icons": [
     {
       "src": "brand-logo.svg",
