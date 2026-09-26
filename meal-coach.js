@@ -11,7 +11,7 @@
   const readJournal=()=>{try{const x=JSON.parse(localStorage.getItem(journalKey())||"[]");return Array.isArray(x)?x:[];}catch{return[];}};
   const saveJournal=x=>localStorage.setItem(journalKey(),JSON.stringify(x.slice(-365)));
   function addJournal(entry){
-    if(entry?.text&&window.DenatNutrition?.add)return window.DenatNutrition.add(entry.text,{type:entry.type||"meal"});
+    if(entry?.text&&window.DenatNutrition?.add)return window.DenatNutrition.add(entry.text,{type:entry.type||"meal",kcalRange:entry.kcalRange,proteinRange:entry.proteinRange,confidence:entry.confidence});
     const x=readJournal();x.push({id:crypto.randomUUID(),at:new Date().toISOString(),person:personName(),...entry});saveJournal(x);return x[x.length-1];
   }
 
