@@ -1,6 +1,17 @@
-# Denat Life V22 — Sport, nutrition & équilibre
+# Denat Life V23 — Sport, nutrition & équilibre
 
 Denat Life est une PWA personnelle et familiale installable sur iPhone. Elle réunit le suivi sportif de Jocelyn, le quotidien repas d’Anaïs et les fonctions partagées du foyer.
+
+## V23
+- Adaptation nutritionnelle quotidienne à partir des repas réellement enregistrés
+- Compare le réel aux repas du menu déjà consommés, au lieu de supposer que le journal est complet
+- Calcule le reste de la journée en kcal, protéines, glucides, lipides et fibres
+- Ajuste modérément la portion du dîner, séparément pour Jocelyn et Anaïs
+- Protéines et féculents peuvent évoluer indépendamment selon les écarts de la journée
+- Objectifs personnels utilisés lorsqu’ils sont configurés ; sinon le menu prévu sert de repère sans imposer de cible arbitraire
+- Journal incomplet signalé comme provisoire
+- Aucun saut de repas ni compensation agressive : les corrections sont volontairement bornées
+- Adaptation visible dans le coach repas et sur le tableau de bord
 
 ## V22
 - Nouveau noyau nutritionnel local : kcal, protéines, glucides, lipides et fibres
