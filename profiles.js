@@ -1,0 +1,36 @@
+// Denat Life — profils personnels Jocelyn / Anaïs, foyer partagé.
+(function(){
+  const DEVICE_KEY="denat_device_profile_v1";
+  const PROFILES={
+    jocelyn:{id:"jocelyn",name:"Jocelyn",meal:"p1"},
+    anais:{id:"anais",name:"Anaïs",meal:"p2"}
+  };
+  const valid=x=>x==="jocelyn"||x==="anais";
+  function currentId(){const x=localStorage.getItem(DEVICE_KEY);return valid(x)?x:"jocelyn";}
+  function current(){return PROFILES[currentId()];}
+  function sportKey(id=currentId()){return `denat_profile_${id}_sport_v1`;}
+  function journalKey(id=currentId()){return `denat_profile_${id}_food_journal_v1`;}
+  function migrate(){
+    const old=localStorage.getItem("forgefit_v2_state");
+    if(old&&!localStorage.getItem(sportKey("jocelyn")))localStorage.setItem(sportKey("jocelyn"),old);
+    if(!localStorage.getItem(DEVICE_KEY))localStorage.setItem(DEVICE_KEY,"jocelyn");
+    localStorage.setItem("forgefit_meals_person",current().meal);
+  }
+  function set(id){
+    if(!valid(id))return false;
+    localStorage.setItem(DEVICE_KEY,id);
+    localStorage.setItem("forgefit_meals_person",PROFILES[id].meal);
+    location.reload();
+    return true;
+  }
+  function label(){return current().name;}
+  function is(id){return currentId()===id;}
+  function applyShell(){
+    const first=document.querySelector('.tab[data-route="settings"] small');
+    if(first)first.textContent=label();
+    document.documentElement.dataset.denatProfile=currentId();
+  }
+  migrate();
+  window.DenatProfile={profiles:PROFILES,currentId,current,label,is,set,sportKey,journalKey,applyShell};
+  if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",applyShell);else applyShell();
+})();
