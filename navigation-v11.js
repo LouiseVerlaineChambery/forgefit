@@ -47,6 +47,13 @@
     }
     baseSetRoute(r);active(r==="settings"?"settings":r);
   };
-  // Anaïs arrive d'abord sur les repas ; le Sport reste accessible dans la barre.
+  function personalizeTabs(){
+    const isAnais=window.DenatProfile?.is?.("anais")===true;
+    const sport=document.querySelector('.tab[data-route="today"]'),meals=document.querySelector('.tab[data-route="meals"]');
+    if(sport){sport.querySelector("span").textContent=isAnais?"Activité":"Sport";sport.querySelector("small").textContent=isAnais?"Optionnel":"Séance";}
+    if(meals){meals.querySelector("span").textContent="Repas";meals.querySelector("small").textContent=isAnais?"Mon quotidien":"Menus";}
+  }
+  personalizeTabs();
+  // Anaïs arrive d'abord sur les repas ; l'activité reste disponible sans objectif imposé.
   if(window.DenatProfile?.is?.("anais"))setTimeout(()=>setRoute("meals"),0);
 })();
