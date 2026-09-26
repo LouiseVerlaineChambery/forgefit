@@ -1,4 +1,4 @@
-// ForgeLife Duo — synchronisation des courses entre deux appareils
+// Denat Life Duo — synchronisation des courses entre deux appareils
 (function(){
   const API="https://lv-social-publisher.jocelyn-denat.workers.dev/forge-sync";
   const HID_KEY="forgelife_household_id";
@@ -89,8 +89,8 @@
   async function shareDuo(){
     const {h,k}=getIdentity();
     const url=`${location.origin}${location.pathname}?view=meals&duo=1&hid=${encodeURIComponent(h)}&key=${encodeURIComponent(k)}`;
-    if(navigator.share){try{await navigator.share({title:"ForgeLife Duo",text:"Nos repas et notre liste de courses partagée",url});return;}catch(e){if(e?.name==="AbortError")return;}}
-    try{await navigator.clipboard.writeText(url);alert("Lien ForgeLife Duo copié.");}catch(e){prompt("Copie ce lien",url);}
+    if(navigator.share){try{await navigator.share({title:"Denat Life Duo",text:"Nos repas et notre liste de courses partagée",url});return;}catch(e){if(e?.name==="AbortError")return;}}
+    try{await navigator.clipboard.writeText(url);alert("Lien Denat Life Duo copié.");}catch(e){prompt("Copie ce lien",url);}
   }
 
   document.addEventListener("change",e=>{
@@ -107,7 +107,6 @@
   },true);
 
   const observer=new MutationObserver(()=>{
-    document.querySelectorAll(".eyebrow").forEach(x=>{if(x.textContent.trim()==="FORGEFIT DUO")x.textContent="FORGELIFE DUO";});
     if(route==="meals"&&document.querySelector("[data-shop]")){setStatus(Date.now()-lastOk<10000,lastOk?"Synchronisé entre vos deux téléphones":"Connexion à la liste partagée…");}
   });
   observer.observe(document.body,{childList:true,subtree:true});
