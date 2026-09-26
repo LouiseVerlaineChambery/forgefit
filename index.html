@@ -3,14 +3,15 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#08111f">
+  <meta name="theme-color" content="#0f4f8f">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="Denat Life">
   <link rel="icon" href="brand-logo.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="brand-logo.svg">
   <link rel="manifest" href="manifest.json">
   <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="denat-life-theme.css">
   <title>Denat Life — Sport, repas & quotidien</title>
 </head>
 <body>
@@ -20,7 +21,8 @@
         <img class="brand-logo" src="brand-logo.svg" alt="Denat Life">
         <div>
           <div class="eyebrow">DENAT LIFE</div>
-          <h1 id="screen-title">Aujourd’hui</h1>
+          <div class="brand-tagline">SPORT • REPAS • QUOTIDIEN</div>
+          <h1 id="screen-title">Sport</h1>
         </div>
       </div>
       <button id="install-btn" class="ghost hidden" type="button">Installer</button>
@@ -29,11 +31,11 @@
     <main id="view" class="view"></main>
 
     <nav class="tabbar" aria-label="Navigation principale">
-      <button class="tab active" data-route="today"><span>◉</span><small>Aujourd’hui</small></button>
+      <button class="tab active" data-route="today"><span>◉</span><small>Sport</small></button>
       <button class="tab" data-route="program"><span>▦</span><small>Programme</small></button>
       <button class="tab" data-route="history"><span>↗</span><small>Progression</small></button>
       <button class="tab" data-route="meals"><span>🍽</span><small>Repas</small></button>
-      <button class="tab" data-route="settings"><span>⚙</span><small>Réglages</small></button>
+      <button class="tab" data-route="settings"><span>♡</span><small>Nous</small></button>
     </nav>
   </div>
 
