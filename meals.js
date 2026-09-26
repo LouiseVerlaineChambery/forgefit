@@ -56,6 +56,8 @@
     const v=getView();
     if(v==="weekshop"){
       view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Courses</div><p class="muted">Votre liste de la semaine, regroupée par rayon.</p></section>${weekShopView()}`;
+    }else if(v==="coach"){
+      view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Coach repas</div><p class="muted">Cuisine avec ce que vous avez · restaurant · suivi partagé.</p>${selectors()}</section>${window.DenatMealCoach?.view?.()||'<section class="card">Coach repas indisponible.</section>'}`;
     }else{
       view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Repas & courses</div><p class="muted">Menu de la semaine · recettes détaillées · dîner cuisiné en double pour le repas du midi du lendemain.</p>${selectors()}</section>${days()}${v==="today"?dayView():v==="week"?weekView():shopView()}${v==="week"?preferencesCard():""}`;
     }
