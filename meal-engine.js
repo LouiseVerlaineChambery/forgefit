@@ -171,6 +171,7 @@
     const d=dinners.find(x=>x.id===id);if(!d)return null;
     return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),steps:d.steps.slice(),p1:d.p1,p2:d.p2,category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
   }
-  function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);return generate();}
-  window.DenatMealEngine={generate,replace,dislike,getRecipe,resetPreferences};
+  function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);return generate();}
+  function preferences(){return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t}))};}
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,toggleFavorite,isFavorite,preferences,resetPreferences};
 })();
