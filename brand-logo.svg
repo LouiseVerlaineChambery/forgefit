@@ -1,7 +1,17 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Denat Life">
-  <rect width="512" height="512" rx="112" fill="#0c0c0d"/>
-  <circle cx="256" cy="256" r="178" fill="none" stroke="#d6a45b" stroke-width="18" opacity="0.95"/>
-  <path d="M148 145h98c73 0 126 45 126 111s-53 111-126 111h-98V145zm72 58v106h28c35 0 59-20 59-53s-24-53-59-53h-28z" fill="#f6f4ef"/>
-  <path d="M294 145h70v164h86v58H294V145z" fill="#d6a45b"/>
-  <path d="M153 401h206" stroke="#f3d39b" stroke-width="10" stroke-linecap="round" opacity="0.75"/>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#071a33"/>
+      <stop offset="1" stop-color="#0b2f59"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#3b82f6"/>
+      <stop offset="1" stop-color="#60a5fa"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="178" fill="none" stroke="url(#blue)" stroke-width="18" opacity="0.95"/>
+  <path d="M148 145h98c73 0 126 45 126 111s-53 111-126 111h-98V145zm72 58v106h28c35 0 59-20 59-53s-24-53-59-53h-28z" fill="#f8fbff"/>
+  <path d="M294 145h70v164h86v58H294V145z" fill="#60a5fa"/>
+  <path d="M153 401h206" stroke="#bfdbfe" stroke-width="10" stroke-linecap="round" opacity="0.9"/>
 </svg>
