@@ -1,32 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Denat Life">
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#0f5d98"/>
-      <stop offset="0.42" stop-color="#123f6d"/>
-      <stop offset="1" stop-color="#071a33"/>
+      <stop offset="0" stop-color="#171719"/>
+      <stop offset="1" stop-color="#080809"/>
     </linearGradient>
     <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#fff5dc"/>
-      <stop offset="0.5" stop-color="#e8c88b"/>
-      <stop offset="1" stop-color="#c79a58"/>
+      <stop offset="0" stop-color="#f6dfb0"/>
+      <stop offset="0.48" stop-color="#d6a45b"/>
+      <stop offset="1" stop-color="#a87534"/>
     </linearGradient>
-    <linearGradient id="leaf" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0" stop-color="#b9e3ff"/>
-      <stop offset="1" stop-color="#5aa8f2"/>
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#001326" flood-opacity="0.34"/>
-    </filter>
   </defs>
-  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
-  <rect x="12" y="12" width="488" height="488" rx="98" fill="none" stroke="#77baf1" stroke-width="3" opacity="0.5"/>
-  <g filter="url(#shadow)" fill="url(#gold)" font-family="Georgia, 'Times New Roman', serif">
-    <text x="72" y="355" font-size="322" font-weight="500">D</text>
-    <text x="196" y="405" font-size="304" font-weight="500">L</text>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <rect x="20" y="20" width="472" height="472" rx="98" fill="none" stroke="#d6a45b" stroke-width="4" opacity="0.34"/>
+  <g fill="url(#gold)" font-family="Didot, 'Bodoni 72', Georgia, 'Times New Roman', serif" font-weight="500">
+    <text x="70" y="356" font-size="310">D</text>
+    <text x="220" y="356" font-size="310">L</text>
   </g>
-  <g transform="translate(330 142) rotate(31)">
-    <path d="M0 70C18 18 66-7 107 0c-7 45-36 88-88 104C9 94 3 83 0 70Z" fill="url(#leaf)"/>
-    <path d="M14 89C43 66 66 40 91 14" fill="none" stroke="#e1f4ff" stroke-width="6" stroke-linecap="round" opacity="0.9"/>
-  </g>
-  <path d="M103 389c77-34 178-39 294-13" fill="none" stroke="#e6c88e" stroke-width="5" stroke-linecap="round" opacity="0.78"/>
+  <path d="M120 397H392" stroke="#f3d39b" stroke-width="7" stroke-linecap="round" opacity="0.62"/>
 </svg>
