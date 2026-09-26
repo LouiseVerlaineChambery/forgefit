@@ -1,6 +1,13 @@
-# Denat Life V26 — Sport, nutrition & équilibre
+# Denat Life V26.1 — Sport, nutrition & équilibre
 
 Denat Life est une PWA personnelle et familiale installable sur iPhone. Elle réunit le suivi sportif de Jocelyn, le quotidien repas d’Anaïs et les fonctions partagées du foyer.
+
+## V26.1
+- Normalisation non destructive de l’ancien historique MyBodyNote et des anciens libellés d’exercices
+- Les alias historiques sont reliés aux 65 exercices canoniques sans réécrire les séances originales
+- Courbes de progression, coach de charge et historique ForgeFit utilisent désormais la même identité d’exercice
+- Les futurs imports MyBodyNote utilisent automatiquement les noms canoniques lorsqu’une correspondance existe
+- Audit visible dans Réglages : couverture de l’historique, alias raccordés et noms restant à identifier
 
 ## V26
 - Moteur unique de progression musculation : les anciens conseils ForgeFit délèguent désormais au coach sport
