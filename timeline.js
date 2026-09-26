@@ -64,13 +64,16 @@
     const when=parseWhen(text),e=window.DenatNutrition?.estimate?.(text),item=window.DenatNutrition?.add?.(text,{at:when.iso,kcalRange:e?.kcal,proteinRange:e?.protein,confidence:e?.confidence});
     return item?{kind:"meal",item,when}:null;
   }
+  function recordWellbeing(text){return window.DenatWellbeing?.record?.(text)||null;}
   function record(text){
     if(sportStatement(text))return recordSport(text);
+    if(window.DenatWellbeing?.parse?.(text))return recordWellbeing(text);
     if(mealStatement(text))return recordMeal(text);
     return null;
   }
   function removeEvent(kind,id){
     if(kind==="meal"){window.DenatNutrition?.remove?.(id);return true;}
+    if(kind==="wellbeing")return window.DenatWellbeing?.remove?.(id)||false;
     if(kind==="sport"&&typeof state!=="undefined"){
       const before=state.sessions.length;state.sessions=state.sessions.filter(x=>x.id!==id);
       if(state.sessions.length!==before){if(typeof saveState==="function")saveState();return true;}
@@ -82,17 +85,19 @@
     const memory=window.DenatMemory;
     const meals=(window.DenatNutrition?.read?.()||[]).filter(x=>{const t=new Date(x.at);return t>=from&&t<to;});
     const sessions=(typeof state!=="undefined"?state.sessions:[]).filter(x=>x?.endedAt&&new Date(x.endedAt)>=from&&new Date(x.endedAt)<to);
+    const wellbeing=(window.DenatWellbeing?.read?.()||[]).filter(x=>{const t=new Date(x.at);return t>=from&&t<to;});
     const events=[
       ...meals.map(x=>({kind:"meal",id:x.id,at:x.at,title:x.mealType||"Repas",text:x.text,meta:Array.isArray(x.kcalRange)?`≈ ${x.kcalRange[0]}–${x.kcalRange[1]} kcal`:""})),
-      ...sessions.map(x=>({kind:"sport",id:x.id,at:x.endedAt,title:"Sport",text:x.workoutName||"Séance",meta:x.source==="manual-timeline"?"Saisie manuelle":"Séance terminée"}))
+      ...sessions.map(x=>({kind:"sport",id:x.id,at:x.endedAt,title:"Sport",text:x.workoutName||"Séance",meta:x.source==="manual-timeline"?"Saisie manuelle":"Séance terminée"})),
+      ...wellbeing.map(x=>({kind:"wellbeing",id:x.id,at:x.at,title:window.DenatWellbeing?.label?.(x)||"Équilibre",text:window.DenatWellbeing?.valueText?.(x)||String(x.value??""),meta:x.note&&x.note!==String(x.value)?"Saisie personnelle":""}))
     ].sort((a,b)=>new Date(a.at)-new Date(b.at));
     return {date:d,from,to,events,label:memory?.dayLabel?.(d)||new Intl.DateTimeFormat("fr-FR",{weekday:"long",day:"numeric",month:"long"}).format(d)};
   }
   function render(offset=0){
     const d=dayData(offset),today=offset===0;
     return `<div class="dlt-head"><button class="ghost" data-dlt-nav="-1">‹</button><div><div class="eyebrow">TIMELINE</div><h2>${esc(d.label)}</h2></div><button class="ghost" data-dlt-nav="1" ${today?"disabled":""}>›</button></div>
-      <div class="dlt-quick"><button data-dlt-fill="Ce matin ">Ce matin</button><button data-dlt-fill="Ce midi ">Ce midi</button><button data-dlt-fill="Hier soir ">Hier soir</button><button data-dlt-fill="J’ai fait ma séance hier à 18h">Sport passé</button></div>
-      <div class="dlt-capture"><textarea id="dlt-input" rows="3" placeholder="Ex. Hier soir j’ai mangé une pizza · J’ai fait ma séance lundi à 18h"></textarea><button class="primary full" id="dlt-add">Ajouter à ma mémoire</button><div id="dlt-feedback"></div></div>
+      <div class="dlt-quick"><button data-dlt-fill="Ce matin ">Ce matin</button><button data-dlt-fill="Ce midi ">Ce midi</button><button data-dlt-fill="Hier soir ">Hier soir</button><button data-dlt-fill="J’ai fait ma séance hier à 18h">Sport passé</button><button data-dlt-fill="Poids  kg">Poids</button><button data-dlt-fill="J’ai dormi  h ">Sommeil</button><button data-dlt-fill="Énergie  /10">Énergie</button></div>
+      <div class="dlt-capture"><textarea id="dlt-input" rows="3" placeholder="Ex. Hier soir j’ai mangé une pizza · Poids 82,4 kg · J’ai dormi 7h30 · Énergie 8/10"></textarea><button class="primary full" id="dlt-add">Ajouter à ma mémoire</button><div id="dlt-feedback"></div></div>
       <div class="dlt-events">${d.events.length?d.events.map(e=>`<div class="dlt-event ${e.kind}"><div class="dlt-time">${new Intl.DateTimeFormat("fr-FR",{hour:"2-digit",minute:"2-digit"}).format(new Date(e.at))}</div><div><span>${esc(e.title)}</span><b>${esc(e.text)}</b><small>${esc(e.meta)}</small></div><button class="ghost" data-dlt-delete="${esc(e.id)}" data-kind="${e.kind}">×</button></div>`).join(""):`<div class="empty">Aucun événement enregistré ce jour-là.</div>`}</div>
       <p class="muted small">La timeline affiche uniquement les faits enregistrés. Une saisie antidatée est rangée au jour et à l’heure compris dans ta phrase.</p>`;
   }
@@ -111,7 +116,7 @@
     body.querySelectorAll("[data-dlt-fill]").forEach(b=>b.addEventListener("click",()=>{input.value=b.dataset.dltFill;input.focus();}));
     body.querySelector("#dlt-add")?.addEventListener("click",()=>{
       const q=input.value.trim();if(!q)return;const r=record(q);
-      if(!r){feedback.innerHTML='<div class="notice small">Je n’ai pas reconnu s’il s’agissait d’un repas ou d’une séance. Essaie « Hier soir j’ai mangé… » ou « J’ai fait ma séance lundi à 18h ».</div>';return;}
+      if(!r){feedback.innerHTML='<div class="notice small">Je n’ai pas reconnu la saisie. Essaie « Hier soir j’ai mangé… », « J’ai fait ma séance lundi à 18h », « Poids 82,4 kg », « J’ai dormi 7h30 » ou « Énergie 8/10 ».</div>';return;}
       window.DenatCloud?.pushNow?.().catch?.(()=>{});
       const target=start(new Date(r.when.iso)),today=start(new Date());currentOffset=Math.min(0,Math.round((target-today)/DAY));paint();
     });
@@ -120,7 +125,7 @@
   function close(){document.querySelector("#dlt-sheet")?.classList.remove("open");}
   document.addEventListener("click",e=>{if(e.target?.matches?.("[data-dlt-close]"))close();});
   const style=document.createElement("style");
-  style.textContent=`.dlt-sheet{position:fixed;inset:0;z-index:999;display:none}.dlt-sheet.open{display:block}.dlt-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px)}.dlt-panel{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:#111113;border-radius:24px 24px 0 0;padding:22px 16px 34px;border-top:1px solid var(--line)}.dlt-close{position:absolute;right:14px;top:12px;border:0;background:transparent;color:var(--muted);font-size:28px}.dlt-head{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;text-align:center;gap:8px}.dlt-head h2{margin:4px 0 12px}.dlt-quick{display:flex;gap:7px;overflow:auto;margin:8px 0 12px}.dlt-quick button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlt-capture textarea{width:100%;box-sizing:border-box;background:#0d0d0f;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit;resize:vertical;margin-bottom:8px}.dlt-events{margin-top:14px}.dlt-event{display:grid;grid-template-columns:48px 1fr 34px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}.dlt-event>div:nth-child(2) span,.dlt-event>div:nth-child(2) b,.dlt-event>div:nth-child(2) small{display:block}.dlt-event span{font-size:9px;letter-spacing:.08em;color:var(--accent2);text-transform:uppercase}.dlt-event b{font-size:12px;line-height:1.4;margin-top:3px}.dlt-event small{color:var(--muted);font-size:10px;margin-top:4px}.dlt-time{font-size:11px;font-weight:750}.dlt-event.sport{border-left:2px solid var(--accent);padding-left:10px}`;
+  style.textContent=`.dlt-sheet{position:fixed;inset:0;z-index:999;display:none}.dlt-sheet.open{display:block}.dlt-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(6px)}.dlt-panel{position:absolute;left:0;right:0;bottom:0;max-height:92vh;overflow:auto;background:#111113;border-radius:24px 24px 0 0;padding:22px 16px 34px;border-top:1px solid var(--line)}.dlt-close{position:absolute;right:14px;top:12px;border:0;background:transparent;color:var(--muted);font-size:28px}.dlt-head{display:grid;grid-template-columns:44px 1fr 44px;align-items:center;text-align:center;gap:8px}.dlt-head h2{margin:4px 0 12px}.dlt-quick{display:flex;gap:7px;overflow:auto;margin:8px 0 12px}.dlt-quick button{white-space:nowrap;border:1px solid var(--line);background:transparent;color:var(--text);border-radius:999px;padding:8px 10px;font-size:11px}.dlt-capture textarea{width:100%;box-sizing:border-box;background:#0d0d0f;color:var(--text);border:1px solid var(--line);border-radius:14px;padding:12px;font:inherit;resize:vertical;margin-bottom:8px}.dlt-events{margin-top:14px}.dlt-event{display:grid;grid-template-columns:48px 1fr 34px;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}.dlt-event>div:nth-child(2) span,.dlt-event>div:nth-child(2) b,.dlt-event>div:nth-child(2) small{display:block}.dlt-event span{font-size:9px;letter-spacing:.08em;color:var(--accent2);text-transform:uppercase}.dlt-event b{font-size:12px;line-height:1.4;margin-top:3px}.dlt-event small{color:var(--muted);font-size:10px;margin-top:4px}.dlt-time{font-size:11px;font-weight:750}.dlt-event.sport{border-left:2px solid var(--accent);padding-left:10px}.dlt-event.wellbeing{border-left:2px solid var(--accent2);padding-left:10px}`;
   document.head.appendChild(style);
-  window.DenatTimeline={parseWhen,mealStatement,sportStatement,record,recordMeal,recordSport,removeEvent,dayData,open,close};
+  window.DenatTimeline={parseWhen,mealStatement,sportStatement,record,recordMeal,recordSport,recordWellbeing,removeEvent,dayData,open,close};
 })();
