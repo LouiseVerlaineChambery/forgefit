@@ -1,7 +1,7 @@
 {
-  "name": "ForgeLife — Sport, repas & quotidien",
-  "short_name": "ForgeLife",
-  "description": "Application personnelle pour la musculation, la progression, les repas et les courses partagées.",
+  "name": "Denat Life — Sport, repas & quotidien",
+  "short_name": "Denat Life",
+  "description": "Application familiale pour la musculation, la progression, les repas et les courses partagées.",
   "start_url": "./",
   "display": "standalone",
   "background_color": "#0c0c0d",
