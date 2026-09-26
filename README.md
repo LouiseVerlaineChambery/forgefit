@@ -1,6 +1,15 @@
-# Denat Life V20.1 — Sport, nutrition & équilibre
+# Denat Life V21 — Sport, nutrition & équilibre
 
 Denat Life est une PWA personnelle et familiale installable sur iPhone. Elle réunit le suivi sportif de Jocelyn, le quotidien repas d’Anaïs et les fonctions partagées du foyer.
+
+## V21
+- Moteur repas V2 avec mémoire de rotation sur plusieurs semaines
+- Réduit fortement les dîners repris de la semaine précédente
+- Équilibre les familles de protéines et les styles culinaires
+- Favoris conservés, mais sans répétition forcée d’une semaine à l’autre
+- Remplacements manuels et repas rapides toujours prioritaires
+- Mémoire de rotation synchronisée par Denat Life Cloud
+- Indicateur de variété visible dans le menu de la semaine
 
 ## V20.1
 - Suppression sécurisée dans la timeline avec annulation pendant 6 secondes
