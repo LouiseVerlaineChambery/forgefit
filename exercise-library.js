@@ -26,6 +26,7 @@
     D("Rowing barre","Dos",["Milieu du dos","Grand dorsal","Biceps"],["Barre"],4,8,105),
     D("Pullover poulie","Dos",["Grand dorsal"],["Poulie"],3,12,75),
     D("Rowing élastique","Dos",["Milieu du dos","Grand dorsal","Biceps"],["Élastique"],3,15,60),
+    D("Reverse snow angel","Dos",["Haut du dos","Deltoïde postérieur","Grand dorsal"],["Poids du corps"],3,15,45),
 
     D("Développé épaules haltères","Épaules",["Deltoïdes","Triceps"],["Haltères"],3,10,90),
     D("Développé épaules machine","Épaules",["Deltoïdes","Triceps"],["Machine"],3,10,90),
