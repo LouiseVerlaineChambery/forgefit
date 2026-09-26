@@ -173,8 +173,25 @@
     {keys:["mollets","presse mollet","extension mollet debout"], options:["Mollets debout machine","Mollets à la presse","Mollets unilatéraux haltère"]},
     {keys:["crunch poulie","crunch"], options:["Crunch poulie","Machine abdos","Crunch au sol"]},
     {keys:["releves de jambes","releve de jambes"], options:["Relevés de genoux chaise romaine","Relevés de jambes suspendu","Reverse crunch"]},
-    {keys:["souleve de terre roumain"], options:["Soulevé de terre roumain haltères","Hip hinge poulie","Leg curl"]}
+    {keys:["souleve de terre roumain"], options:["Soulevé de terre roumain haltères","Hip hinge poulie","Leg curl"]},
+    {keys:["pont fessier","hip thrust"], options:["Pont fessier au sol","Hip thrust au poids du corps","Hip thrust machine très léger"]},
+    {keys:["abduction de hanches","abduction"], options:["Abduction élastique debout","Abduction machine très légère","Abduction allongé sur le côté"]},
+    {keys:["hip hinge au poids du corps"], options:["Hip hinge avec bâton","Soulevé de terre roumain haltères très légers","Hip hinge poulie très léger"]}
   ];
+
+  function variantMeta(name){
+    const n=norm(name);
+    let icon="↔",equipment="Alternative";
+    if(n.includes("machine")||n.includes("pec deck")||n.includes("assiste")){icon="▣";equipment="Machine";}
+    else if(n.includes("poulie")||n.includes("cable")){icon="◉";equipment="Poulie";}
+    else if(n.includes("haltere")){icon="◆";equipment="Haltères";}
+    else if(n.includes("barre")){icon="━";equipment="Barre";}
+    else if(n.includes("elastique")){icon="≈";equipment="Élastique";}
+    else if(n.includes("pompe")||n.includes("poids du corps")||n.includes("au sol")||n.includes("traction")){icon="●";equipment="Poids du corps";}
+    const info=window.FFGuide?.info?.(name);
+    const muscle=info?.muscles?.[0]||"Même zone";
+    return {icon,equipment,muscle};
+  }
 
   function alternativesFor(name,category){
     const n=norm(name);
@@ -201,7 +218,7 @@
       box.innerHTML=`
         <button type="button" class="ghost full ff-variant-toggle">↔ Variante / machine prise</button>
         <div class="ff-variant-list hidden" style="margin-top:8px;display:grid;gap:8px">
-          ${choices.map((v,i)=>`<button type="button" class="secondary full" data-ff-variant="${i}">${esc(v)}</button>`).join("")}
+          ${choices.map((v,i)=>{const m=variantMeta(v);return `<button type="button" class="secondary full ff-variant-choice" data-ff-variant="${i}"><span class="ff-variant-icon">${m.icon}</span><span class="ff-variant-copy"><b>${esc(v)}</b><small>${esc(m.equipment)} · ${esc(m.muscle)}</small></span></button>`;}).join("")}
           <div class="small muted">La charge est remise à zéro lors d'un changement : les machines ne sont pas directement comparables.</div>
         </div>`;
       card.appendChild(box);
@@ -310,7 +327,7 @@
   const style=document.createElement("style");
   style.textContent=`
     .ff-variant-list.hidden{display:none!important}
-    .ff-variant-toggle{font-size:13px}
+    .ff-variant-toggle{font-size:13px}.ff-variant-choice{display:flex!important;align-items:center!important;gap:11px!important;text-align:left!important}.ff-variant-icon{width:34px;height:34px;flex:0 0 34px;border:1px solid var(--line);border-radius:10px;display:grid;place-items:center;color:var(--accent2);font-size:17px}.ff-variant-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.ff-variant-copy b{font-size:13px;color:var(--text)}.ff-variant-copy small{font-size:10px;color:var(--muted);font-weight:500}
   `;
   document.head.appendChild(style);
 
