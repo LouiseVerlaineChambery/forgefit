@@ -50,3 +50,6 @@ body.meals-theme .ff-shop-cat{color:#946729!important;font-size:10px!important;l
 .dl-coach-apply{background:linear-gradient(135deg,#e4b94f,#c48c2d)!important;color:#17120a!important}
 
 @media(max-width:380px){.dl-more-grid{grid-template-columns:1fr}.dl-brand-hero{grid-template-columns:62px 1fr}.dl-brand-hero img{width:62px;height:62px;border-radius:19px}.dl-brand-name{font-size:21px}}
+
+body.meals-theme .ff-pref-chip{color:#3a3026!important;border-color:#ddcfbb!important;background:#fffaf0!important}
+body.meals-theme .ff-pref-empty{color:#817667!important}
