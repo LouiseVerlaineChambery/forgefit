@@ -1,68 +1,75 @@
 {
   "weekOf": "2026-09-21",
   "generatedAt": "2026-09-26",
-  "source": "ChatGPT weekly menu",
+  "source": "Denat Life weekly menu",
   "retailer": "Carrefour France",
-  "weeklyEstimateEUR": 121,
-  "weeklyEstimateRangeEUR": [105, 135],
+  "weeklyEstimateEUR": 134,
+  "weeklyEstimateRangeEUR": [115, 150],
   "estimateNote": "Estimation indicative Carrefour France. Les prix réels varient selon le magasin, le Drive, les promotions, les marques et les formats achetés.",
-  "mealPrepNote": "Le dîner est volontairement préparé en 4 portions : dîner pour deux, puis le même repas au déjeuner du lendemain.",
+  "mealPrepNote": "Le dîner est volontairement préparé en 4 portions : dîner pour deux, puis le même repas au repas du midi du lendemain.",
   "days": [
     {
       "name": "Lundi",
-      "estimateEUR": 17,
+      "estimateEUR": 19,
+      "breakfast": ["Skyr + banane — 20 secondes", "250 g skyr · 1 banane", "150 g skyr · 1 banane"],
       "lunch": ["Poulet rôti, pommes de terre & légumes — restes de dimanche", "200 g poulet · 320 g pommes de terre · 300 g légumes", "130 g poulet · 220 g pommes de terre · 250 g légumes"],
       "dinner": ["Poulet curry doux, riz & brocoli", "180 g poulet · 90 g riz sec · 250 g brocoli", "120 g poulet · 60 g riz sec · 250 g brocoli"],
       "snack": ["Skyr, pomme & noix", "250 g skyr · 1 pomme · 20 g noix", "150 g skyr · 1 pomme · 15 g noix"],
-      "shop": ["600 g poulet", "300 g riz basmati sec", "1 kg brocoli", "280 ml lait de coco léger", "400 g skyr", "2 pommes", "35 g noix"]
+      "shop": ["600 g poulet", "300 g riz basmati sec", "1 kg brocoli", "280 ml lait de coco léger", "800 g skyr", "2 bananes", "2 pommes", "35 g noix"]
     },
     {
       "name": "Mardi",
-      "estimateEUR": 24,
+      "estimateEUR": 26,
+      "breakfast": ["Pain complet + beurre de cacahuète + fruit — 40 secondes", "80 g pain complet · 20 g beurre de cacahuète · 1 fruit", "50 g pain complet · 15 g beurre de cacahuète · 1 fruit"],
       "lunch": ["Poulet curry doux, riz & brocoli — restes de lundi", "180 g poulet · 90 g riz sec · 250 g brocoli", "120 g poulet · 60 g riz sec · 250 g brocoli"],
       "dinner": ["Saumon, pommes de terre & haricots verts", "180 g saumon · 300 g pommes de terre · 250 g haricots verts", "130 g saumon · 220 g pommes de terre · 250 g haricots verts"],
       "snack": ["Skyr & fruits rouges", "250 g skyr · 150 g fruits rouges", "150 g skyr · 100 g fruits rouges"],
-      "shop": ["620 g saumon", "1,04 kg pommes de terre", "1 kg haricots verts", "400 g skyr", "250 g fruits rouges", "1 citron"]
+      "shop": ["620 g saumon", "1,04 kg pommes de terre", "1 kg haricots verts", "400 g skyr", "130 g pain complet", "35 g beurre de cacahuète", "2 fruits", "250 g fruits rouges", "1 citron"]
     },
     {
       "name": "Mercredi",
-      "estimateEUR": 16,
+      "estimateEUR": 18,
+      "breakfast": ["Skyr + pomme — 20 secondes", "250 g skyr · 1 pomme", "150 g skyr · 1 pomme"],
       "lunch": ["Saumon, pommes de terre & haricots verts — restes de mardi", "180 g saumon · 300 g pommes de terre · 250 g haricots verts", "130 g saumon · 220 g pommes de terre · 250 g haricots verts"],
       "dinner": ["Chili maison bœuf & haricots rouges", "160 g bœuf 5% · 150 g haricots · 80 g riz sec", "100 g bœuf 5% · 120 g haricots · 50 g riz sec"],
       "snack": ["Banane & fromage blanc", "1 banane · 250 g fromage blanc", "1 banane · 150 g fromage blanc"],
-      "shop": ["520 g bœuf haché 5%", "540 g haricots rouges cuits", "260 g riz sec", "2 bocaux sauce tomate", "2 poivrons", "2 oignons", "400 g fromage blanc", "2 bananes"]
+      "shop": ["520 g bœuf haché 5%", "540 g haricots rouges cuits", "260 g riz sec", "2 bocaux sauce tomate", "2 poivrons", "2 oignons", "400 g fromage blanc", "400 g skyr", "2 pommes", "2 bananes"]
     },
     {
       "name": "Jeudi",
-      "estimateEUR": 15,
+      "estimateEUR": 17,
+      "breakfast": ["Pain complet + beurre de cacahuète + banane — 40 secondes", "80 g pain complet · 20 g beurre de cacahuète · 1 banane", "50 g pain complet · 15 g beurre de cacahuète · 1 banane"],
       "lunch": ["Chili maison bœuf & haricots rouges — restes de mercredi", "160 g bœuf 5% · 150 g haricots · 80 g riz sec", "100 g bœuf 5% · 120 g haricots · 50 g riz sec"],
       "dinner": ["Dinde, pâtes complètes, épinards & tomate", "180 g dinde · 90 g pâtes sèches · 200 g épinards", "120 g dinde · 60 g pâtes sèches · 200 g épinards"],
       "snack": ["Poire & skyr", "1 poire · 250 g skyr", "1 poire · 150 g skyr"],
-      "shop": ["600 g dinde", "300 g pâtes complètes sèches", "800 g épinards", "500 g tomates", "400 g skyr", "2 poires"]
+      "shop": ["600 g dinde", "300 g pâtes complètes sèches", "800 g épinards", "500 g tomates", "400 g skyr", "130 g pain complet", "35 g beurre de cacahuète", "2 bananes", "2 poires"]
     },
     {
       "name": "Vendredi",
-      "estimateEUR": 19,
+      "estimateEUR": 21,
+      "breakfast": ["Skyr + kiwi — 20 secondes", "250 g skyr · 1 kiwi", "150 g skyr · 1 kiwi"],
       "lunch": ["Dinde, pâtes complètes, épinards & tomate — restes de jeudi", "180 g dinde · 90 g pâtes sèches · 200 g épinards", "120 g dinde · 60 g pâtes sèches · 200 g épinards"],
       "dinner": ["Cabillaud, quinoa & courgettes", "200 g cabillaud · 90 g quinoa sec · 300 g courgettes", "140 g cabillaud · 60 g quinoa sec · 250 g courgettes"],
       "snack": ["Fromage blanc, kiwi & amandes", "250 g fromage blanc · 1 kiwi · 20 g amandes", "150 g fromage blanc · 1 kiwi · 15 g amandes"],
-      "shop": ["680 g cabillaud", "300 g quinoa sec", "1,1 kg courgettes", "400 g fromage blanc", "2 kiwis", "35 g amandes"]
+      "shop": ["680 g cabillaud", "300 g quinoa sec", "1,1 kg courgettes", "400 g fromage blanc", "400 g skyr", "4 kiwis", "35 g amandes"]
     },
     {
       "name": "Samedi",
-      "estimateEUR": 16,
+      "estimateEUR": 18,
+      "breakfast": ["Yaourt à boire + banane — 10 secondes", "250 ml yaourt à boire nature · 1 banane", "180 ml yaourt à boire nature · 1 fruit"],
       "lunch": ["Cabillaud, quinoa & courgettes — restes de vendredi", "200 g cabillaud · 90 g quinoa sec · 300 g courgettes", "140 g cabillaud · 60 g quinoa sec · 250 g courgettes"],
       "dinner": ["Pizza maison poulet, mozzarella & légumes", "1/2 pizza · poulet · légumes", "1/3 à 1/2 pizza selon faim"],
       "snack": ["Fruit & skyr", "1 fruit · 250 g skyr", "1 fruit · 150 g skyr"],
-      "shop": ["600 g poulet", "2 pâtes à pizza", "300 g mozzarella pasteurisée", "2 bocaux sauce tomate", "400 g champignons", "2 poivrons", "2 oignons", "400 g skyr", "2 fruits"]
+      "shop": ["600 g poulet", "2 pâtes à pizza", "300 g mozzarella pasteurisée", "2 bocaux sauce tomate", "400 g champignons", "2 poivrons", "2 oignons", "400 g skyr", "500 ml yaourt à boire nature", "1 banane", "3 fruits"]
     },
     {
       "name": "Dimanche",
-      "estimateEUR": 14,
+      "estimateEUR": 15,
+      "breakfast": ["Skyr + fruit — 20 secondes", "250 g skyr · 1 fruit", "150 g skyr · 1 fruit"],
       "lunch": ["Pizza maison poulet, mozzarella & légumes — restes de samedi", "1/2 pizza", "1/3 à 1/2 pizza selon faim"],
       "dinner": ["Poulet rôti, pommes de terre & légumes", "200 g poulet · 320 g pommes de terre · 300 g légumes", "130 g poulet · 220 g pommes de terre · 250 g légumes"],
       "snack": ["Yaourt & fruit", "200 g yaourt · 1 fruit", "150 g yaourt · 1 fruit"],
-      "shop": ["660 g poulet", "1,08 kg pommes de terre", "1,1 kg légumes de saison", "400 g yaourt nature", "2 fruits"]
+      "shop": ["660 g poulet", "1,08 kg pommes de terre", "1,1 kg légumes de saison", "400 g skyr", "400 g yaourt nature", "4 fruits"]
     }
   ],
   "weekShop": [
@@ -71,13 +78,16 @@
     "620 g de saumon",
     "680 g de cabillaud",
     "520 g de bœuf haché 5%",
-    "1,6 kg de skyr",
+    "≈ 3,6 kg de skyr",
     "800 g de fromage blanc",
     "400 g de yaourt nature",
+    "500 ml de yaourt à boire nature",
     "300 g de mozzarella pasteurisée",
     "560 g de riz sec",
     "300 g de pâtes complètes sèches",
     "300 g de quinoa sec",
+    "260 g de pain complet",
+    "70 g de beurre de cacahuète",
     "≈ 2,12 kg de pommes de terre",
     "540 g de haricots rouges cuits",
     "2 pâtes à pizza",
@@ -90,12 +100,8 @@
     "4 poivrons",
     "4 oignons",
     "400 g de champignons",
-    "fruits rouges 250 g",
-    "2 pommes",
-    "2 bananes",
-    "2 poires",
-    "2 kiwis",
-    "4 autres fruits",
+    "250 g de fruits rouges",
+    "≈ 22 fruits variés pour petits-déjeuners et collations",
     "35 g de noix",
     "35 g d’amandes",
     "280 ml de lait de coco léger",
