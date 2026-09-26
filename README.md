@@ -1,6 +1,18 @@
-# Denat Life V25 — Sport, nutrition & équilibre
+# Denat Life V26 — Sport, nutrition & équilibre
 
 Denat Life est une PWA personnelle et familiale installable sur iPhone. Elle réunit le suivi sportif de Jocelyn, le quotidien repas d’Anaïs et les fonctions partagées du foyer.
+
+## V26
+- Moteur unique de progression musculation : les anciens conseils ForgeFit délèguent désormais au coach sport
+- Double progression : répétitions d’abord, charge ensuite
+- Fourchettes automatiques selon le type d’exercice (polyarticulaire, isolation, abdos/gainage)
+- Une hausse de charge n’est proposée qu’après validation du haut de fourchette sur toutes les séries avec RPE maîtrisé
+- Sans RPE fiable, la charge n’augmente pas automatiquement
+- Une séance difficile conserve d’abord la charge ; deux références difficiles consécutives peuvent déclencher une baisse d’un cran
+- Pendant la séance, Denat Life peut alléger une série trop difficile mais n’augmente pas la charge sur la seule base d’une série facile
+- Exercices au poids du corps : progression prioritaire en répétitions
+- Séances Hôtel/Nomade toujours exclues des références de charge
+- La fiche de progression d’un exercice affiche maintenant la prochaine cible et la logique utilisée
 
 ## V25
 - Nouvel écran Muscles dans la progression sportive
