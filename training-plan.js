@@ -141,14 +141,14 @@
     return true;
   }
 
-  // Première installation de cette fonction : la demande de l'utilisateur active la reprise.
-  if(!state.reprise){
-    activateReprise(true);
+  // La reprise et la protection genou concernent le profil de Jocelyn uniquement.
+  if(window.DenatProfile?.is?.("anais")){
+    if(!state.reprise)state.reprise={enabled:false,completed:false,profile:"anais"};
   }else{
-    completeRepriseIfNeeded();
+    if(!state.reprise)activateReprise(true);
+    else completeRepriseIfNeeded();
+    applyLightLowerReprise();
   }
-
-  applyLightLowerReprise();
 
   // Pendant la reprise, ne jamais proposer automatiquement les anciennes charges.
   const baseSuggestWeight=suggestWeight;
