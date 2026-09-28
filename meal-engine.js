@@ -5,6 +5,7 @@
   const FAVS="denat_meal_favorites_v1";
   const HISTORY="denat_meal_rotation_v1";
   const INGREDIENT_PREFS="denat_meal_ingredient_preferences_v1";
+  const OPTIONS="denat_meal_options_v1";
   const NAMES=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
   const dinners=[
@@ -134,6 +135,16 @@
   function iso(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),x=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${x}`;}
   function seed(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
   function ingredientPrefs(){const p=read(INGREDIENT_PREFS,{likes:[],dislikes:["olives"]});return {likes:Array.isArray(p.likes)?p.likes:[],dislikes:Array.isArray(p.dislikes)?p.dislikes:["olives"]};}
+  function options(){const x=read(OPTIONS,{includeSnacksInShopping:true});return {includeSnacksInShopping:x.includeSnacksInShopping!==false};}
+  function setOption(key,value){const x=options();x[key]=!!value;localStorage.setItem(OPTIONS,JSON.stringify(x));return x;}
+  function seasonFor(date=new Date()){const m=date.getMonth()+1;return m>=3&&m<=5?"printemps":m>=6&&m<=8?"ete":m>=9&&m<=11?"automne":"hiver";}
+  function seasonTags(d){
+    const n=recipeText(d),tags=[];
+    if(/courgette|tomate|poivron|concombre|ratatouille|avocat/.test(n))tags.push("ete");
+    if(/champignon|carotte|pomme de terre|brocoli|epinard/.test(n))tags.push("automne","hiver");
+    if(/petits pois|pois gourmand|epinard|brocoli/.test(n))tags.push("printemps");
+    return [...new Set(tags)];
+  }
   function recipeText(d){return normName([d.t,d.p1,d.p2,...(d.shop||[])].join(" "));}
   function hasIngredient(d,item){const q=normName(item);return q&&recipeText(d).includes(q);}
   function allowed(){
@@ -211,12 +222,13 @@
   }
   function chooseForWeek(weekKey){
     const fav=new Set(favoriteIds());
+    const season=seasonFor(new Date(weekKey+"T12:00:00"));
     const pool=allowed().slice().sort((a,b)=>{
-      const ageA=recentMealAge(a.id,weekKey),ageB=recentMealAge(b.id,weekKey);
+      const ageA=recentMealAge(a.id,weekKey),ageB=recentMealAge(b.id,weekKey),seasonA=seasonTags(a).includes(season)?120000000:0,seasonB=seasonTags(b).includes(season)?120000000:0;
       const repeatA=ageA===1?900000000:ageA===2?350000000:ageA===3?120000000:0;
       const repeatB=ageB===1?900000000:ageB===2?350000000:ageB===3?120000000:0;
       const favA=fav.has(a.id)&&ageA!==1?180000000:0,favB=fav.has(b.id)&&ageB!==1?180000000:0;
-      return (seed(weekKey+a.id)+repeatA-favA)-(seed(weekKey+b.id)+repeatB-favB);
+      return (seed(weekKey+a.id)+repeatA-favA-seasonA)-(seed(weekKey+b.id)+repeatB-favB-seasonB);
     });
     const out=[],counts={},cats={};
     for(const d of pool){
@@ -252,14 +264,14 @@
     const prevSunday=chooseForWeek(prevKey)[6];
     const days=chosen.map((d,i)=>{
       const prev=i===0?prevSunday:chosen[i-1],b=breakfasts[(seed(weekKey)+i)%breakfasts.length],s=snacks[(seed(weekKey)+i*2)%snacks.length];
-      const daily=consolidate([...b[3],...d.shop,...s[3]]),nutrition={p1:dayMacros(d,prev,b,s,"p1"),p2:dayMacros(d,prev,b,s,"p2")};
+      const opt=options(),daily=consolidate([...b[3],...d.shop,...(opt.includeSnacksInShopping?s[3]:[])]),nutrition={p1:dayMacros(d,prev,b,s,"p1"),p2:dayMacros(d,prev,b,s,"p2")};
       return {name:NAMES[i],estimateEUR:d.cost+5,breakfast:b.slice(0,3),lunch:mealArray(prev," — restes de la veille"),dinner:mealArray(d),dinnerId:d.id,dinnerCategory:mealCategory(d),dinnerMinutes:d.prep+d.cook,dinnerFavorite:isFavorite(d.id),snack:s.slice(0,3),nutrition,shop:daily.map(x=>x.text)};
     });
     const total=days.reduce((n,d)=>n+d.estimateEUR,0);
     const consolidated=consolidate(days.flatMap(d=>d.shop));
     rememberWeek(weekKey,days.map(d=>d.dinnerId));
     const variety={proteins:new Set(days.map(d=>proteinOf(dinners.find(x=>x.id===d.dinnerId)||{}))).size,categories:new Set(days.map(d=>d.dinnerCategory)).size,recentRepeats:days.filter(d=>recentMealAge(d.dinnerId,weekKey)===1).length};
-    return {weekOf:weekKey,generatedAt:iso(new Date()),source:"Denat Life automatic weekly engine V2",retailer:"Carrefour France",weeklyEstimateEUR:total,weeklyEstimateRangeEUR:[Math.round(total*.88),Math.round(total*1.12)],estimateNote:"Estimation indicative. Les prix réels varient selon le magasin, les promotions, les marques et les formats.",mealPrepNote:"Le dîner est préparé en 4 portions : dîner pour deux puis le même repas au repas du midi du lendemain.",variety,days,weekShop:consolidated.map(x=>x.text),weekShopCategories:consolidated.map(x=>x.category)};
+    return {weekOf:weekKey,generatedAt:iso(new Date()),source:"Denat Life automatic weekly engine V2",retailer:"Carrefour France",weeklyEstimateEUR:total,weeklyEstimateRangeEUR:[Math.round(total*.88),Math.round(total*1.12)],estimateNote:"Estimation indicative. Les prix réels varient selon le magasin, les promotions, les marques et les formats.",mealPrepNote:"Le dîner est préparé en 4 portions : dîner pour deux puis le même repas au repas du midi du lendemain.",season:seasonFor(new Date(weekKey+"T12:00:00")),options:options(),variety,days,weekShop:consolidated.map(x=>x.text),weekShopCategories:consolidated.map(x=>x.category)};
   }
 
   function replace(day,currentId){
@@ -289,5 +301,5 @@
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
   function preferences(){const ingredients=ingredientPrefs();return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),ingredientLikes:ingredients.likes,ingredientDislikes:ingredients.dislikes,recipeCount:dinners.length};}
   function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}
-  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference};
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference,options,setOption,seasonFor,seasonTags};
 })();
