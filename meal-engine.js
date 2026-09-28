@@ -299,9 +299,36 @@
     const fav=new Set(favoriteIds());fav.delete(currentId);localStorage.setItem(FAVS,JSON.stringify([...fav]));
     return replace(day,currentId);
   }
+  function completeSteps(d){
+    const txt=normName([d.t,d.p1,d.p2,...d.shop].join(" ")),steps=[],total=d.prep+d.cook;
+    const carb=/riz/.test(txt)?"riz":/pates|orzo/.test(txt)?"pâtes":/quinoa/.test(txt)?"quinoa":/boulgour/.test(txt)?"boulgour":/semoule/.test(txt)?"semoule":/pomme de terre/.test(txt)?"pommes de terre":/gnocchi/.test(txt)?"gnocchis":"";
+    const protein=/poulet/.test(txt)?"poulet":/dinde/.test(txt)?"dinde":/boeuf/.test(txt)?"bœuf":/saumon/.test(txt)?"saumon":/cabillaud/.test(txt)?"cabillaud":/crevette/.test(txt)?"crevettes":/thon/.test(txt)?"thon":/oeuf/.test(txt)?"œufs":/lentille/.test(txt)?"lentilles":/pois chiche/.test(txt)?"pois chiches":"";
+    steps.push(`Peser et préparer tous les ingrédients pour 4 portions. Laver les légumes, puis les couper avant de commencer la cuisson.`);
+    if(carb==="riz")steps.push("Rincer le riz puis le cuire dans l’eau selon le temps du paquet (en général 10–12 min). Égoutter si nécessaire et garder au chaud.");
+    else if(carb==="pâtes")steps.push("Porter une grande casserole d’eau à ébullition, saler légèrement puis cuire les pâtes/orzo al dente selon le paquet. Égoutter en gardant un peu d’eau de cuisson.");
+    else if(carb==="quinoa")steps.push("Rincer le quinoa puis le cuire environ 12–15 min dans deux fois son volume d’eau. Couper le feu et laisser reposer 5 min.");
+    else if(carb==="boulgour")steps.push("Cuire le boulgour dans environ deux fois son volume d’eau pendant 10–12 min, puis égrainer.");
+    else if(carb==="semoule")steps.push("Verser la semoule dans un saladier, couvrir du même volume d’eau bouillante, couvrir 5 min puis égrainer à la fourchette.");
+    else if(carb==="pommes de terre")steps.push("Couper les pommes de terre en morceaux réguliers. Les cuire 15–20 min à l’eau, ou 25–30 min au four à 200 °C avec très peu d’huile.");
+    else if(carb==="gnocchis")steps.push("Cuire les gnocchis selon le paquet, puis les faire légèrement dorer à la poêle si souhaité.");
+    if(protein==="poulet"||protein==="dinde")steps.push(`Couper le ${protein} en morceaux. Chauffer une grande poêle avec un filet d’huile et cuire 7–10 min à feu moyen-vif en remuant, jusqu’à cuisson complète à cœur.`);
+    else if(protein==="bœuf")steps.push("Chauffer une grande poêle. Cuire le bœuf en l’émiettant ou en le saisissant 5–8 min selon la découpe, jusqu’à cuisson souhaitée.");
+    else if(protein==="saumon")steps.push("Cuire le saumon au four à 190 °C pendant environ 12–15 min, ou à la poêle 4–6 min par face selon l’épaisseur, jusqu’à cuisson à cœur.");
+    else if(protein==="cabillaud")steps.push("Cuire le cabillaud au four à 190 °C environ 12–15 min, jusqu’à ce que la chair soit opaque et se détache facilement.");
+    else if(protein==="crevettes")steps.push("Saisir les crevettes 3–5 min dans une poêle chaude en remuant, jusqu’à ce qu’elles soient bien roses et cuites à cœur.");
+    else if(protein==="œufs")steps.push("Battre les œufs. Les cuire à feu moyen jusqu’à prise complète, sans laisser de partie liquide.");
+    else if(protein==="lentilles")steps.push("Rincer les lentilles puis les cuire dans une grande casserole d’eau selon le paquet, généralement 20–25 min, avant de les égoutter.");
+    else if(protein==="pois chiches")steps.push("Rincer et égoutter les pois chiches, puis les réchauffer 5–8 min avec les légumes et l’assaisonnement.");
+    else if(protein==="thon")steps.push("Égoutter le thon. L’ajouter seulement en fin de préparation pour le réchauffer sans le dessécher.");
+    steps.push("Cuire ou réchauffer les légumes dans la même poêle 5–10 min selon leur taille. Ajouter la sauce ou l’assaisonnement indiqué dans les ingrédients, puis mélanger avec le féculent.");
+    steps.push("Goûter et rectifier l’assaisonnement. Répartir immédiatement selon les portions Jocelyn/Anaïs indiquées sur la fiche.");
+    steps.push("Pour les 2 portions du lendemain : refroidir rapidement, placer dans des boîtes fermées au réfrigérateur et réchauffer complètement avant de servir.");
+    return steps;
+  }
   function getRecipe(id){
     const d=dinners.find(x=>x.id===id);if(!d)return null;
-    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps:d.steps.slice(),p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
+    const steps=(d.steps||[]).length>=5&&!d.steps.some(x=>/Préparer les ingrédients et lancer le féculent|Préparer les ingrédients\.$/.test(x))?d.steps.slice():completeSteps(d);
+    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps,p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
   }
   function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);localStorage.removeItem(HISTORY);return generate();}
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
