@@ -4,6 +4,7 @@
   const OVERRIDES="denat_meal_overrides_v1";
   const FAVS="denat_meal_favorites_v1";
   const HISTORY="denat_meal_rotation_v1";
+  const INGREDIENT_PREFS="denat_meal_ingredient_preferences_v1";
   const NAMES=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
   const dinners=[
@@ -48,7 +49,13 @@
     {"id":"oeufs_shakshuka","t":"Shakshuka douce, œufs & pain complet","p1":"4 œufs · tomate · 100 g pain complet","p2":"3 œufs · tomate · 70 g pain complet","cost":14,"shop":["14 œufs","2 bocaux sauce tomate","4 poivrons","2 oignons","340 g pain complet"],"prep":12,"cook":20,"steps":["Faire revenir oignons et poivrons.","Ajouter la sauce tomate et laisser mijoter.","Casser les œufs dans la sauce, couvrir et cuire jusqu’à ce qu’ils soient complètement pris.","Servir avec le pain complet et conserver les portions restantes au frais."]},
     {"id":"omelette_riz","t":"Riz sauté aux œufs, petits pois & carottes","p1":"4 œufs · 90 g riz sec · légumes","p2":"3 œufs · 60 g riz sec · légumes","cost":13,"shop":["14 œufs","300 g riz sec","500 g petits pois","500 g carottes","100 ml sauce soja réduite en sel"],"prep":10,"cook":15,"steps":["Cuire le riz et les légumes.","Battre les œufs puis les cuire complètement dans une grande poêle.","Ajouter riz, légumes et sauce soja puis faire sauter quelques minutes.","Répartir en 4 portions et réserver 2 portions au frais."]},
     {"id":"gnocchis_legumes","t":"Gnocchis tomate, mozzarella & légumes rôtis","p1":"250 g gnocchis · tomate · légumes","p2":"180 g gnocchis · tomate · légumes","cost":15,"shop":["860 g gnocchis","2 bocaux sauce tomate","800 g légumes à rôtir","250 g mozzarella pasteurisée"],"prep":10,"cook":22,"steps":["Rôtir ou poêler les légumes.","Cuire les gnocchis puis ajouter la sauce tomate.","Mélanger avec les légumes et la mozzarella jusqu’à ce qu’elle soit bien fondue.","Répartir en 4 portions et réserver 2 portions au frais."]},
-    {"id":"lasagnes_courgette","t":"Lasagnes légères bœuf & courgette","p1":"portion généreuse · bœuf · courgette","p2":"portion standard · bœuf · courgette","cost":22,"shop":["500 g bœuf haché 5%","12 feuilles lasagnes","800 g courgettes","2 bocaux sauce tomate","250 g mozzarella pasteurisée"],"prep":18,"cook":35,"steps":["Préchauffer le four à 190 °C et couper les courgettes finement.","Cuire complètement le bœuf puis ajouter la sauce tomate.","Monter les couches lasagnes, sauce, courgettes et mozzarella.","Cuire jusqu’à pâtes tendres et fromage bien fondu, puis réserver 2 portions au frais."]}
+    {"id":"lasagnes_courgette","t":"Lasagnes légères bœuf & courgette","p1":"portion généreuse · bœuf · courgette","p2":"portion standard · bœuf · courgette","cost":22,"shop":["500 g bœuf haché 5%","12 feuilles lasagnes","800 g courgettes","2 bocaux sauce tomate","250 g mozzarella pasteurisée"],"prep":18,"cook":35,"steps":["Préchauffer le four à 190 °C et couper les courgettes finement.","Cuire complètement le bœuf puis ajouter la sauce tomate.","Monter les couches lasagnes, sauce, courgettes et mozzarella.","Cuire jusqu’à pâtes tendres et fromage bien fondu, puis réserver 2 portions au frais."]},
+    {"id":"poulet_parmesan","t":"Poulet parmesan léger, pâtes & courgettes","p1":"180 g poulet · 90 g pâtes sèches · courgettes","p2":"120 g poulet · 60 g pâtes sèches · courgettes","cost":19,"shop":["600 g poulet","300 g pâtes sèches","1 kg courgettes","2 bocaux sauce tomate","100 g fromage râpé pasteurisé"],"prep":12,"cook":22,"steps":["Cuire les pâtes.","Saisir le poulet jusqu’à cuisson complète.","Ajouter courgettes et sauce tomate puis laisser mijoter.","Ajouter un peu de fromage au service et réserver 2 portions au frais."]},
+    {"id":"dinde_boulgour","t":"Dinde citronnée, boulgour & brocoli","p1":"180 g dinde · 90 g boulgour sec · 250 g brocoli","p2":"120 g dinde · 60 g boulgour sec · 250 g brocoli","cost":18,"shop":["600 g dinde","300 g boulgour sec","1 kg brocoli","2 citrons"],"prep":10,"cook":20,"steps":["Cuire le boulgour et le brocoli.","Saisir la dinde jusqu’à cuisson complète.","Ajouter le jus de citron et des herbes en fin de cuisson.","Assembler et réserver 2 portions au frais."]},
+    {"id":"boeuf_riz_courgette","t":"Bœuf tomate, riz & courgettes","p1":"170 g bœuf · 90 g riz sec · 300 g courgettes","p2":"110 g bœuf · 60 g riz sec · 250 g courgettes","cost":20,"shop":["560 g bœuf haché 5%","300 g riz sec","1,1 kg courgettes","2 bocaux sauce tomate"],"prep":10,"cook":20,"steps":["Lancer le riz.","Cuire complètement le bœuf en l’émiettant.","Ajouter les courgettes puis la sauce tomate et laisser mijoter.","Servir avec le riz et conserver 2 portions au frais."]},
+    {"id":"saumon_boulgour","t":"Saumon citron, boulgour & brocoli","p1":"180 g saumon · 90 g boulgour sec · 250 g brocoli","p2":"130 g saumon · 60 g boulgour sec · 250 g brocoli","cost":24,"shop":["620 g saumon","300 g boulgour sec","1 kg brocoli","2 citrons"],"prep":8,"cook":22,"steps":["Cuire le boulgour et le brocoli.","Cuire le saumon à cœur au four ou à la poêle.","Ajouter citron et herbes.","Répartir en 4 portions et réserver 2 portions au frais."]},
+    {"id":"crevettes_coco","t":"Crevettes coco, riz & brocoli","p1":"180 g crevettes · 90 g riz sec · 250 g brocoli","p2":"120 g crevettes · 60 g riz sec · 250 g brocoli","cost":21,"shop":["600 g crevettes décortiquées","300 g riz sec","1 kg brocoli","280 ml lait de coco léger"],"prep":10,"cook":16,"steps":["Lancer le riz et cuire le brocoli.","Cuire complètement les crevettes à la poêle.","Ajouter le lait de coco et laisser réduire légèrement.","Servir avec le riz et réserver les portions du lendemain."]},
+    {"id":"frittata_courgette","t":"Frittata courgette, tomate & pommes de terre","p1":"4 œufs · 300 g pommes de terre · courgette","p2":"3 œufs · 220 g pommes de terre · courgette","cost":14,"shop":["14 œufs","1,05 kg pommes de terre","800 g courgettes","500 g tomates","150 g fromage râpé pasteurisé"],"prep":12,"cook":25,"steps":["Cuire les pommes de terre en petits dés.","Ajouter courgettes et tomates puis verser les œufs battus.","Ajouter un peu de fromage et terminer la cuisson au four jusqu’à prise complète.","Réserver les portions du lendemain au frais."]}
   ];
 
   const breakfasts=[
@@ -74,7 +81,20 @@
   function monday(d=new Date()){const x=new Date(d.getFullYear(),d.getMonth(),d.getDate());x.setDate(x.getDate()-((x.getDay()+6)%7));return x;}
   function iso(d){const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,"0"),x=String(d.getDate()).padStart(2,"0");return `${y}-${m}-${x}`;}
   function seed(s){let h=2166136261;for(let i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
-  function allowed(){const bad=new Set(read(DISLIKES,[]));const a=dinners.filter(x=>!bad.has(x.id));return a.length>=7?a:dinners;}
+  function ingredientPrefs(){const p=read(INGREDIENT_PREFS,{likes:[],dislikes:["olives"]});return {likes:Array.isArray(p.likes)?p.likes:[],dislikes:Array.isArray(p.dislikes)?p.dislikes:["olives"]};}
+  function recipeText(d){return normName([d.t,d.p1,d.p2,...(d.shop||[])].join(" "));}
+  function hasIngredient(d,item){const q=normName(item);return q&&recipeText(d).includes(q);}
+  function allowed(){
+    const bad=new Set(read(DISLIKES,[])),prefs=ingredientPrefs();
+    const a=dinners.filter(x=>!bad.has(x.id)&&!prefs.dislikes.some(i=>hasIngredient(x,i)));
+    return a.length>=7?a:dinners.filter(x=>!bad.has(x.id));
+  }
+  function addIngredientPreference(kind,item){
+    const p=ingredientPrefs(),v=String(item||"").trim();if(!v)return p;
+    p.likes=p.likes.filter(x=>normName(x)!==normName(v));p.dislikes=p.dislikes.filter(x=>normName(x)!==normName(v));
+    p[kind==="like"?"likes":"dislikes"].push(v);localStorage.setItem(INGREDIENT_PREFS,JSON.stringify(p));return p;
+  }
+  function removeIngredientPreference(kind,item){const p=ingredientPrefs(),key=kind==="like"?"likes":"dislikes";p[key]=p[key].filter(x=>normName(x)!==normName(item));localStorage.setItem(INGREDIENT_PREFS,JSON.stringify(p));return p;}
   function favoriteIds(){return read(FAVS,[]);}
   function isFavorite(id){return favoriteIds().includes(id);}
   function toggleFavorite(id){const s=new Set(favoriteIds());s.has(id)?s.delete(id):s.add(id);localStorage.setItem(FAVS,JSON.stringify([...s]));return isFavorite(id);}
@@ -215,7 +235,7 @@
   }
   function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);localStorage.removeItem(HISTORY);return generate();}
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
-  function preferences(){return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t}))};}
+  function preferences(){const ingredients=ingredientPrefs();return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),ingredientLikes:ingredients.likes,ingredientDislikes:ingredients.dislikes,recipeCount:dinners.length};}
   function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}
-  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory};
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference};
 })();
