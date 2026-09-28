@@ -90,7 +90,17 @@
     view.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{day=+b.dataset.day;renderMeals();});
     view.querySelectorAll("[data-open]").forEach(b=>b.onclick=()=>{day=+b.dataset.open;localStorage.setItem(VIEW_KEY,"today");renderMeals();});
     view.querySelectorAll("[data-course-sub]").forEach(b=>b.onclick=()=>{courseSub=b.dataset.courseSub;localStorage.setItem("denat_courses_view",courseSub);renderMeals();});
-    view.querySelector("#ff-recipe-search")?.addEventListener("input",e=>{localStorage.setItem("denat_recipe_search",e.target.value);clearTimeout(window.__denatRecipeSearchTimer);window.__denatRecipeSearchTimer=setTimeout(renderMeals,180);});
+    view.querySelector("#ff-recipe-search")?.addEventListener("input",e=>{
+      const value=e.target.value,query=value.toLowerCase().trim();localStorage.setItem("denat_recipe_search",value);
+      const method=localStorage.getItem("denat_recipe_method")||"",fastOnly=localStorage.getItem("denat_recipe_fast_only")==="1",seasonOnly=localStorage.getItem("denat_recipe_season_only")==="1";
+      const all=window.DenatMealEngine?.allRecipes?.()||[],visible=new Set(all.filter(r=>{
+        const hay=[r.title,r.category,r.protein,r.method,...r.ingredients].join(" ").toLowerCase();
+        const seasonOk=!seasonOnly||window.DenatMealEngine?.isMonthlySeasonal?.({t:r.title,p1:r.p1,p2:r.p2,shop:r.ingredients});
+        return(!query||hay.includes(query))&&(!method||r.method===method)&&(!fastOnly||r.total<=25)&&seasonOk;
+      }).map(r=>r.id));
+      view.querySelectorAll(".ff-catalog-item[data-recipe]").forEach(card=>card.hidden=!visible.has(card.dataset.recipe));
+      const heading=view.querySelector(".ff-catalog-head h2");if(heading)heading.textContent=`${visible.size} résultats`;
+    });
     view.querySelectorAll("[data-method]").forEach(b=>b.onclick=()=>{localStorage.setItem("denat_recipe_method",b.dataset.method);renderMeals();});
     view.querySelector("#ff-season-filter")?.addEventListener("click",()=>{localStorage.setItem("denat_recipe_season_only",localStorage.getItem("denat_recipe_season_only")==="1"?"0":"1");renderMeals();});
     view.querySelector("#ff-clear-filters")?.addEventListener("click",()=>{["denat_recipe_search","denat_recipe_method","denat_recipe_fast_only","denat_recipe_season_only"].forEach(k=>localStorage.removeItem(k));renderMeals();});
