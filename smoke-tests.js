@@ -11,5 +11,5 @@ const q=E.replaceQuick(0,d.days[0].dinnerId);assert(q.days[0].dinnerMinutes<=25)
 const af=E.replaceByMode(1,d.days[1].dinnerId,"airfryer");assert.equal(af.days[1].dinnerMethod,"airfryer");
 assert(E.monthProduce(new Date("2026-09-28T12:00:00")).vegetables.includes("poireau"));
 const meals=read("meals.js");assert(/let courseSub=/.test(meals));assert(meals.includes("function bindCoursesOnly"));assert(meals.includes("function catalogView"));assert(meals.includes("function pantryView"));
-assert(read("session-ux.js").includes("Machine occupée"));
+assert(read("session-ux.js").includes("Machine occupée"));assert(read("session-ux.js").includes("Sans machine"));assert(read("exercise-library.js").includes("function alternatives"));assert(read("exercise-library.js").includes("function hotelExercises"));
 console.log(JSON.stringify({ok:true,recipes:recipes.length,weekShop:d.weekShop.length,quick:q.days[0].dinnerMinutes,airFryer:af.days[1].dinnerId}));
