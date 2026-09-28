@@ -472,5 +472,22 @@
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
   function preferences(){const ingredients=ingredientPrefs();return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),ingredientLikes:ingredients.likes,ingredientDislikes:ingredients.dislikes,recipeCount:dinners.length};}
   function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}
-  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference,options,setOption,seasonFor,seasonTags,monthProduce,monthScore,isMonthlySeasonal,anaisNutritionFit,balancedFit,dessertList,replaceByMode,regenerateWeek};
+  function qualityAudit(){
+    const recipes=allRecipes(),issues=[],signature=new Map();
+    recipes.forEach(r=>{
+      const sig=normName([r.protein,r.method,...r.ingredients].sort().join("|"));
+      if(signature.has(sig))issues.push({id:r.id,type:"similar",with:signature.get(sig),title:r.title});else signature.set(sig,r.id);
+      if(r.steps.length<6)issues.push({id:r.id,type:"steps",title:r.title});
+      if(r.total<=0||r.total>90)issues.push({id:r.id,type:"time",title:r.title});
+      if(!r.ingredients.length)issues.push({id:r.id,type:"ingredients",title:r.title});
+      if(r.method==="airfryer"&&!r.steps.some(x=>/air ?fryer/i.test(x)))issues.push({id:r.id,type:"airfryer",title:r.title});
+    });
+    return {recipes:recipes.length,issues,issueCount:issues.length,complete:recipes.length-new Set(issues.map(x=>x.id)).size};
+  }
+  function pantryMatch(items=[]){
+    const wanted=items.map(normName).filter(Boolean);
+    return allRecipes().map(r=>{const hay=normName([r.title,...r.ingredients].join(" ")),matched=wanted.filter(x=>hay.includes(x));return {...r,pantryMatched:matched,pantryScore:matched.length,pantryMissing:Math.max(0,r.ingredients.length-matched.length)};}).filter(r=>r.pantryScore>0).sort((a,b)=>b.pantryScore-a.pantryScore||a.pantryMissing-b.pantryMissing||a.total-b.total);
+  }
+
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference,options,setOption,seasonFor,seasonTags,monthProduce,monthScore,isMonthlySeasonal,anaisNutritionFit,balancedFit,dessertList,replaceByMode,regenerateWeek,qualityAudit,pantryMatch};
 })();
