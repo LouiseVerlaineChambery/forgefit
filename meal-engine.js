@@ -347,7 +347,7 @@
   }
   function getRecipe(id){
     const d=dinners.find(x=>x.id===id);if(!d)return null;
-    const steps=(d.steps||[]).length>=5&&!d.steps.some(x=>/Préparer les ingrédients et lancer le féculent|Préparer les ingrédients\.$/.test(x))?d.steps.slice():completeSteps(d);
+    const steps=(d.steps||[]).length>=6&&!d.steps.some(x=>/Préparer les ingrédients et lancer le féculent|Préparer les ingrédients\.$/.test(x))?d.steps.slice():completeSteps(d);
     return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps,p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
   }
   function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);localStorage.removeItem(HISTORY);return generate();}
