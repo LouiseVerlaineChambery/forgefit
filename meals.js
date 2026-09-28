@@ -105,7 +105,7 @@
     view.querySelector("#ff-season-filter")?.addEventListener("click",()=>{localStorage.setItem("denat_recipe_season_only",localStorage.getItem("denat_recipe_season_only")==="1"?"0":"1");renderMeals();});
     view.querySelector("#ff-clear-filters")?.addEventListener("click",()=>{["denat_recipe_search","denat_recipe_method","denat_recipe_fast_only","denat_recipe_season_only"].forEach(k=>localStorage.removeItem(k));renderMeals();});
     view.querySelector("#ff-fast-filter")?.addEventListener("click",()=>{localStorage.setItem("denat_recipe_fast_only",localStorage.getItem("denat_recipe_fast_only")==="1"?"0":"1");renderMeals();});
-    view.querySelectorAll("[data-recipe]").forEach(b=>b.onclick=()=>showRecipe(b.dataset.recipe));
+    view.querySelectorAll("[data-recipe]").forEach(b=>{b.onclick=e=>{if(document.activeElement?.id==="ff-recipe-search"){e.preventDefault();return;}showRecipe(b.dataset.recipe);};});
     view.querySelectorAll("[data-replace-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.replaceMeal;if(window.DenatMealEngine){data=DenatMealEngine.replace(i,data.days[i]?.dinnerId);renderMeals();}});
     view.querySelectorAll("[data-quick-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.quickMeal;if(window.DenatMealEngine){data=DenatMealEngine.replaceQuick(i,data.days[i]?.dinnerId);renderMeals();}});
     view.querySelectorAll("[data-favorite-meal]").forEach(b=>b.onclick=()=>{const i=+b.dataset.favoriteMeal;if(window.DenatMealEngine){DenatMealEngine.toggleFavorite(data.days[i]?.dinnerId);data=DenatMealEngine.generate();renderMeals();}});
