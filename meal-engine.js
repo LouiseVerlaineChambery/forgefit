@@ -343,6 +343,7 @@
     steps.push("Cuire ou réchauffer les légumes dans la même poêle 5–10 min selon leur taille. Ajouter la sauce ou l’assaisonnement indiqué dans les ingrédients, puis mélanger avec le féculent.");
     steps.push("Goûter et rectifier l’assaisonnement. Répartir immédiatement selon les portions Jocelyn/Anaïs indiquées sur la fiche.");
     steps.push("Pour les 2 portions du lendemain : refroidir rapidement, placer dans des boîtes fermées au réfrigérateur et réchauffer complètement avant de servir.");
+    while(steps.length<6)steps.splice(steps.length-2,0,"Poursuivre la cuisson à feu moyen quelques minutes en mélangeant, jusqu’à ce que l’ensemble soit bien chaud et que les légumes aient la texture souhaitée.");
     return steps;
   }
   function getRecipe(id){
