@@ -335,8 +335,16 @@
     const fav=new Set(favoriteIds());fav.delete(currentId);localStorage.setItem(FAVS,JSON.stringify([...fav]));
     return replace(day,currentId);
   }
+  function cookingMethod(d){
+    if(d.method)return d.method;
+    const n=normName([d.t,...(d.steps||[])].join(" "));
+    if(/air fryer|airfryer/.test(n))return "airfryer";
+    if(/four|roti|lasagne|frittata/.test(n))return "four";
+    if(/wok|poele|saute|brouille|omelette/.test(n))return "poele";
+    return "casserole";
+  }
   function completeSteps(d){
-    const txt=normName([d.t,d.p1,d.p2,...d.shop].join(" ")),steps=[],total=d.prep+d.cook;
+    const txt=normName([d.t,d.p1,d.p2,...d.shop].join(" ")),steps=[],total=d.prep+d.cook,method=cookingMethod(d);
     const carb=/riz/.test(txt)?"riz":/pates|orzo/.test(txt)?"pâtes":/quinoa/.test(txt)?"quinoa":/boulgour/.test(txt)?"boulgour":/semoule/.test(txt)?"semoule":/pomme de terre/.test(txt)?"pommes de terre":/gnocchi/.test(txt)?"gnocchis":"";
     const protein=/poulet/.test(txt)?"poulet":/dinde/.test(txt)?"dinde":/boeuf/.test(txt)?"bœuf":/saumon/.test(txt)?"saumon":/cabillaud/.test(txt)?"cabillaud":/crevette/.test(txt)?"crevettes":/thon/.test(txt)?"thon":/oeuf/.test(txt)?"œufs":/lentille/.test(txt)?"lentilles":/pois chiche/.test(txt)?"pois chiches":"";
     steps.push(`Peser et préparer tous les ingrédients pour 4 portions. Laver les légumes, puis les couper avant de commencer la cuisson.`);
@@ -347,7 +355,13 @@
     else if(carb==="semoule")steps.push("Verser la semoule dans un saladier, couvrir du même volume d’eau bouillante, couvrir 5 min puis égrainer à la fourchette.");
     else if(carb==="pommes de terre")steps.push("Couper les pommes de terre en morceaux réguliers. Les cuire 15–20 min à l’eau, ou 25–30 min au four à 200 °C avec très peu d’huile.");
     else if(carb==="gnocchis")steps.push("Cuire les gnocchis selon le paquet, puis les faire légèrement dorer à la poêle si souhaité.");
-    if(protein==="poulet"||protein==="dinde")steps.push(`Couper le ${protein} en morceaux. Chauffer une grande poêle avec un filet d’huile et cuire 7–10 min à feu moyen-vif en remuant, jusqu’à cuisson complète à cœur.`);
+    if(method==="airfryer"&&(protein==="poulet"||protein==="dinde"))steps.push(`Préchauffer l’Air Fryer à 190 °C. Assaisonner le ${protein}, disposer sans surcharger le panier puis cuire environ 12–16 min en retournant à mi-cuisson, jusqu’à cuisson complète à cœur.`);
+    else if(method==="airfryer"&&protein==="saumon")steps.push("Préchauffer l’Air Fryer à 180 °C. Cuire le saumon environ 9–12 min selon l’épaisseur, jusqu’à cuisson à cœur.");
+    else if(method==="airfryer"&&protein==="cabillaud")steps.push("Préchauffer l’Air Fryer à 180 °C. Cuire le cabillaud 9–12 min selon l’épaisseur, jusqu’à chair opaque.");
+    else if(method==="airfryer"&&protein==="crevettes")steps.push("Préchauffer l’Air Fryer à 190 °C. Cuire les crevettes assaisonnées 7–9 min en secouant le panier à mi-cuisson.");
+    else if(method==="airfryer"&&protein==="pois chiches")steps.push("Sécher les pois chiches, les assaisonner avec très peu d’huile puis cuire à l’Air Fryer à 190 °C pendant 12–15 min en secouant deux fois.");
+    else if(method==="four"&&(protein==="poulet"||protein==="dinde"))steps.push(`Préchauffer le four à 200 °C. Assaisonner le ${protein}, enfourner environ 20–25 min selon la taille des morceaux et vérifier la cuisson à cœur.`);
+    else if(protein==="poulet"||protein==="dinde")steps.push(`Couper le ${protein} en morceaux. Chauffer une grande poêle avec un filet d’huile et cuire 7–10 min à feu moyen-vif en remuant, jusqu’à cuisson complète à cœur.`);
     else if(protein==="bœuf")steps.push("Chauffer une grande poêle. Cuire le bœuf en l’émiettant ou en le saisissant 5–8 min selon la découpe, jusqu’à cuisson souhaitée.");
     else if(protein==="saumon")steps.push("Cuire le saumon au four à 190 °C pendant environ 12–15 min, ou à la poêle 4–6 min par face selon l’épaisseur, jusqu’à cuisson à cœur.");
     else if(protein==="cabillaud")steps.push("Cuire le cabillaud au four à 190 °C environ 12–15 min, jusqu’à ce que la chair soit opaque et se détache facilement.");
@@ -365,7 +379,7 @@
   function getRecipe(id){
     const d=dinners.find(x=>x.id===id);if(!d)return null;
     const steps=(d.steps||[]).length>=6&&!d.steps.some(x=>/Préparer les ingrédients et lancer le féculent|Préparer les ingrédients\.$/.test(x))?d.steps.slice():completeSteps(d);
-    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps,p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
+    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,method:cookingMethod(d),portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps,p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id)};
   }
   function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);localStorage.removeItem(HISTORY);return generate();}
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
