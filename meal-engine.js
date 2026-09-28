@@ -445,7 +445,7 @@
     if(/brocoli|epinard|courgette|champignon|haricot vert|carotte|poivron|tomate|courge|poireau|ratatouille|concombre|salade/.test(n)){score+=2;reasons.push("légumes");}
     if(/lentille|pois chiche|haricot rouge|quinoa|complet/.test(n)){score+=1;reasons.push("glucides riches en fibres");}
     if(/saumon|sardine|maquereau|noix|noisette|amande/.test(n)){score+=1;reasons.push("oméga-3 / oléagineux");}
-    return {adapted:score>=4,score,reasons:[...new Set(reasons)].slice(0,4)};
+    return {adapted:score>=6,score,reasons:[...new Set(reasons)].slice(0,4)};
   }
   function getRecipe(id){
     const d=dinners.find(x=>x.id===id);if(!d)return null;
