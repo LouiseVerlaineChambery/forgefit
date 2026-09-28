@@ -24,7 +24,7 @@
   function euro(v){return Number.isFinite(+v)?`≈ ${Math.round(+v)} €`:"—";}
   function portion(x){const p=getPerson();if(p==="p1")return `<div class="ff-portion"><b>Jocelyn</b>${x[1]}</div>`;if(p==="p2")return `<div class="ff-portion"><b>Anaïs</b>${x[2]}</div>`;return `<div class="ff-portions"><div class="ff-portion"><b>Jocelyn</b>${x[1]}</div><div class="ff-portion"><b>Anaïs</b>${x[2]}</div></div>`;}
   function meal(label,x){if(!x)return"";return `<div class="ff-meal"><div class="eyebrow">${label}</div><h3 style="margin-top:6px">${x[0]}</h3>${portion(x)}</div>`;}
-  function selectors(){const v=getView(),name=window.DenatProfile?.label?.()||"Jocelyn";return `<div class="row" style="margin:10px 0"><div><div class="eyebrow">ESPACE PERSONNEL</div><b>${name}</b></div><button class="ghost" data-switch-profile>Changer</button></div><div class="ff-switch ff-five"><button data-v="today" class="${v==="today"?"active":""}">Repas</button><button data-v="coach" class="${v==="coach"?"active":""}">Coach</button><button data-v="week" class="${v==="week"?"active":""}">Semaine</button><button data-v="shop" class="${v==="shop"?"active":""}">Courses jour</button><button data-v="weekshop" class="${v==="weekshop"?"active":""}">Courses semaine</button></div>`;}
+  function selectors(){const v=getView(),name=window.DenatProfile?.label?.()||"Jocelyn";return `<div class="row" style="margin:10px 0"><div><div class="eyebrow">ESPACE PERSONNEL</div><b>${name}</b></div><button class="ghost" data-switch-profile>Changer</button></div><div class="ff-switch ff-five"><button data-v="today" class="${v==="today"?"active":""}">Repas</button><button data-v="coach" class="${v==="coach"?"active":""}">Coach</button><button data-v="week" class="${v==="week"?"active":""}">Semaine</button><button data-v="catalog" class="${v==="catalog"?"active":""}">Recettes</button><button data-v="courses" class="${v==="courses"?"active":""}">Courses</button></div>`;}
   function days(){return `<div class="ff-days">${data.days.map((d,i)=>`<button data-day="${i}" class="${i===day?"active":""}">${d.name}</button>`).join("")}</div>`;}
   function budgetCard(d){const r=data.weeklyEstimateRangeEUR;return `<div class="ff-budget"><div><b>${euro(d?.estimateEUR)}</b><span>courses estimées du jour</span></div><div><b>${euro(data.weeklyEstimateEUR)}</b><span>semaine Carrefour${r?` · env. ${r[0]}–${r[1]} €`:""}</span></div></div>`;}
   function currentMealPerson(){return window.DenatProfile?.is?.("anais")?"p2":"p1";}
@@ -74,7 +74,7 @@
   function renderMeals(){
     if(loading){view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Repas & courses</div><p class="muted">Chargement du menu de la semaine…</p></section>`;return;}
     const v=getView();
-    if(v==="weekshop"){
+    if(v==="courses"||v==="weekshop"){
       view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Courses</div><p class="muted">Liste du jour ou courses consolidées de la semaine.</p></section>${coursesView()}`;
     }else if(v==="coach"){
       view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Coach repas</div><p class="muted">Cuisine avec ce que vous avez · restaurant · suivi partagé.</p>${selectors()}</section>${window.DenatMealCoach?.view?.()||'<section class="card">Coach repas indisponible.</section>'}`;
