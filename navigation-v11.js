@@ -26,7 +26,7 @@
       <section class="card"><div class="row"><div><div class="eyebrow">DONNÉES DENAT LIFE</div><h3 style="margin:6px 0">Votre espace privé</h3></div><span class="pill" id="cloud-pill">${cloudLabel()}</span></div><p class="muted small">Séances, progression, préférences repas et listes de courses sont enregistrées dans votre espace Denat Life. Le téléphone conserve seulement un cache de secours hors connexion.</p><button class="secondary full" id="cloud-share">Connecter un autre appareil</button></section>`;
     view.querySelector('[data-more="program"]')?.addEventListener("click",()=>baseSetRoute("program"));
     view.querySelector('[data-more="coach"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","coach");baseSetRoute("meals");active("meals");});
-    view.querySelector('[data-more="courses"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","weekshop");baseSetRoute("meals");active("courses");});
+    view.querySelector('[data-more="courses"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","courses");localStorage.setItem("denat_courses_view","week");baseSetRoute("meals");active("courses");});
     view.querySelector('[data-more="history"]')?.addEventListener("click",()=>baseSetRoute("history"));
     view.querySelector('[data-more="week"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","week");baseSetRoute("meals");active("meals");});
     view.querySelector('[data-more="settings"]')?.addEventListener("click",()=>{baseSetRoute("settings");setTimeout(()=>document.querySelector("#dash-settings")?.click(),0);});
@@ -35,7 +35,8 @@
   window.addEventListener("denat-cloud-status",e=>{const p=document.querySelector("#cloud-pill");if(p)p.textContent=cloudLabel();});
   setRoute=function(r){
     if(r==="courses"){
-      localStorage.setItem("forgefit_meals_view","weekshop");
+      localStorage.setItem("forgefit_meals_view","courses");
+      if(!localStorage.getItem("denat_courses_view"))localStorage.setItem("denat_courses_view","week");
       baseSetRoute("meals");title.textContent="Courses";active("courses");return;
     }
     if(r==="meals"){
