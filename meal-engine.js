@@ -148,6 +148,24 @@
     {"id":"four_cabillaud_tomate","t":"Cabillaud au four tomate-citron, riz & brocoli","p1":"200 g cabillaud · 90 g riz sec · brocoli","p2":"140 g cabillaud · 60 g riz sec · brocoli","cost":21,"shop":["680 g cabillaud","300 g riz sec","1 kg brocoli","500 g tomates","2 citrons"],"prep":10,"cook":20,"method":"four","steps":["Préparer les ingrédients."]}
   ];
 
+  const generatedBases=[
+    ["Poulet","poulet","600 g poulet"],["Dinde","dinde","600 g dinde"],["Bœuf","boeuf","560 g bœuf"],["Saumon","saumon","620 g saumon"],["Cabillaud","cabillaud","680 g cabillaud"],["Crevettes","crevettes","600 g crevettes"],["Pois chiches","pois_chiches","640 g pois chiches cuits"],["Œufs","oeufs","14 œufs"]
+  ];
+  const generatedSides=[
+    ["riz & brocoli","riz_brocoli","300 g riz sec","1 kg brocoli"],["semoule & courgettes","semoule_courgette","300 g semoule","900 g courgettes"],["quinoa & épinards","quinoa_epinards","300 g quinoa sec","700 g épinards"],["boulgour & carottes","boulgour_carottes","300 g boulgour sec","900 g carottes"],["pommes de terre & champignons","pdt_champignons","1,05 kg pommes de terre","650 g champignons"],["pâtes & haricots verts","pates_haricots","300 g pâtes sèches","1 kg haricots verts"],["riz & poivrons","riz_poivrons","300 g riz sec","4 poivrons"]
+  ];
+  const generatedMethods=[
+    ["Air Fryer","airfryer",8,16],["au four","four",10,25],["à la poêle","poele",8,18]
+  ];
+  const generatedRecipes=[];
+  generatedBases.forEach(([protein,pid,pShop])=>generatedSides.forEach(([side,sid,carbShop,vegShop])=>generatedMethods.forEach(([methodLabel,method,prep,cook])=>{
+    const id=`gen_${pid}_${sid}_${method}`;
+    if(dinners.some(x=>x.id===id))return;
+    const proteinP1=pid==="boeuf"?"170 g":pid==="saumon"?"180 g":pid==="cabillaud"?"200 g":pid==="crevettes"?"180 g":pid==="pois_chiches"?"180 g":pid==="oeufs"?"4 œufs":"180 g";
+    const proteinP2=pid==="boeuf"?"110 g":pid==="saumon"?"130 g":pid==="cabillaud"?"140 g":pid==="crevettes"?"120 g":pid==="pois_chiches"?"140 g":pid==="oeufs"?"3 œufs":"120 g";
+    generatedRecipes.push({id,t:`${protein} ${methodLabel}, ${side}`,p1:`${proteinP1} ${protein.toLowerCase()} · portion Jocelyn · ${side}`,p2:`${proteinP2} ${protein.toLowerCase()} · portion Anaïs · ${side}`,cost:pid==="saumon"?24:pid==="cabillaud"||pid==="crevettes"?21:18,shop:[pShop,carbShop,vegShop],prep,cook,method,steps:["Préparer les ingrédients."]});
+  })));
+  dinners.push(...generatedRecipes);
   const breakfasts=[
     ["Skyr + banane — 20 secondes","250 g skyr · 1 banane","150 g skyr · 1 banane",["400 g skyr","2 bananes"]],
     ["Pain complet + beurre de cacahuète + fruit — 40 secondes","80 g pain complet · 20 g beurre de cacahuète · 1 fruit","50 g pain complet · 15 g beurre de cacahuète · 1 fruit",["130 g pain complet","35 g beurre de cacahuète","2 fruits"]],
