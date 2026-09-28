@@ -422,15 +422,25 @@
     if(/lentille|pois chiche|haricot rouge|quinoa/.test(n)){score+=1;reasons.push("légumineuse ou quinoa");}
     return {adapted:score>=4,score,reasons:[...new Set(reasons)].slice(0,3)};
   }
+  function balancedFit(d){
+    const r=typeof d==="string"?dinners.find(x=>x.id===d):d;if(!r)return {adapted:false,score:0,reasons:[]};
+    const n=recipeText(r),mac=mealMacros(r,"p2")||{},reasons=[];let score=0;
+    if((mac.protein||0)>=25){score+=2;reasons.push("protéines");}else if((mac.protein||0)>=18)score+=1;
+    if((mac.fiber||0)>=8){score+=2;reasons.push("fibres");}else if((mac.fiber||0)>=5)score+=1;
+    if(/brocoli|epinard|courgette|champignon|haricot vert|carotte|poivron|tomate|courge|poireau|ratatouille|concombre|salade/.test(n)){score+=2;reasons.push("légumes");}
+    if(/lentille|pois chiche|haricot rouge|quinoa|complet/.test(n)){score+=1;reasons.push("glucides riches en fibres");}
+    if(/saumon|sardine|maquereau|noix|noisette|amande/.test(n)){score+=1;reasons.push("oméga-3 / oléagineux");}
+    return {adapted:score>=4,score,reasons:[...new Set(reasons)].slice(0,4)};
+  }
   function getRecipe(id){
     const d=dinners.find(x=>x.id===id);if(!d)return null;
     const rawOk=(d.steps||[]).length>=6&&!d.steps.some(x=>/Préparer les ingrédients et lancer le féculent|Préparer les ingrédients\.$/.test(x));
     const method=cookingMethod(d),steps=rawOk&&!(method==="airfryer"&&!d.steps.some(x=>/air ?fryer/i.test(x)))?d.steps.slice():completeSteps(d);
-    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,method,portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps,p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id),anaisFit:anaisNutritionFit(d)};
+    return {id:d.id,title:d.t,prep:d.prep,cook:d.cook,total:d.prep+d.cook,method,portions:4,ingredients:d.shop.slice(),shop:d.shop.slice(),steps,p1:d.p1,p2:d.p2,nutritionP1:mealMacros(d,"p1"),nutritionP2:mealMacros(d,"p2"),category:mealCategory(d),protein:proteinOf(d),favorite:isFavorite(d.id),anaisFit:anaisNutritionFit(d),balancedFit:balancedFit(d)};
   }
   function resetPreferences(){localStorage.removeItem(DISLIKES);localStorage.removeItem(OVERRIDES);localStorage.removeItem(FAVS);localStorage.removeItem(HISTORY);return generate();}
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
   function preferences(){const ingredients=ingredientPrefs();return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),ingredientLikes:ingredients.likes,ingredientDislikes:ingredients.dislikes,recipeCount:dinners.length};}
   function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}
-  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference,options,setOption,seasonFor,seasonTags,monthProduce,monthScore,isMonthlySeasonal,anaisNutritionFit};
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference,options,setOption,seasonFor,seasonTags,monthProduce,monthScore,isMonthlySeasonal,anaisNutritionFit,balancedFit};
 })();
