@@ -42,6 +42,18 @@
       return ex;
     });
   }
+  function adaptActiveSession(){
+    const L=lib(),s=state.activeSession;if(!L||!s)return false;
+    const used=new Set();
+    s.exercises=s.exercises.map(old=>{
+      const def=L.find(old.name),allowed=def&&!def.equipment.some(x=>["Machine","Poulie","Barre"].includes(x))&&def.equipment.every(x=>x==="Poids du corps"||cfg.equipment.has(x));
+      if(allowed&&!used.has(def.id)){used.add(def.id);return old;}
+      const choices=L.alternatives?.(old.name,"hotel")||[],next=choices.find(x=>!used.has(x.id)&&(x.equipment.every(e=>e==="Poids du corps"||cfg.equipment.has(e))));
+      if(!next)return old;used.add(next.id);
+      return {...old,name:next.name,libraryId:next.id,muscles:[...next.muscles],equipment:[...next.equipment],category:next.category,rest:Math.min(next.rest,75),targetReps:next.reps,replacedFrom:old.name,nomadAdapted:true,sets:(old.sets||[]).map(x=>x.done?x:{...x,weight:"",reps:next.reps,rpe:""})};
+    });
+    s.hotelMode={equipment:[...cfg.equipment],adaptedAt:new Date().toISOString()};s.workoutName=s.workoutName.includes("Hôtel")?s.workoutName:s.workoutName+" · Hôtel";saveState();renderActiveSession();return true;
+  }
   function start(){
     const exercises=plan();if(!exercises.length)return;
     state.activeSession={
@@ -107,6 +119,6 @@
     .dl-nomad-equipment{display:grid;grid-template-columns:1fr 1fr;gap:8px}.dl-nomad-equipment button.active{border-color:var(--accent);color:var(--accent2);background:rgba(59,130,246,.16)}
     .dl-nomad-time{grid-template-columns:repeat(3,1fr)!important}@media(max-width:420px){.dl-nomad-equipment{grid-template-columns:1fr}}
   `;document.head.appendChild(style);
-  window.DenatNomad={plan,start,modal,muscleSets,config:cfg};
+  window.DenatNomad={plan,start,modal,muscleSets,adaptActiveSession,config:cfg};
   render();
 })();
