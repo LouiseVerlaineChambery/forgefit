@@ -372,6 +372,7 @@
     else if(protein==="pois chiches")steps.push("Rincer et égoutter les pois chiches, puis les réchauffer 5–8 min avec les légumes et l’assaisonnement.");
     else if(protein==="thon")steps.push("Égoutter le thon. L’ajouter seulement en fin de préparation pour le réchauffer sans le dessécher.");
     steps.push("Cuire ou réchauffer les légumes dans la même poêle 5–10 min selon leur taille. Ajouter la sauce ou l’assaisonnement indiqué dans les ingrédients, puis mélanger avec le féculent.");
+    if(method==="airfryer"&&!steps.some(x=>/air ?fryer/i.test(x)))steps.push("Pour la partie cuite à l’Air Fryer : préchauffer l’appareil selon la recette, ne pas surcharger le panier et remuer ou retourner à mi-cuisson pour une cuisson homogène.");
     steps.push("Goûter et rectifier l’assaisonnement. Répartir immédiatement selon les portions Jocelyn/Anaïs indiquées sur la fiche.");
     steps.push("Pour les 2 portions du lendemain : refroidir rapidement, placer dans des boîtes fermées au réfrigérateur et réchauffer complètement avant de servir.");
     while(steps.length<6)steps.splice(steps.length-2,0,"Poursuivre la cuisson à feu moyen quelques minutes en mélangeant, jusqu’à ce que l’ensemble soit bien chaud et que les légumes aient la texture souhaitée.");
