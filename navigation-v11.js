@@ -14,6 +14,7 @@
         ${isAnais?`
         <div class="dl-more-item" data-more="coach"><b>Coach repas</b><span>Noter ce que tu as mangé et garder ton journal.</span></div>
         <div class="dl-more-item" data-more="week"><b>Menu 7 jours</b><span>Voir les repas communs de la semaine.</span></div>
+        <div class="dl-more-item" data-more="recipes"><b>Catalogue de recettes</b><span>Parcourir toutes les recettes, rechercher et filtrer les plats rapides.</span></div>
         <div class="dl-more-item" data-more="courses"><b>Courses</b><span>Ouvrir la liste commune du foyer.</span></div>
         <div class="dl-more-item" data-more="settings"><b>Réglages</b><span>Profil, sauvegarde et paramètres.</span></div>
         `:`
@@ -29,6 +30,7 @@
     view.querySelector('[data-more="courses"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","courses");localStorage.setItem("denat_courses_view","week");baseSetRoute("meals");active("courses");});
     view.querySelector('[data-more="history"]')?.addEventListener("click",()=>baseSetRoute("history"));
     view.querySelector('[data-more="week"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","week");baseSetRoute("meals");active("meals");});
+    view.querySelector('[data-more="recipes"]')?.addEventListener("click",()=>{localStorage.setItem("forgefit_meals_view","catalog");baseSetRoute("meals");active("meals");});
     view.querySelector('[data-more="settings"]')?.addEventListener("click",()=>{baseSetRoute("settings");setTimeout(()=>document.querySelector("#dash-settings")?.click(),0);});
     view.querySelector("#cloud-share")?.addEventListener("click",()=>window.DenatCloud?.shareAccess?.());
   }
