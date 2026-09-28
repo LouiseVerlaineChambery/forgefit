@@ -6,6 +6,7 @@
   const HISTORY="denat_meal_rotation_v1";
   const INGREDIENT_PREFS="denat_meal_ingredient_preferences_v1";
   const OPTIONS="denat_meal_options_v1";
+  const QUICK_ROTATION="denat_meal_quick_rotation_v1";
   const NAMES=["Lundi","Mardi","Mercredi","Jeudi","Vendredi","Samedi","Dimanche"];
 
   const dinners=[
@@ -283,9 +284,14 @@
     return generate();
   }
   function replaceQuick(day,currentId){
-    const weekKey=iso(monday()),used=new Set(generate().days.map(x=>x.dinnerId));
-    const quick=allowed().filter(x=>x.id!==currentId&&!used.has(x.id)&&(x.prep+x.cook)<=25).sort((a,b)=>seed(weekKey+"quick"+a.id)-seed(weekKey+"quick"+b.id));
-    if(quick[0])saveOverride(weekKey,day,quick[0].id);
+    const weekKey=iso(monday()),used=new Set(generate().days.map(x=>x.dinnerId)),pool=allowed().filter(x=>(x.prep+x.cook)<=25),state=read(QUICK_ROTATION,{week:"",byDay:{}});
+    if(state.week!==weekKey){state.week=weekKey;state.byDay={};}
+    const seen=new Set(state.byDay[day]||[]);seen.add(currentId);
+    let quick=pool.filter(x=>x.id!==currentId&&!used.has(x.id)&&!seen.has(x.id));
+    if(!quick.length){seen.clear();seen.add(currentId);quick=pool.filter(x=>x.id!==currentId&&!used.has(x.id));}
+    quick.sort((a,b)=>seed(weekKey+"quick"+day+seen.size+a.id)-seed(weekKey+"quick"+day+seen.size+b.id));
+    const next=quick[0]||pool.find(x=>x.id!==currentId&&!seen.has(x.id))||pool.find(x=>x.id!==currentId);
+    if(next){seen.add(next.id);state.byDay[day]=[...seen];localStorage.setItem(QUICK_ROTATION,JSON.stringify(state));saveOverride(weekKey,day,next.id);}
     return generate();
   }
   function dislike(day,currentId){
