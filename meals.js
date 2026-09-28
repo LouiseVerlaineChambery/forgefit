@@ -81,11 +81,23 @@
     return `<section class="card"><div class="row"><div><div class="eyebrow">NOS GOÛTS</div><h3 style="margin:6px 0">On aime / On n’aime pas</h3></div><span class="pill">${p.recipeCount||"—"} recettes</span></div><p class="muted small">Un aliment placé dans « On n’aime pas » est retiré des prochains menus. Les plats refusés restent gérés séparément.</p><div class="ff-pref-entry"><input id="ff-pref-input" placeholder="Ex. olives, aubergines, saumon…"><button class="secondary" data-pref-add="like">♥ On aime</button><button class="secondary" data-pref-add="dislike">⊘ On n’aime pas</button></div><div class="small"><b>On aime</b></div><div class="ff-pref-list">${likes}</div><div class="small" style="margin-top:16px"><b>On n’aime pas</b></div><div class="ff-pref-list">${dislikes}</div><hr style="border:0;border-top:1px solid var(--line);margin:18px 0"><div class="small"><b>Plats favoris</b></div><div class="ff-pref-list">${fav}</div><div class="small" style="margin-top:16px"><b>Plats refusés · toucher pour réautoriser</b></div><div class="ff-pref-list">${bad}</div></section>`;
   }
 
+  function bindCoursesOnly(){
+    view.querySelector("[data-course-back]")?.addEventListener("click",()=>{localStorage.setItem(VIEW_KEY,"today");renderMeals();});
+    view.querySelectorAll("[data-course-sub]").forEach(b=>b.onclick=()=>{courseSub=b.dataset.courseSub;localStorage.setItem("denat_courses_view",courseSub);renderMeals();});
+    view.querySelectorAll("[data-day]").forEach(b=>b.onclick=()=>{day=+b.dataset.day;renderMeals();});
+    view.querySelectorAll("#ff-snack-shopping").forEach(toggle=>toggle.addEventListener("change",e=>{DenatMealEngine.setOption("includeSnacksInShopping",e.target.checked);data=DenatMealEngine.generate();localStorage.removeItem(weekShopKey());localStorage.removeItem(shopKey(day));renderMeals();}));
+    view.querySelectorAll("[data-shop]").forEach(box=>box.onchange=()=>{let a=readShop(day),i=+box.dataset.shop;a=box.checked?[...new Set([...a,i])]:a.filter(x=>x!==i);localStorage.setItem(shopKey(day),JSON.stringify(a));box.closest(".ff-shop")?.classList.toggle("done",box.checked);});
+    view.querySelectorAll("[data-week-shop]").forEach(box=>box.onchange=()=>{let a=readWeekShop(),i=+box.dataset.weekShop;a=box.checked?[...new Set([...a,i])]:a.filter(x=>x!==i);localStorage.setItem(weekShopKey(),JSON.stringify(a));box.closest(".ff-shop")?.classList.toggle("done",box.checked);const count=view.querySelector("#week-shop-count");if(count)count.textContent=`${a.length}/${(data.weekShop||[]).length}`;});
+    view.querySelector("#reset-shop")?.addEventListener("click",()=>{localStorage.removeItem(shopKey(day));renderMeals();});
+    view.querySelector("#reset-week-shop")?.addEventListener("click",()=>{localStorage.removeItem(weekShopKey());renderMeals();});
+  }
   function renderMeals(){
     if(loading){view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Repas & courses</div><p class="muted">Chargement du menu de la semaine…</p></section>`;return;}
     const v=getView();
     if(v==="courses"||v==="weekshop"){
-      view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Courses</div><p class="muted">Liste du jour ou courses consolidées de la semaine.</p></section>${coursesView()}`;
+      try{view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Courses</div><p class="muted">Liste du jour ou courses consolidées de la semaine.</p></section>${coursesView()}`;bindCoursesOnly();}
+      catch(e){console.error("Denat Life Courses:",e);view.innerHTML=`<section class="card"><h2>Courses</h2><div class="notice">Impossible d’afficher la liste. <button class="secondary" id="ff-courses-retry">Réessayer</button></div></section>`;view.querySelector("#ff-courses-retry")?.addEventListener("click",()=>{data=DenatMealEngine.generate();renderMeals();});}
+      return;
     }else if(v==="coach"){
       view.innerHTML=`<section class="card hero"><div class="eyebrow">DENAT LIFE</div><div class="hero-title">Coach repas</div><p class="muted">Cuisine avec ce que vous avez · restaurant · suivi partagé.</p>${selectors()}</section>${window.DenatMealCoach?.view?.()||'<section class="card">Coach repas indisponible.</section>'}`;
     }else{
