@@ -1,4 +1,4 @@
-const CACHE="denat-life-v28-meal-preferences";
+const CACHE="denat-life-v29-100-recipes";
 const ASSETS=["./","./index.html","./styles.css","./denat-life-theme.css","./meals-warm-v1.css","./brand-v11.css","./cloud-state.js","./boot.js","./profiles.js","./app.js","./mybodynote.js","./training-plan.js","./metrics.js","./exercise-guide.js","./exercise-library.js","./forgefit-v3.js","./health-connector.js","./health-coach.js","./sport-coach.js","./nomad-workout.js","./muscle-analytics.js","./session-ux.js","./nutrition-core.js","./meal-engine.js","./nutrition-journal.js","./nutrition-adaptive.js","./time-context.js","./daily-memory.js","./timeline.js","./wellbeing.js","./meal-coach.js","./meals.js","./entry-links.js","./split-theme.js","./dashboard.js","./navigation-v11.js","./weekly-menu.json","./manifest.json","./brand-logo-v5.svg","./icon-192.png","./icon-512.png"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(ASSETS)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
