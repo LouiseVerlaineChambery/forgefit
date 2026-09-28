@@ -192,14 +192,31 @@
   function ingredientPrefs(){const p=read(INGREDIENT_PREFS,{likes:[],dislikes:["olives"]});return {likes:Array.isArray(p.likes)?p.likes:[],dislikes:Array.isArray(p.dislikes)?p.dislikes:["olives"]};}
   function options(){const x=read(OPTIONS,{includeSnacksInShopping:true});return {includeSnacksInShopping:x.includeSnacksInShopping!==false};}
   function setOption(key,value){const x=options();x[key]=!!value;localStorage.setItem(OPTIONS,JSON.stringify(x));return x;}
+  const MONTH_PRODUCE={
+    1:{vegetables:["betterave","carotte","céleri","chou","chou de Bruxelles","chou-fleur","courge","endive","épinard","mâche","navet","panais","poireau","potiron","topinambour"],fruits:["citron","clémentine","kiwi","mandarine","orange","poire","pomme"]},
+    2:{vegetables:["betterave","carotte","céleri","chou","chou de Bruxelles","chou-fleur","endive","épinard","mâche","navet","panais","poireau","topinambour"],fruits:["citron","clémentine","kiwi","mandarine","orange","poire","pomme"]},
+    3:{vegetables:["betterave","carotte","céleri","chou","chou-fleur","endive","épinard","navet","panais","poireau","radis"],fruits:["kiwi","orange","poire","pomme"]},
+    4:{vegetables:["asperge","blette","carotte","chou-fleur","épinard","navet","petit pois","poireau","radis","salade"],fruits:["fraise","kiwi","pomme","rhubarbe"]},
+    5:{vegetables:["artichaut","asperge","blette","carotte","concombre","courgette","épinard","petit pois","radis","salade"],fruits:["cerise","fraise","framboise","rhubarbe"]},
+    6:{vegetables:["artichaut","aubergine","blette","brocoli","carotte","concombre","courgette","fenouil","haricot vert","petit pois","poivron","tomate"],fruits:["abricot","cerise","fraise","framboise","melon","pêche"]},
+    7:{vegetables:["ail","artichaut","aubergine","blette","champignon de Paris","concombre","courgette","fenouil","haricot vert","maïs","poivron","tomate"],fruits:["abricot","figue","fraise","framboise","melon","myrtille","nectarine","pastèque","pêche","prune"]},
+    8:{vegetables:["ail","artichaut","aubergine","blette","champignon de Paris","concombre","courgette","fenouil","haricot vert","maïs","poivron","tomate"],fruits:["abricot","figue","framboise","melon","mirabelle","mûre","myrtille","nectarine","pastèque","pêche","poire","pomme","prune"]},
+    9:{vegetables:["ail","artichaut","aubergine","blette","brocoli","carotte","chou-fleur","champignon de Paris","concombre","courge","courgette","cresson","épinard","fenouil","haricot vert","maïs","oignon","poireau","poivron","potiron","tomate","salade"],fruits:["figue","melon","mirabelle","mûre","myrtille","noisette","noix","pastèque","pêche","poire","pomme","prune","raisin"]},
+    10:{vegetables:["ail","betterave","blette","brocoli","carotte","céleri","champignon de Paris","chou","chou de Bruxelles","chou-fleur","courge","courgette","endive","épinard","fenouil","mâche","navet","panais","poireau","potiron"],fruits:["châtaigne","coing","figue","kaki","noisette","noix","poire","pomme","raisin"]},
+    11:{vegetables:["ail","betterave","brocoli","carotte","céleri","champignon de Paris","chou","chou de Bruxelles","chou-fleur","courge","endive","épinard","mâche","navet","panais","poireau","potiron","topinambour"],fruits:["châtaigne","citron","clémentine","kaki","kiwi","mandarine","noisette","poire","pomme"]},
+    12:{vegetables:["ail","betterave","carotte","céleri","champignon de Paris","chou","chou de Bruxelles","chou-fleur","courge","endive","épinard","mâche","navet","panais","poireau","potiron","topinambour"],fruits:["citron","clémentine","kaki","kiwi","mandarine","orange","poire","pomme"]}
+  };
+  function monthProduce(date=new Date()){const m=date.getMonth()+1,x=MONTH_PRODUCE[m]||{vegetables:[],fruits:[]};return {month:m,monthName:new Intl.DateTimeFormat("fr-FR",{month:"long"}).format(date),...x};}
   function seasonFor(date=new Date()){const m=date.getMonth()+1;return m>=3&&m<=5?"printemps":m>=6&&m<=8?"ete":m>=9&&m<=11?"automne":"hiver";}
   function seasonTags(d){
     const n=recipeText(d),tags=[];
-    if(/courgette|tomate|poivron|concombre|ratatouille|avocat/.test(n))tags.push("ete");
-    if(/champignon|carotte|pomme de terre|brocoli|epinard/.test(n))tags.push("automne","hiver");
-    if(/petits pois|pois gourmand|epinard|brocoli/.test(n))tags.push("printemps");
+    if(/courgette|tomate|poivron|concombre|ratatouille/.test(n))tags.push("ete");
+    if(/champignon|carotte|pomme de terre|brocoli|epinard|courge|potiron|poireau/.test(n))tags.push("automne","hiver");
+    if(/petits pois|pois gourmand|epinard|brocoli|asperge|radis/.test(n))tags.push("printemps");
     return [...new Set(tags)];
   }
+  function monthScore(d,date=new Date()){const p=monthProduce(date),n=recipeText(d),matches=[...p.vegetables,...p.fruits].filter(x=>n.includes(normName(x)));return {score:matches.length,matches};}
+  function isMonthlySeasonal(d,date=new Date()){return monthScore(d,date).score>0;}
   function recipeText(d){return normName([d.t,d.p1,d.p2,...(d.shop||[])].join(" "));}
   function hasIngredient(d,item){const q=normName(item);return q&&recipeText(d).includes(q);}
   function allowed(){
@@ -279,7 +296,7 @@
     const fav=new Set(favoriteIds());
     const season=seasonFor(new Date(weekKey+"T12:00:00"));
     const pool=allowed().slice().sort((a,b)=>{
-      const ageA=recentMealAge(a.id,weekKey),ageB=recentMealAge(b.id,weekKey),seasonA=seasonTags(a).includes(season)?120000000:0,seasonB=seasonTags(b).includes(season)?120000000:0;
+      const ageA=recentMealAge(a.id,weekKey),ageB=recentMealAge(b.id,weekKey),date=new Date(weekKey+"T12:00:00"),seasonA=monthScore(a,date).score*120000000,seasonB=monthScore(b,date).score*120000000;
       const repeatA=ageA===1?900000000:ageA===2?350000000:ageA===3?120000000:0;
       const repeatB=ageB===1?900000000:ageB===2?350000000:ageB===3?120000000:0;
       const favA=fav.has(a.id)&&ageA!==1?180000000:0,favB=fav.has(b.id)&&ageB!==1?180000000:0;
@@ -406,5 +423,5 @@
   function restoreDislike(id){const bad=new Set(read(DISLIKES,[]));bad.delete(id);localStorage.setItem(DISLIKES,JSON.stringify([...bad]));return generate();}
   function preferences(){const ingredients=ingredientPrefs();return {favorites:favoriteIds().map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),dislikes:read(DISLIKES,[]).map(id=>dinners.find(x=>x.id===id)).filter(Boolean).map(x=>({id:x.id,title:x.t})),ingredientLikes:ingredients.likes,ingredientDislikes:ingredients.dislikes,recipeCount:dinners.length};}
   function allRecipes(){return allowed().map(x=>getRecipe(x.id)).filter(Boolean);}
-  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference,options,setOption,seasonFor,seasonTags};
+  window.DenatMealEngine={generate,replace,replaceQuick,dislike,getRecipe,allRecipes,toggleFavorite,isFavorite,restoreDislike,preferences,resetPreferences,rotationHistory,ingredientPrefs,addIngredientPreference,removeIngredientPreference,options,setOption,seasonFor,seasonTags,monthProduce,monthScore,isMonthlySeasonal};
 })();
