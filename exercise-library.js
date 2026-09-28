@@ -155,6 +155,20 @@
     const q=norm(query);
     return exercises.filter(e=>(!group||e.group===group)&&(!equipment||e.equipment.includes(equipment))&&(!q||norm([e.name,e.group,...e.muscles,...e.equipment].join(" ")).includes(q)));
   }
+  function alternatives(name,mode="similar"){
+    const current=find(name);if(!current)return[];
+    let pool=exercises.filter(e=>e.id!==current.id);
+    if(mode==="hotel")pool=pool.filter(e=>e.equipment.every(x=>["Poids du corps","Élastique","Banc"].includes(x)));
+    const curMuscles=new Set(current.muscles),score=e=>{
+      const overlap=e.muscles.filter(x=>curMuscles.has(x)).length*10;
+      const group=e.group===current.group?12:0,category=e.category===current.category?3:0;
+      const equip=mode==="hotel"?0:e.equipment.some(x=>current.equipment.includes(x))?2:0;
+      return overlap+group+category+equip;
+    };
+    return pool.map(e=>({e,score:score(e)})).filter(x=>x.score>=10).sort((a,b)=>b.score-a.score||a.e.name.localeCompare(b.e.name)).map(x=>x.e).slice(0,8);
+  }
+  function hotelExercises(group=""){return exercises.filter(e=>(!group||e.group===group)&&e.equipment.every(x=>["Poids du corps","Élastique","Banc"].includes(x)));}
+
   function close(){document.querySelector(".dl-library-modal")?.remove();}
   function open(options={}){
     close();
@@ -203,5 +217,5 @@
     .dl-lib-copy{display:flex;flex-direction:column;gap:3px;min-width:0}.dl-lib-copy b{color:var(--text);font-size:13px}.dl-lib-copy small{color:var(--muted);font-size:10px;font-weight:500}
   `;document.head.appendChild(style);
 
-  window.DenatExerciseLibrary={exercises,find,canonicalName,sameExercise,auditNames,auditState,filtered,toExercise,groups,equipments,open,norm};
+  window.DenatExerciseLibrary={exercises,find,canonicalName,sameExercise,auditNames,auditState,filtered,alternatives,hotelExercises,toExercise,groups,equipments,open,norm};
 })();
