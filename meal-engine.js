@@ -267,11 +267,12 @@
       const favA=fav.has(a.id)&&ageA!==1?180000000:0,favB=fav.has(b.id)&&ageB!==1?180000000:0;
       return (seed(weekKey+a.id)+repeatA-favA-seasonA)-(seed(weekKey+b.id)+repeatB-favB-seasonB);
     });
-    const out=[],counts={},cats={};
+    const out=[],counts={},cats={},methods={};
     for(const d of pool){
-      const p=proteinOf(d),cat=mealCategory(d);
-      if((counts[p]||0)>=2||(cats[cat]||0)>=3)continue;
-      out.push(d);counts[p]=(counts[p]||0)+1;cats[cat]=(cats[cat]||0)+1;if(out.length===7)break;
+      const p=proteinOf(d),cat=mealCategory(d),method=cookingMethod(d);
+      if((counts[p]||0)>=2||(cats[cat]||0)>=3||(methods[method]||0)>=3)continue;
+      if(out.length>=2&&cookingMethod(out.at(-1))===method&&cookingMethod(out.at(-2))===method)continue;
+      out.push(d);counts[p]=(counts[p]||0)+1;cats[cat]=(cats[cat]||0)+1;methods[method]=(methods[method]||0)+1;if(out.length===7)break;
     }
     for(const d of pool){if(out.length===7)break;if(!out.includes(d))out.push(d);}
     return out;
@@ -302,12 +303,12 @@
     const days=chosen.map((d,i)=>{
       const prev=i===0?prevSunday:chosen[i-1],b=breakfasts[(seed(weekKey)+i)%breakfasts.length],s=snacks[(seed(weekKey)+i*2)%snacks.length];
       const opt=options(),daily=consolidate([...b[3],...d.shop,...(opt.includeSnacksInShopping?s[3]:[])]),nutrition={p1:dayMacros(d,prev,b,s,"p1"),p2:dayMacros(d,prev,b,s,"p2")};
-      return {name:NAMES[i],estimateEUR:d.cost+5,breakfast:b.slice(0,3),lunch:mealArray(prev," — restes de la veille"),dinner:mealArray(d),dinnerId:d.id,dinnerCategory:mealCategory(d),dinnerMinutes:d.prep+d.cook,dinnerFavorite:isFavorite(d.id),snack:s.slice(0,3),nutrition,shop:daily.map(x=>x.text)};
+      return {name:NAMES[i],estimateEUR:d.cost+5,breakfast:b.slice(0,3),lunch:mealArray(prev," — restes de la veille"),dinner:mealArray(d),dinnerId:d.id,dinnerCategory:mealCategory(d),dinnerMinutes:d.prep+d.cook,dinnerFavorite:isFavorite(d.id),dinnerMethod:cookingMethod(d),snack:s.slice(0,3),nutrition,shop:daily.map(x=>x.text)};
     });
     const total=days.reduce((n,d)=>n+d.estimateEUR,0);
     const consolidated=consolidate(days.flatMap(d=>d.shop));
     rememberWeek(weekKey,days.map(d=>d.dinnerId));
-    const variety={proteins:new Set(days.map(d=>proteinOf(dinners.find(x=>x.id===d.dinnerId)||{}))).size,categories:new Set(days.map(d=>d.dinnerCategory)).size,recentRepeats:days.filter(d=>recentMealAge(d.dinnerId,weekKey)===1).length};
+    const variety={proteins:new Set(days.map(d=>proteinOf(dinners.find(x=>x.id===d.dinnerId)||{}))).size,categories:new Set(days.map(d=>d.dinnerCategory)).size,methods:new Set(days.map(d=>d.dinnerMethod)).size,recentRepeats:days.filter(d=>recentMealAge(d.dinnerId,weekKey)===1).length};
     return {weekOf:weekKey,generatedAt:iso(new Date()),source:"Denat Life automatic weekly engine V2",retailer:"Carrefour France",weeklyEstimateEUR:total,weeklyEstimateRangeEUR:[Math.round(total*.88),Math.round(total*1.12)],estimateNote:"Estimation indicative. Les prix réels varient selon le magasin, les promotions, les marques et les formats.",mealPrepNote:"Le dîner est préparé en 4 portions : dîner pour deux puis le même repas au repas du midi du lendemain.",season:seasonFor(new Date(weekKey+"T12:00:00")),options:options(),variety,days,weekShop:consolidated.map(x=>x.text),weekShopCategories:consolidated.map(x=>x.category)};
   }
 
